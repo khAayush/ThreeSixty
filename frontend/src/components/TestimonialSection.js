@@ -34,7 +34,7 @@ const companies = ["TechCorp", "Herald College", "InnovateLabs", "Informatics", 
 
 const TestimonialSection = () => {
     return ( 
-        <section className="py-16 px-4 md:px-10 lg:px-28 bg-[#fafbfc] text-center">
+        <section className="py-16 px-4 md:px-10 lg:px-28 bg-[#fafbfc] text-center" id="testimonials">
       <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-600 rounded-full font-medium text-sm mb-5">
         Testimonials
       </span>

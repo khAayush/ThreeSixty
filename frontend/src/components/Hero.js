@@ -19,7 +19,7 @@ const Hero = () => {
         </div>
         <div className="flex items-center gap-3">
           <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow focus:outline-none transition">
-            Get Started Free
+            Get Started
           </button>
           <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-5 py-3 rounded-lg font-semibold hover:shadow transition">
             <svg width="20" height="20" fill="none" stroke="currentColor" className="mr-1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2"/><polygon points="10,8 16,12 10,16 10,8" fill="currentColor"/></svg>

@@ -65,7 +65,7 @@ const features = [
 
 const FeatureSection = () => {
     return ( 
-        <section className="px-4 md:px-12 lg:px-32 py-16 bg-[#fafbfc]">
+        <section className="px-4 md:px-12 lg:px-32 py-16 bg-[#fafbfc]" id="features">
       <div className="max-w-3xl mx-auto text-center mb-10">
         <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 rounded-full font-medium text-sm mb-4">Features</span>
         <h2 className="text-lg md:text-xl font-medium mb-2">

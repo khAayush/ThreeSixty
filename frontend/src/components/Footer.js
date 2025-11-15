@@ -30,7 +30,7 @@ const socialIcons = [
 
 const Footer = () => {
     return ( 
-        <footer className="bg-[#262930] text-gray-400 pt-12 pb-4 px-8">
+        <footer className="bg-[#262930] text-gray-400 pt-12 pb-4 px-8" id="footer">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between md:items-start gap-12">
         <div className="flex-1 min-w-[250px] max-w-sm">
           <div className="flex items-center mb-3 gap-2">
@@ -50,7 +50,7 @@ const Footer = () => {
               className="bg-[#2e323c] border border-gray-700 px-4 py-2 rounded-lg placeholder-gray-500 text-gray-100 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your email"
             />
-            
+
             <button
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition"
