@@ -50,6 +50,7 @@ const Footer = () => {
               className="bg-[#2e323c] border border-gray-700 px-4 py-2 rounded-lg placeholder-gray-500 text-gray-100 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your email"
             />
+            
             <button
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow-sm transition"
@@ -72,7 +73,7 @@ const Footer = () => {
           ))}
         </div>
       </div>
-      
+
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mt-10 pt-4 border-t border-[#353840] gap-4">
         <div className="text-gray-500 text-sm">&copy; 2025 ThreeSixty. All rights reserved.</div>
         <div className="flex gap-6">
