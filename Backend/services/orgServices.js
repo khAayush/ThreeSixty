@@ -1,19 +1,12 @@
-const mongoose = require("mongoose");
+const Organization = require("../models/Organization");
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true, lowercase: true },
-  passwordHash: { type: String, required: true },
-  role: {
-    type: String,
-    enum: ["SUPER_ADMIN", "ADMIN", "EMPLOYEE"],
-    default: "EMPLOYEE",
-  },
-  orgId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Organization",
-    required: true,
-  },
-}, { timestamps: true });
+const findOrgByDomain = (domain) => {
+  return Organization.findOne({ domain });
+};
 
-module.exports = mongoose.model("User", userSchema);
+const createOrgFromDomain = (domain) => {
+  const name = domain.split(".")[0].replace(/[-_]/g, " ");
+  return Organization.create({ name, domain, status: "PENDING" });
+};
+
+module.exports = { findOrgByDomain, createOrgFromDomain };
