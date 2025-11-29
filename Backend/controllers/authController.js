@@ -1,9 +1,13 @@
+const OAuth2Client = require("google-auth-library").OAuth2Client;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { findOrgByDomain, createOrgFromDomain } = require("../services/orgServices");
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const getDomainFromEmail = (email) => email.split("@")[1]?.toLowerCase();
 
@@ -76,12 +80,12 @@ const login = async (req, res, next) => {
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user || !user.passwordHash) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "User not found, check your email address." });
     }
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid Password" });
     }
 
     const token = signToken(user);
@@ -103,10 +107,24 @@ const login = async (req, res, next) => {
 
 const googleSignIn = async (req, res, next) => {
   try {
-    const { email, googleId, name } = req.body; // frontend sends these
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ message: "Missing idToken" });
+    }
+
+    // token verification
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const googleId = payload.sub;
+    const email = payload.email;
+    const name = payload.name || email.split("@")[0];
 
     if (!email || !googleId) {
-      return res.status(400).json({ message: "Missing Google data" });
+      return res.status(400).json({ message: "Invalid Google token" });
     }
 
     let user = await User.findOne({ email: email.toLowerCase() });
