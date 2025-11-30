@@ -1,5 +1,6 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import PasswordInput from "../components/PasswordInput";
 
 const API_URL = "http://localhost:8000/api";
 
@@ -146,28 +147,22 @@ const ResetPassword = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="block mb-1 text-gray-700 font-medium">
-                New password
-              </label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
+              <PasswordInput
+                id="reset-new"
+                label="New password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
 
             <div className="mb-5">
-              <label className="block mb-1 text-gray-700 font-medium">
-                Confirm password
-              </label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
+              <PasswordInput
+                id="reset-confirm"
+                label="Confirm password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
+                required
               />
             </div>
 

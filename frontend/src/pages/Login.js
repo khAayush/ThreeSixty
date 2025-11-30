@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import PasswordInput from "../components/PasswordInput";
 
 const API_URL = "http://localhost:8000/api";
 
@@ -98,14 +99,12 @@ const Login = () => {
               />
             </div>
             <div className="mb-2">
-              <label className="block mb-1 text-gray-700 font-medium">Password</label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="Enter your password"
-                required
+              <PasswordInput
+                id="login-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
               />
             </div>
             <div className="flex items-center justify-between mb-5">

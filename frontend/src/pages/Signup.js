@@ -1,6 +1,7 @@
 import {useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import PasswordInput from "../components/PasswordInput";
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -120,14 +121,12 @@ const Signup = () => {
               />
             </div>
             <div className="mb-1">
-              <label className="block mb-1 text-gray-700 font-medium">Password</label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="Create a strong password"
-                required
+              <PasswordInput
+                id="signup-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a strong password"
+                required
               />
             </div>
             <div className="text-xs text-gray-400 mb-4">Must be at least 8 characters</div>
