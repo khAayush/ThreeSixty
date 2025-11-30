@@ -99,6 +99,7 @@ const Login = () => {
               />
             </div>
             <div className="mb-2">
+              <label className="block mb-1 text-gray-700 font-medium">Password</label>
               <PasswordInput
                 id="login-password"
                 value={password}

@@ -93,6 +93,7 @@ const navigate = useNavigate();
 
             <form onSubmit={handleSetPassword} className="space-y-4">
               <div>
+                <label className="block mb-1 text-gray-700 font-medium">Password</label>
                 <PasswordInput
                   id="set-password-new"
                   label="New password"
@@ -103,6 +104,7 @@ const navigate = useNavigate();
               </div>
 
               <div>
+                <label className="block mb-1 text-gray-700 font-medium">Password</label>
                 <PasswordInput
                   id="set-password-confirm"
                   label="Confirm password"

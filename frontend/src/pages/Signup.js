@@ -121,6 +121,7 @@ const Signup = () => {
               />
             </div>
             <div className="mb-1">
+              <label className="block mb-1 text-gray-700 font-medium">Password</label>
               <PasswordInput
                 id="signup-password"
                 value={password}

@@ -147,6 +147,7 @@ const ResetPassword = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
+              <label className="block mb-1 text-gray-700 font-medium">Password</label>
               <PasswordInput
                 id="reset-new"
                 label="New password"
@@ -157,6 +158,7 @@ const ResetPassword = () => {
             </div>
 
             <div className="mb-5">
+              <label className="block mb-1 text-gray-700 font-medium">Confirm Password</label>
               <PasswordInput
                 id="reset-confirm"
                 label="Confirm password"
