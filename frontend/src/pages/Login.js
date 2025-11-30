@@ -1,11 +1,10 @@
-import  {useState} from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = "http://localhost:8000/api";
 
 const Login = () => {
-
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,8 +36,7 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // navigate("/dashboard");
-      console.log("Login successful");
+      navigate("/dashboard");
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -46,11 +44,20 @@ const Login = () => {
     }
   };
 
-    return ( 
-        <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+  return (
+    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
       <div className="pt-6 pl-8">
-        <Link to="/" className="flex items-center text-gray-400 hover:text-gray-900 text-sm font-medium">
-          <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <Link
+          to="/"
+          className="flex items-center text-gray-400 hover:text-gray-900 text-sm font-medium"
+        >
+          <svg
+            className="mr-2 h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
           Back to home
@@ -68,7 +75,9 @@ const Login = () => {
         </div>
 
         <div className="w-full max-w-md mx-auto bg-white py-10 px-8 rounded-2xl shadow border border-gray-100">
-          <h2 className="text-xl mb-2 font-normal text-center text-gray-700">Welcome back</h2>
+          <h2 className="text-xl mb-2 font-normal text-center text-gray-700">
+            Welcome back
+          </h2>
 
           {error && (
             <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
@@ -104,7 +113,10 @@ const Login = () => {
                 <input type="checkbox" className="mr-2 h-4 w-4 rounded border-gray-300" />
                 Remember me
               </label>
-              <Link to="/forgot-password" className="text-blue-500 hover:underline text-sm font-medium">
+              <Link
+                to="/forgot-password"
+                className="text-blue-500 hover:underline text-sm font-medium"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -144,6 +156,7 @@ const Login = () => {
 
                   localStorage.setItem("token", data.token);
                   localStorage.setItem("user", JSON.stringify(data.user));
+
                   navigate("/dashboard");
                 } catch (err) {
                   console.error("Google login error", err);
@@ -159,7 +172,10 @@ const Login = () => {
 
           <div className="text-center text-sm text-gray-500 mt-2">
             Don&apos;t have an account?
-            <Link to="/signup" className="text-blue-500 font-medium ml-1 hover:underline">
+            <Link
+              to="/signup"
+              className="text-blue-500 font-medium ml-1 hover:underline"
+            >
               Sign up
             </Link>
           </div>
@@ -170,7 +186,7 @@ const Login = () => {
         </div>
       </div>
     </div>
-     );
-}
- 
+  );
+};
+
 export default Login;

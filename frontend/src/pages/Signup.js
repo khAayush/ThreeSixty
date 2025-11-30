@@ -180,6 +180,7 @@ const Signup = () => {
 
                   localStorage.setItem("token", data.token);
                   localStorage.setItem("user", JSON.stringify(data.user));
+
                   navigate("/dashboard");
                 } catch (err) {
                   console.error("Google login error", err);

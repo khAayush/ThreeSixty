@@ -1,32 +1,62 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:8000/api";
 
-const ForgotPassword = () => {
+const ResetPassword = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const qEmail = searchParams.get("email");
+    const qToken = searchParams.get("token");
+    setEmail(qEmail);
+    setToken(qToken);
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
-    setLoading(true);
 
+    if (!email || !token) {
+        console.log("Missing email or token:", { email, token });
+      setError("Invalid or missing reset link.");
+      return;
+    }
+
+    if (password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/auth/forgot-password`, {
+      const res = await fetch(`${API_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, token, newPassword: password }),
       });
 
       const data = await res.json();
-      setMessage(data.message || "If that email exists, reset instructions have been sent.");
-      // if (data.resetToken) {
-      //   console.log("DEV reset token:", data.resetToken);
-      // }
+
+      if (!res.ok) {
+        setError(data.message || "Failed to reset password");
+        setLoading(false);
+        return;
+      }
+
+      setMessage("Password reset successfully. You can now sign in.");
+      setTimeout(() => navigate("/login"), 1500);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -34,8 +64,8 @@ const ForgotPassword = () => {
     }
   };
 
-    return ( 
-      <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+  return (
+    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
       <div className="pt-6 pl-8">
         <Link
           to="/"
@@ -90,13 +120,15 @@ const ForgotPassword = () => {
                   strokeWidth={2}
                   viewBox="0 0 24 24"
                 >
-                  <rect x="3" y="7" width="18" height="10" rx="2" />
-                  <path d="M3 7l9 6 9-6" />
+                  <rect x="5" y="11" width="14" height="8" rx="2" />
+                  <path d="M9 11V8a3 3 0 0 1 6 0v3" />
                 </svg>
               </div>
-              <h2 className="text-lg font-medium text-gray-800 mb-1">Forgot password?</h2>
+              <h2 className="text-lg font-medium text-gray-800 mb-1">
+                Reset your password
+              </h2>
               <div className="text-gray-400 text-base mb-4 text-center">
-                No worries, we&apos;ll send you reset instructions
+                Enter a new password for your account
               </div>
             </div>
           </div>
@@ -113,29 +145,40 @@ const ForgotPassword = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-5">
-              <label className="block mb-1 text-gray-700 font-medium">Email</label>
+            <div className="mb-3">
+              <label className="block mb-1 text-gray-700 font-medium">
+                New password
+              </label>
               <input
-                type="email"
+                type="password"
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="you@company.com"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+
+            <div className="mb-5">
+              <label className="block mb-1 text-gray-700 font-medium">
+                Confirm password
+              </label>
+              <input
+                type="password"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                required
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+              />
+            </div>
+
             <button
               type="submit"
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium text-base transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Sending..." : "Send Reset Link"}
+              {loading ? "Resetting..." : "Reset password"}
             </button>
           </form>
-
-          <div className="text-sm text-gray-400 text-center mt-4">
-            We&apos;ll send a password reset link to your email if an account exists
-          </div>
         </div>
 
         <div className="mt-8 text-gray-400 text-sm text-center">
@@ -143,7 +186,7 @@ const ForgotPassword = () => {
         </div>
       </div>
     </div>
-     );
-}
- 
-export default ForgotPassword;
+  );
+};
+
+export default ResetPassword;

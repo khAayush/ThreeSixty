@@ -1,6 +1,7 @@
 const OAuth2Client = require("google-auth-library").OAuth2Client;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const User = require("../models/User");
 const { findOrgByDomain, createOrgFromDomain } = require("../services/orgServices");
 
@@ -66,6 +67,7 @@ const register = async (req, res, next) => {
         email: user.email,
         role: user.role,
         orgId: user.orgId,
+        hasPassword: !!user.passwordHash, 
       },
       token,
     });
@@ -97,6 +99,7 @@ const login = async (req, res, next) => {
         email: user.email,
         role: user.role,
         orgId: user.orgId,
+        hasPassword: !!user.passwordHash, 
       },
       token,
     });
@@ -167,6 +170,7 @@ const googleSignIn = async (req, res, next) => {
         email: user.email,
         role: user.role,
         orgId: user.orgId,
+        hasPassword: !!user.passwordHash, 
       },
       token,
     });
@@ -197,4 +201,64 @@ const setPassword = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, googleSignIn, setPassword };
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  console.log(email);
+
+  try {
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const resetToken = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "5m" });
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>You requested a password reset. Click the link below to reset your password:</p>
+             <a href="http://localhost:3000/reset-password?token=${resetToken}&email=${user.email}">Reset Password</a>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ status: "ok", message: "Password reset email sent" });
+    console.log("Reset email sent");
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+    console.error(error);
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const isSame = await bcrypt.compare(newPassword, user.passwordHash);
+    if (isSame) {
+      return res.status(400).json({ error: "New password cannot be the same as the old password." });
+    }
+    const encryptedPassword = await bcrypt.hash(newPassword, 10);
+    await User.findByIdAndUpdate(decoded.id, { passwordHash: encryptedPassword });
+    res.json({ status: "ok", message: "Password reset successful" });
+  } catch (error) {
+    res.status(400).json({ error: "Invalid or expired token" });
+  }
+};
+
+module.exports = { register, login, googleSignIn, setPassword, forgotPassword, resetPassword };
