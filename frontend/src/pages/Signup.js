@@ -91,7 +91,7 @@ const Signup = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="John"
+                  placeholder="Aayush"
                   required
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
@@ -102,7 +102,7 @@ const Signup = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  placeholder="Doe"
+                  placeholder="Khatiwada"
                   required
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}

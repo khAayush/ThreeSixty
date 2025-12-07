@@ -37,7 +37,14 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      navigate("/dashboard");
+      // NEW: redirect based on role
+      if (data.user.role === "ADMIN") {
+        navigate("/admin-dashboard");
+      } else if (data.user.role === "EMPLOYEE") {
+        navigate("/employee-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -157,7 +164,13 @@ const Login = () => {
                   localStorage.setItem("token", data.token);
                   localStorage.setItem("user", JSON.stringify(data.user));
 
-                  navigate("/dashboard");
+                  if (data.user.role === "ADMIN") {
+                    navigate("/admin-dashboard");
+                  } else if (data.user.role === "EMPLOYEE") {
+                    navigate("/employee-dashboard");
+                  } else {
+                    navigate("/dashboard");
+                  }
                 } catch (err) {
                   console.error("Google login error", err);
                 }
