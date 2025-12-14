@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 
 import './App.css';
+import SupAdminDashboard from "./pages/SupAdminDashboard";
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+        <Route path="/supadmin-dashboard" element={<SupAdminDashboard />} />
      </Routes>
    </Router>
      <Toaster position="top-right" />
