@@ -1,65 +1,64 @@
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import PasswordInput from "../components/PasswordInput";
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import PasswordInput from '../components/PasswordInput';
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = 'http://localhost:8000/api';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [token, setToken] = useState("");
+  const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
 
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const qEmail = searchParams.get("email");
-    const qToken = searchParams.get("token");
+    const qEmail = searchParams.get('email');
+    const qToken = searchParams.get('token');
     setEmail(qEmail);
     setToken(qToken);
   }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setMessage("");
+    setError('');
+    setMessage('');
 
     if (!email || !token) {
-        console.log("Missing email or token:", { email, token });
-      setError("Invalid or missing reset link.");
+      setError('Invalid or missing reset link.');
       return;
     }
 
     if (password !== confirm) {
-      setError("Passwords do not match");
+      setError('Passwords do not match');
       return;
     }
 
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/auth/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, token, newPassword: password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Failed to reset password");
+        setError(data.message || 'Failed to reset password');
         setLoading(false);
         return;
       }
 
-      setMessage("Password reset successfully. You can now sign in.");
-      setTimeout(() => navigate("/login"), 1500);
+      setMessage('Password reset successfully. You can now sign in.');
+      setTimeout(() => navigate('/login'), 1500);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -125,9 +124,7 @@ const ResetPassword = () => {
                   <path d="M9 11V8a3 3 0 0 1 6 0v3" />
                 </svg>
               </div>
-              <h2 className="text-lg font-medium text-gray-800 mb-1">
-                Reset your password
-              </h2>
+              <h2 className="text-lg font-medium text-gray-800 mb-1">Reset your password</h2>
               <div className="text-gray-400 text-base mb-4 text-center">
                 Enter a new password for your account
               </div>
@@ -173,7 +170,7 @@ const ResetPassword = () => {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium text-base transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Resetting..." : "Reset password"}
+              {loading ? 'Resetting...' : 'Reset password'}
             </button>
           </form>
         </div>

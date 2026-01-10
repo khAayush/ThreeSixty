@@ -1,27 +1,27 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
-import PasswordInput from "../components/PasswordInput";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
+import PasswordInput from '../components/PasswordInput';
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = 'http://localhost:8000/api';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
@@ -29,24 +29,24 @@ const Login = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Login failed");
+        setError(data.message || 'Login failed');
         setLoading(false);
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
       // NEW: redirect based on role
-      if (data.user.role === "ADMIN") {
-        navigate("/admin-dashboard");
-      } else if (data.user.role === "EMPLOYEE") {
-        navigate("/employee-dashboard");
+      if (data.user.role === 'ADMIN') {
+        navigate('/admin-dashboard');
+      } else if (data.user.role === 'EMPLOYEE') {
+        navigate('/employee-dashboard');
       } else {
-        navigate("/dashboard");
+        navigate('/dashboard');
       }
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -83,9 +83,7 @@ const Login = () => {
         </div>
 
         <div className="w-full max-w-md mx-auto bg-white py-10 px-8 rounded-2xl shadow border border-gray-100">
-          <h2 className="text-xl mb-2 font-normal text-center text-gray-700">
-            Welcome back
-          </h2>
+          <h2 className="text-xl mb-2 font-normal text-center text-gray-700">Welcome back</h2>
 
           {error && (
             <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
@@ -132,7 +130,7 @@ const Login = () => {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white py-2.5 rounded-lg font-medium text-base transition"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
@@ -149,8 +147,8 @@ const Login = () => {
                   const idToken = credentialResponse.credential;
 
                   const res = await fetch(`${API_URL}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idToken }),
                   });
 
@@ -161,22 +159,22 @@ const Login = () => {
                     return;
                   }
 
-                  localStorage.setItem("token", data.token);
-                  localStorage.setItem("user", JSON.stringify(data.user));
+                  localStorage.setItem('token', data.token);
+                  localStorage.setItem('user', JSON.stringify(data.user));
 
-                  if (data.user.role === "ADMIN") {
-                    navigate("/admin-dashboard");
-                  } else if (data.user.role === "EMPLOYEE") {
-                    navigate("/employee-dashboard");
+                  if (data.user.role === 'ADMIN') {
+                    navigate('/admin-dashboard');
+                  } else if (data.user.role === 'EMPLOYEE') {
+                    navigate('/employee-dashboard');
                   } else {
-                    navigate("/dashboard");
+                    navigate('/dashboard');
                   }
                 } catch (err) {
-                  console.error("Google login error", err);
+                  console.error('Google login error', err);
                 }
               }}
               onError={() => {
-                console.error("Google Login Failed");
+                console.error('Google Login Failed');
               }}
               shape="pill"
               width="100%"
@@ -185,10 +183,7 @@ const Login = () => {
 
           <div className="text-center text-sm text-gray-500 mt-2">
             Don&apos;t have an account?
-            <Link
-              to="/signup"
-              className="text-blue-500 font-medium ml-1 hover:underline"
-            >
+            <Link to="/signup" className="text-blue-500 font-medium ml-1 hover:underline">
               Sign up
             </Link>
           </div>

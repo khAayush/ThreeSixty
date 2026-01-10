@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Squares2X2Icon,
   CubeIcon,
@@ -9,7 +9,7 @@ import {
   ExclamationTriangleIcon,
   UsersIcon,
   Cog6ToothIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 const EmployeeDashboard = () => {
   return (
@@ -21,29 +21,25 @@ const EmployeeDashboard = () => {
           <div className="w-9 h-9 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xs font-semibold mr-2">
             360°
           </div>
-          <span className="font-semibold text-gray-900 text-sm">
-            ThreeSixty
-          </span>
+          <span className="font-semibold text-gray-900 text-sm">ThreeSixty</span>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 px-3 pt-4 text-sm space-y-1">
           {[
-            { label: "Overview", icon: Squares2X2Icon },
-            { label: "My Assets", icon: CubeIcon },
-            { label: "Request Asset", icon: ClipboardDocumentListIcon },
-            { label: "Tickets", icon: TicketIcon },
-            { label: "Lost & Found", icon: ExclamationTriangleIcon },
-            { label: "Admin Contacts", icon: UsersIcon },
-            { label: "Chat", icon: ChatBubbleBottomCenterTextIcon },
-            { label: "Settings", icon: Cog6ToothIcon },
+            { label: 'Overview', icon: Squares2X2Icon },
+            { label: 'My Assets', icon: CubeIcon },
+            { label: 'Request Asset', icon: ClipboardDocumentListIcon },
+            { label: 'Tickets', icon: TicketIcon },
+            { label: 'Lost & Found', icon: ExclamationTriangleIcon },
+            { label: 'Admin Contacts', icon: UsersIcon },
+            { label: 'Chat', icon: ChatBubbleBottomCenterTextIcon },
+            { label: 'Settings', icon: Cog6ToothIcon },
           ].map((item, idx) => (
             <button
               key={item.label}
               className={`w-full flex items-center px-3 py-2 rounded-lg ${
-                idx === 0
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-50"
+                idx === 0 ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               <item.icon className="w-5 h-5 mr-3" />
@@ -80,30 +76,16 @@ const EmployeeDashboard = () => {
           {/* Welcome + top cards */}
           <section className="space-y-4">
             <div>
-              <h1 className="text-sm font-semibold text-gray-900">
-                Welcome back, Samip!
-              </h1>
+              <h1 className="text-sm font-semibold text-gray-900">Welcome back, Samip!</h1>
               <p className="text-xs text-gray-500 mt-1">
                 Here&apos;s what&apos;s happening with your assets and requests
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <TopStatCard
-                label="My Assets"
-                value="3"
-                description="Currently assigned to you"
-              />
-              <TopStatCard
-                label="Pending Requests"
-                value="1"
-                description="Awaiting approval"
-              />
-              <TopStatCard
-                label="Open Tickets"
-                value="1"
-                description="Need attention"
-              />
+              <TopStatCard label="My Assets" value="3" description="Currently assigned to you" />
+              <TopStatCard label="Pending Requests" value="1" description="Awaiting approval" />
+              <TopStatCard label="Open Tickets" value="1" description="Need attention" />
             </div>
           </section>
 
@@ -111,22 +93,20 @@ const EmployeeDashboard = () => {
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* My assets list */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">
-                My Assets
-              </h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">My Assets</h2>
               <div className="space-y-3">
                 {[
                   {
                     name: 'MacBook Pro 16" M3',
-                    code: "TC-LAP-001",
+                    code: 'TC-LAP-001',
                   },
                   {
                     name: 'LG UltraWide 34"',
-                    code: "TC-MON-001",
+                    code: 'TC-MON-001',
                   },
                   {
-                    name: "Logitech MX Keys Mini",
-                    code: "TC-KEY-003",
+                    name: 'Logitech MX Keys Mini',
+                    code: 'TC-KEY-003',
                   },
                 ].map((asset) => (
                   <div
@@ -138,9 +118,7 @@ const EmployeeDashboard = () => {
                         <CubeIcon className="w-5 h-5 text-blue-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {asset.name}
-                        </p>
+                        <p className="text-sm font-medium text-gray-900">{asset.name}</p>
                         <p className="text-xs text-gray-500">{asset.code}</p>
                       </div>
                     </div>
@@ -154,43 +132,36 @@ const EmployeeDashboard = () => {
 
             {/* Recent activity */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">
-                Recent Activity
-              </h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">Recent Activity</h2>
               <div className="space-y-3 text-xs">
                 {[
                   {
-                    title: "Request Approved",
+                    title: 'Request Approved',
                     text: 'Your request for Dell UltraSharp 27" was approved',
-                    date: "Dec 13, 2024",
+                    date: 'Dec 13, 2024',
                   },
                   {
-                    title: "Ticket Updated",
-                    text: "John Admin replied to your ticket “Monitor not detected”",
-                    date: "Dec 13, 2024",
+                    title: 'Ticket Updated',
+                    text: 'John Admin replied to your ticket “Monitor not detected”',
+                    date: 'Dec 13, 2024',
                   },
                   {
-                    title: "Asset Assigned",
-                    text: "Logitech MX Keys Mini was assigned to you",
-                    date: "Feb 10, 2024",
+                    title: 'Asset Assigned',
+                    text: 'Logitech MX Keys Mini was assigned to you',
+                    date: 'Feb 10, 2024',
                   },
                   {
-                    title: "Ticket Resolved",
-                    text: "Your ticket “Request for software installation” was resolved",
-                    date: "Dec 9, 2024",
+                    title: 'Ticket Resolved',
+                    text: 'Your ticket “Request for software installation” was resolved',
+                    date: 'Dec 9, 2024',
                   },
                 ].map((item) => (
-                  <div
-                    key={item.title + item.date}
-                    className="flex items-start justify-between"
-                  >
+                  <div key={item.title + item.date} className="flex items-start justify-between">
                     <div>
                       <p className="font-medium text-gray-900">{item.title}</p>
                       <p className="text-gray-500">{item.text}</p>
                     </div>
-                    <span className="text-gray-400 whitespace-nowrap ml-2">
-                      {item.date}
-                    </span>
+                    <span className="text-gray-400 whitespace-nowrap ml-2">{item.date}</span>
                   </div>
                 ))}
               </div>
@@ -201,9 +172,7 @@ const EmployeeDashboard = () => {
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* Pending requests */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">
-                Pending Requests
-              </h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">Pending Requests</h2>
               <div className="bg-[#f9fafb] rounded-xl px-4 py-4 text-xs">
                 <p className="font-medium text-gray-900 mb-1">iPad Pro 12.9"</p>
                 <p className="text-gray-500 mb-1">Requested on Dec 12, 2024</p>
@@ -218,9 +187,7 @@ const EmployeeDashboard = () => {
 
             {/* Open tickets */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">
-                Open Tickets
-              </h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">Open Tickets</h2>
               <div className="bg-[#f9fafb] rounded-xl px-4 py-4 text-xs">
                 <p className="font-medium text-gray-900 mb-1">
                   Monitor not detected when connected

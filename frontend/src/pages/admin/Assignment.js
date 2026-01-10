@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Squares2X2Icon,
   CubeIcon,
@@ -10,76 +10,75 @@ import {
   UsersIcon,
   Cog6ToothIcon,
   BellIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 const Assignment = () => {
-  const [activeTab, setActiveTab] = useState("requests");
+  const [activeTab, setActiveTab] = useState('requests');
 
   const requests = [
     {
-      name: "Jessica Williams",
-      item: "Laptops",
-      reason:
-        "Need laptop for new project work - current one is outdated.",
-      date: "Dec 12, 2024",
+      name: 'Jessica Williams',
+      item: 'Laptops',
+      reason: 'Need laptop for new project work - current one is outdated.',
+      date: 'Dec 12, 2024',
     },
     {
-      name: "David Park",
-      item: "Monitors",
-      reason: "Additional monitor for dual-screen setup",
-      date: "Dec 13, 2024",
+      name: 'David Park',
+      item: 'Monitors',
+      reason: 'Additional monitor for dual-screen setup',
+      date: 'Dec 13, 2024',
     },
     {
-      name: "Amanda Foster",
-      item: "Mobile Devices",
-      reason: "Company phone for client communications",
-      date: "Dec 13, 2024",
+      name: 'Amanda Foster',
+      item: 'Mobile Devices',
+      reason: 'Company phone for client communications',
+      date: 'Dec 13, 2024',
     },
   ];
 
   const assignments = [
     {
-      code: "TC-LAP-001",
-      asset: "MacBook Pro 16\" M3",
-      employee: "Sarah Johnson",
-      assigned: "Jan 20, 2024",
-      due: "—",
-      status: "active",
+      code: 'TC-LAP-001',
+      asset: 'MacBook Pro 16" M3',
+      employee: 'Sarah Johnson',
+      assigned: 'Jan 20, 2024',
+      due: '—',
+      status: 'active',
     },
     {
-      code: "TC-LAP-002",
-      asset: "Dell XPS 15",
-      employee: "Michael Chen",
-      assigned: "Feb 25, 2024",
-      due: "Feb 25, 2025",
-      status: "active",
+      code: 'TC-LAP-002',
+      asset: 'Dell XPS 15',
+      employee: 'Michael Chen',
+      assigned: 'Feb 25, 2024',
+      due: 'Feb 25, 2025',
+      status: 'active',
     },
     {
-      code: "TC-MON-001",
-      asset: "LG UltraWide 34\"",
-      employee: "Sarah Johnson",
-      assigned: "Jan 22, 2024",
-      due: "—",
-      status: "active",
+      code: 'TC-MON-001',
+      asset: 'LG UltraWide 34"',
+      employee: 'Sarah Johnson',
+      assigned: 'Jan 22, 2024',
+      due: '—',
+      status: 'active',
     },
     {
-      code: "TC-MOB-001",
-      asset: "iPhone 15 Pro",
-      employee: "Emma Davis",
-      assigned: "Sep 25, 2024",
-      due: "—",
-      status: "active",
+      code: 'TC-MOB-001',
+      asset: 'iPhone 15 Pro',
+      employee: 'Emma Davis',
+      assigned: 'Sep 25, 2024',
+      due: '—',
+      status: 'active',
     },
     {
-      code: "TC-KEY-001",
-      asset: "Logitech MX Keys",
-      employee: "Michael Chen",
-      assigned: "Feb 28, 2024",
-      due: "—",
-      status: "active",
+      code: 'TC-KEY-001',
+      asset: 'Logitech MX Keys',
+      employee: 'Michael Chen',
+      assigned: 'Feb 28, 2024',
+      due: '—',
+      status: 'active',
     },
   ];
-  
+
   return (
     <div className="min-h-screen flex bg-[#f5f7fb] text-gray-800">
       {/* Sidebar */}
@@ -93,22 +92,22 @@ const Assignment = () => {
 
         <nav className="flex-1 px-3 pt-4 text-sm space-y-1">
           {[
-            { label: "Overview", icon: Squares2X2Icon },
-            { label: "Assets", icon: CubeIcon },
-            { label: "Categories", icon: FolderIcon },
-            { label: "Assignments", icon: ClipboardDocumentListIcon },
-            { label: "Tickets", icon: TicketIcon },
-            { label: "Lost & Found", icon: ExclamationTriangleIcon },
-            { label: "Chat", icon: ChatBubbleBottomCenterTextIcon },
-            { label: "Users", icon: UsersIcon },
-            { label: "Settings", icon: Cog6ToothIcon },
+            { label: 'Overview', icon: Squares2X2Icon },
+            { label: 'Assets', icon: CubeIcon },
+            { label: 'Categories', icon: FolderIcon },
+            { label: 'Assignments', icon: ClipboardDocumentListIcon },
+            { label: 'Tickets', icon: TicketIcon },
+            { label: 'Lost & Found', icon: ExclamationTriangleIcon },
+            { label: 'Chat', icon: ChatBubbleBottomCenterTextIcon },
+            { label: 'Users', icon: UsersIcon },
+            { label: 'Settings', icon: Cog6ToothIcon },
           ].map((item) => (
             <button
               key={item.label}
               className={`w-full flex items-center px-3 py-2 rounded-lg ${
-                item.label === "Assignments"
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-50"
+                item.label === 'Assignments'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               <item.icon className="w-5 h-5 mr-3" />
@@ -144,9 +143,7 @@ const Assignment = () => {
         <main className="flex-1 px-8 py-6">
           {/* Header */}
           <section className="mb-5">
-            <h1 className="text-sm font-semibold text-gray-900">
-              Assignments &amp; Requests
-            </h1>
+            <h1 className="text-sm font-semibold text-gray-900">Assignments &amp; Requests</h1>
             <p className="text-xs text-gray-500 mt-1">
               Manage asset requests and track assignments
             </p>
@@ -157,30 +154,26 @@ const Assignment = () => {
             {/* Tabs */}
             <div className="flex items-center mb-4">
               <button
-                onClick={() => setActiveTab("requests")}
+                onClick={() => setActiveTab('requests')}
                 className={`px-4 py-1.5 rounded-full text-xs font-medium flex items-center ${
-                  activeTab === "requests"
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-600"
+                  activeTab === 'requests' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
                 }`}
               >
                 Requests
                 <span
                   className={`ml-2 px-2 py-0.5 rounded-full text-[11px] ${
-                    activeTab === "requests"
-                      ? "bg-white/10"
-                      : "bg-white text-gray-600"
+                    activeTab === 'requests' ? 'bg-white/10' : 'bg-white text-gray-600'
                   }`}
                 >
                   {requests.length}
                 </span>
               </button>
               <button
-                onClick={() => setActiveTab("assignments")}
+                onClick={() => setActiveTab('assignments')}
                 className={`ml-2 px-4 py-1.5 rounded-full text-xs ${
-                  activeTab === "assignments"
-                    ? "bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-600"
+                  activeTab === 'assignments'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-600'
                 }`}
               >
                 Assignments
@@ -188,7 +181,7 @@ const Assignment = () => {
             </div>
 
             {/* Content switches here */}
-            {activeTab === "requests" ? (
+            {activeTab === 'requests' ? (
               <RequestsTable requests={requests} />
             ) : (
               <AssignmentsTable assignments={assignments} />
@@ -223,9 +216,7 @@ const RequestsTable = ({ requests }) => (
               </span>
             </td>
             <td className="py-2 pr-4 text-gray-500 text-xs">{row.reason}</td>
-            <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
-              {row.date}
-            </td>
+            <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">{row.date}</td>
             <td className="py-2 pr-4">
               <span className="inline-flex px-2.5 py-1 rounded-full bg-yellow-50 text-[11px] text-yellow-600">
                 pending
@@ -265,12 +256,8 @@ const AssignmentsTable = ({ assignments }) => (
             <td className="py-2 pr-4 text-blue-600">{row.code}</td>
             <td className="py-2 pr-4 text-gray-800">{row.asset}</td>
             <td className="py-2 pr-4 text-gray-700">{row.employee}</td>
-            <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
-              {row.assigned}
-            </td>
-            <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
-              {row.due}
-            </td>
+            <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">{row.assigned}</td>
+            <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">{row.due}</td>
             <td className="py-2 pr-4">
               <span className="inline-flex px-2.5 py-1 rounded-full bg-blue-50 text-[11px] text-blue-600">
                 {row.status}
@@ -298,6 +285,5 @@ const AssignmentsTable = ({ assignments }) => (
     </table>
   </div>
 );
-
 
 export default Assignment;

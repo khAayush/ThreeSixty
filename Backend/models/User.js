@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
     },
 
     passwordHash: {
-      type: String
+      type: String,
     },
 
     googleId: {
@@ -23,17 +23,17 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["SUPER_ADMIN", "ADMIN", "EMPLOYEE"],
-      default: "EMPLOYEE",
+      enum: ['SUPER_ADMIN', 'ADMIN', 'EMPLOYEE'],
+      default: 'EMPLOYEE',
     },
 
     orgId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Organization",
+      ref: 'Organization',
       required: true,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);

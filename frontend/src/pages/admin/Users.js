@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Squares2X2Icon,
   CubeIcon,
@@ -11,64 +11,64 @@ import {
   Cog6ToothIcon,
   BellIcon,
   UserGroupIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 const users = [
   {
-    initials: "JA",
-    name: "John Administrator",
-    email: "john.admin@techcorp.com",
-    role: "Admin",
-    joined: "Jan 10, 2024",
-    status: "active",
+    initials: 'JA',
+    name: 'John Administrator',
+    email: 'john.admin@techcorp.com',
+    role: 'Admin',
+    joined: 'Jan 10, 2024',
+    status: 'active',
   },
   {
-    initials: "SJ",
-    name: "Sarah Johnson",
-    email: "sarah.johnson@techcorp.com",
-    role: "Employee",
-    joined: "Jan 20, 2024",
-    status: "active",
+    initials: 'SJ',
+    name: 'Sarah Johnson',
+    email: 'sarah.johnson@techcorp.com',
+    role: 'Employee',
+    joined: 'Jan 20, 2024',
+    status: 'active',
   },
   {
-    initials: "MC",
-    name: "Michael Chen",
-    email: "michael.chen@techcorp.com",
-    role: "Employee",
-    joined: "Feb 15, 2024",
-    status: "active",
+    initials: 'MC',
+    name: 'Michael Chen',
+    email: 'michael.chen@techcorp.com',
+    role: 'Employee',
+    joined: 'Feb 15, 2024',
+    status: 'active',
   },
   {
-    initials: "ED",
-    name: "Emma Davis",
-    email: "emma.davis@techcorp.com",
-    role: "Employee",
-    joined: "Mar 5, 2024",
-    status: "active",
+    initials: 'ED',
+    name: 'Emma Davis',
+    email: 'emma.davis@techcorp.com',
+    role: 'Employee',
+    joined: 'Mar 5, 2024',
+    status: 'active',
   },
   {
-    initials: "JW",
-    name: "Jessica Williams",
-    email: "jessica.williams@techcorp.com",
-    role: "Employee",
-    joined: "Apr 12, 2024",
-    status: "active",
+    initials: 'JW',
+    name: 'Jessica Williams',
+    email: 'jessica.williams@techcorp.com',
+    role: 'Employee',
+    joined: 'Apr 12, 2024',
+    status: 'active',
   },
   {
-    initials: "DP",
-    name: "David Park",
-    email: "david.park@techcorp.com",
-    role: "Employee",
-    joined: "May 20, 2024",
-    status: "active",
+    initials: 'DP',
+    name: 'David Park',
+    email: 'david.park@techcorp.com',
+    role: 'Employee',
+    joined: 'May 20, 2024',
+    status: 'active',
   },
   {
-    initials: "AF",
-    name: "Amanda Foster",
-    email: "amanda.foster@techcorp.com",
-    role: "Employee",
-    joined: "Jun 8, 2024",
-    status: "active",
+    initials: 'AF',
+    name: 'Amanda Foster',
+    email: 'amanda.foster@techcorp.com',
+    role: 'Employee',
+    joined: 'Jun 8, 2024',
+    status: 'active',
   },
 ];
 
@@ -86,22 +86,22 @@ const UsersPage = () => {
 
         <nav className="flex-1 px-3 pt-4 text-sm space-y-1">
           {[
-            { label: "Overview", icon: Squares2X2Icon },
-            { label: "Assets", icon: CubeIcon },
-            { label: "Categories", icon: FolderIcon },
-            { label: "Assignments", icon: ClipboardDocumentListIcon },
-            { label: "Tickets", icon: TicketIcon },
-            { label: "Lost & Found", icon: ExclamationTriangleIcon },
-            { label: "Chat", icon: ChatBubbleBottomCenterTextIcon },
-            { label: "Users", icon: UsersIcon },
-            { label: "Settings", icon: Cog6ToothIcon },
+            { label: 'Overview', icon: Squares2X2Icon },
+            { label: 'Assets', icon: CubeIcon },
+            { label: 'Categories', icon: FolderIcon },
+            { label: 'Assignments', icon: ClipboardDocumentListIcon },
+            { label: 'Tickets', icon: TicketIcon },
+            { label: 'Lost & Found', icon: ExclamationTriangleIcon },
+            { label: 'Chat', icon: ChatBubbleBottomCenterTextIcon },
+            { label: 'Users', icon: UsersIcon },
+            { label: 'Settings', icon: Cog6ToothIcon },
           ].map((item) => (
             <button
               key={item.label}
               className={`w-full flex items-center px-3 py-2 rounded-lg ${
-                item.label === "Users"
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-50"
+                item.label === 'Users'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               <item.icon className="w-5 h-5 mr-3" />
@@ -139,9 +139,7 @@ const UsersPage = () => {
           <section className="flex items-center justify-between">
             <div>
               <h1 className="text-sm font-semibold text-gray-900">Users</h1>
-              <p className="text-xs text-gray-500 mt-1">
-                Manage users in your organization
-              </p>
+              <p className="text-xs text-gray-500 mt-1">Manage users in your organization</p>
             </div>
             <button className="inline-flex items-center px-3 py-2 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700">
               <span className="mr-1.5 text-base">+</span>
@@ -151,24 +149,9 @@ const UsersPage = () => {
 
           {/* Summary cards */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StatCard
-              label="Total Users"
-              value={7}
-              iconBg="bg-blue-50"
-              iconColor="text-blue-500"
-            />
-            <StatCard
-              label="Admins"
-              value={1}
-              iconBg="bg-purple-50"
-              iconColor="text-purple-500"
-            />
-            <StatCard
-              label="Employees"
-              value={6}
-              iconBg="bg-green-50"
-              iconColor="text-green-500"
-            />
+            <StatCard label="Total Users" value={7} iconBg="bg-blue-50" iconColor="text-blue-500" />
+            <StatCard label="Admins" value={1} iconBg="bg-purple-50" iconColor="text-purple-500" />
+            <StatCard label="Employees" value={6} iconBg="bg-green-50" iconColor="text-green-500" />
           </section>
 
           {/* Users table */}
@@ -194,9 +177,7 @@ const UsersPage = () => {
                           <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-[11px] font-semibold">
                             {u.initials}
                           </div>
-                          <span className="text-sm text-gray-900">
-                            {u.name}
-                          </span>
+                          <span className="text-sm text-gray-900">{u.name}</span>
                         </div>
                       </td>
 
@@ -223,9 +204,7 @@ const UsersPage = () => {
                       </td>
 
                       {/* Join date */}
-                      <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
-                        {u.joined}
-                      </td>
+                      <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">{u.joined}</td>
 
                       {/* Status */}
                       <td className="py-2 pr-4">
@@ -259,9 +238,7 @@ const StatCard = ({ label, value, iconBg, iconColor }) => (
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className="text-2xl font-semibold text-gray-900">{value}</p>
     </div>
-    <div
-      className={`w-10 h-10 rounded-2xl flex items-center justify-center ${iconBg}`}
-    >
+    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${iconBg}`}>
       <UserGroupIcon className={`w-5 h-5 ${iconColor}`} />
     </div>
   </div>

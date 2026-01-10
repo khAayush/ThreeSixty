@@ -12,20 +12,18 @@ const SupAdminDashboard = () => {
 
         <nav className="flex-1 px-2 py-3 text-sm">
           {[
-            "Overview",
-            "Organizations",
-            "Users",
-            "Assets",
-            "Tickets",
-            "Lost & Found",
-            "Settings",
+            'Overview',
+            'Organizations',
+            'Users',
+            'Assets',
+            'Tickets',
+            'Lost & Found',
+            'Settings',
           ].map((item, i) => (
             <button
               key={item}
               className={`w-full flex items-center px-3 py-2 rounded-lg mb-1 ${
-                i === 0
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-50"
+                i === 0 ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               <span className="ml-1">{item}</span>
@@ -67,9 +65,7 @@ const SupAdminDashboard = () => {
         <main className="flex-1 p-6 space-y-6">
           {/* Title */}
           <section>
-            <h1 className="text-sm font-semibold text-gray-800">
-              Dashboard Overview
-            </h1>
+            <h1 className="text-sm font-semibold text-gray-800">Dashboard Overview</h1>
             <p className="text-xs text-gray-500">
               Monitor and manage all organizations, users, and assets
             </p>
@@ -79,9 +75,9 @@ const SupAdminDashboard = () => {
           <section className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             {[
               {
-                label: "Total Organizations",
+                label: 'Total Organizations',
                 value: 5,
-                iconBg: "bg-blue-100",
+                iconBg: 'bg-blue-100',
                 Icon: () => (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -100,9 +96,9 @@ const SupAdminDashboard = () => {
                 ),
               },
               {
-                label: "Pending Approvals",
+                label: 'Pending Approvals',
                 value: 2,
-                iconBg: "bg-blue-100",
+                iconBg: 'bg-blue-100',
                 Icon: () => (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -121,9 +117,9 @@ const SupAdminDashboard = () => {
                 ),
               },
               {
-                label: "Total Users",
+                label: 'Total Users',
                 value: 649,
-                iconBg: "bg-blue-100",
+                iconBg: 'bg-blue-100',
                 Icon: () => (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -142,9 +138,9 @@ const SupAdminDashboard = () => {
                 ),
               },
               {
-                label: "Total Assets",
+                label: 'Total Assets',
                 value: 1846,
-                iconBg: "bg-blue-100",
+                iconBg: 'bg-blue-100',
                 Icon: () => (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -175,9 +171,7 @@ const SupAdminDashboard = () => {
                     <card.Icon />
                   </span>
                 </div>
-                <span className="text-2xl font-semibold text-gray-800">
-                  {card.value}
-                </span>
+                <span className="text-2xl font-semibold text-gray-800">{card.value}</span>
               </div>
             ))}
           </section>
@@ -185,20 +179,16 @@ const SupAdminDashboard = () => {
           {/* Pending organizations */}
           <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
             <div className="mb-3">
-              <h2 className="text-sm font-semibold text-gray-800">
-                Pending Organizations
-              </h2>
-              <p className="text-xs text-gray-500">
-                Organizations waiting for approval
-              </p>
+              <h2 className="text-sm font-semibold text-gray-800">Pending Organizations</h2>
+              <p className="text-xs text-gray-500">Organizations waiting for approval</p>
             </div>
 
             <div className="space-y-3">
               {[
-                { name: "Herald College", domain: "heraldcollege.edu.np" },
+                { name: 'Herald College', domain: 'heraldcollege.edu.np' },
                 {
-                  name: "Islington College",
-                  domain: "islingtoncollege.edu.np",
+                  name: 'Islington College',
+                  domain: 'islingtoncollege.edu.np',
                 },
               ].map((org) => (
                 <div
@@ -223,9 +213,7 @@ const SupAdminDashboard = () => {
                       </svg>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">
-                        {org.name}
-                      </p>
+                      <p className="text-sm font-medium text-gray-800">{org.name}</p>
                       <p className="text-xs text-gray-500">{org.domain}</p>
                     </div>
                   </div>
@@ -245,18 +233,14 @@ const SupAdminDashboard = () => {
           {/* Recent activity */}
           <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
             <div className="mb-3">
-              <h2 className="text-sm font-semibold text-gray-800">
-                Recent Activity
-              </h2>
-              <p className="text-xs text-gray-500">
-                Latest updates across all organizations
-              </p>
+              <h2 className="text-sm font-semibold text-gray-800">Recent Activity</h2>
+              <p className="text-xs text-gray-500">Latest updates across all organizations</p>
             </div>
 
             <div className="divide-y divide-gray-100">
               {[
                 {
-                  iconBg: "bg-yellow-50",
+                  iconBg: 'bg-yellow-50',
                   Icon: () => (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -273,13 +257,13 @@ const SupAdminDashboard = () => {
                       />
                     </svg>
                   ),
-                  title: "New organization registered",
-                  desc: "CloudBase Networks has submitted a new registration",
-                  org: "CloudBase Networks",
-                  date: "Dec 12",
+                  title: 'New organization registered',
+                  desc: 'CloudBase Networks has submitted a new registration',
+                  org: 'CloudBase Networks',
+                  date: 'Dec 12',
                 },
                 {
-                  iconBg: "bg-green-50",
+                  iconBg: 'bg-green-50',
                   Icon: () => (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -296,13 +280,13 @@ const SupAdminDashboard = () => {
                       />
                     </svg>
                   ),
-                  title: "Organization approved",
-                  desc: "NextGen Solutions has been approved and activated",
-                  org: "NextGen Solutions",
-                  date: "Dec 11",
+                  title: 'Organization approved',
+                  desc: 'NextGen Solutions has been approved and activated',
+                  org: 'NextGen Solutions',
+                  date: 'Dec 11',
                 },
                 {
-                  iconBg: "bg-blue-100",
+                  iconBg: 'bg-blue-100',
                   Icon: () => (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -319,16 +303,13 @@ const SupAdminDashboard = () => {
                       />
                     </svg>
                   ),
-                  title: "New user added",
-                  desc: "Robert Taylor joined NextGen Solutions as Admin",
-                  org: "NextGen Solutions",
-                  date: "Dec 11",
+                  title: 'New user added',
+                  desc: 'Robert Taylor joined NextGen Solutions as Admin',
+                  org: 'NextGen Solutions',
+                  date: 'Dec 11',
                 },
               ].map((item) => (
-                <div
-                  key={item.title + item.date}
-                  className="flex items-start justify-between py-3"
-                >
+                <div key={item.title + item.date} className="flex items-start justify-between py-3">
                   <div className="flex items-start space-x-3">
                     <div
                       className={`mt-1 w-8 h-8 rounded-xl flex items-center justify-center ${item.iconBg}`}

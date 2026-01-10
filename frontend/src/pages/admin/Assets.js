@@ -16,7 +16,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
   EyeIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 const Assets = () => {
   return (
@@ -32,22 +32,22 @@ const Assets = () => {
 
         <nav className="flex-1 px-3 pt-4 text-sm space-y-1">
           {[
-            { label: "Overview", icon: Squares2X2Icon },
-            { label: "Assets", icon: CubeIcon },
-            { label: "Categories", icon: FolderIcon },
-            { label: "Assignments", icon: ClipboardDocumentListIcon },
-            { label: "Tickets", icon: TicketIcon },
-            { label: "Lost & Found", icon: ExclamationTriangleIcon },
-            { label: "Chat", icon: ChatBubbleBottomCenterTextIcon },
-            { label: "Users", icon: UsersIcon },
-            { label: "Settings", icon: Cog6ToothIcon },
+            { label: 'Overview', icon: Squares2X2Icon },
+            { label: 'Assets', icon: CubeIcon },
+            { label: 'Categories', icon: FolderIcon },
+            { label: 'Assignments', icon: ClipboardDocumentListIcon },
+            { label: 'Tickets', icon: TicketIcon },
+            { label: 'Lost & Found', icon: ExclamationTriangleIcon },
+            { label: 'Chat', icon: ChatBubbleBottomCenterTextIcon },
+            { label: 'Users', icon: UsersIcon },
+            { label: 'Settings', icon: Cog6ToothIcon },
           ].map((item) => (
             <button
               key={item.label}
               className={`w-full flex items-center px-3 py-2 rounded-lg ${
-                item.label === "Assets"
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-50"
+                item.label === 'Assets'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               <item.icon className="w-5 h-5 mr-3" />
@@ -84,9 +84,7 @@ const Assets = () => {
           {/* Header */}
           <section className="flex items-center justify-between">
             <div>
-              <h1 className="text-sm font-semibold text-gray-900">
-                Assets Management
-              </h1>
+              <h1 className="text-sm font-semibold text-gray-900">Assets Management</h1>
               <p className="text-xs text-gray-500 mt-1">
                 Manage and track all your organization&apos;s assets
               </p>
@@ -137,43 +135,43 @@ const Assets = () => {
                 <tbody className="divide-y divide-gray-100">
                   {[
                     {
-                      name: "Laptops",
-                      desc: "Portable computers for work",
+                      name: 'Laptops',
+                      desc: 'Portable computers for work',
                       visible: true,
                       items: 3,
                       total: 45,
                     },
                     {
-                      name: "Monitors",
-                      desc: "Display screens and monitors",
+                      name: 'Monitors',
+                      desc: 'Display screens and monitors',
                       visible: true,
                       items: 2,
                       total: 38,
                     },
                     {
-                      name: "Mobile Devices",
-                      desc: "Phones and tablets",
+                      name: 'Mobile Devices',
+                      desc: 'Phones and tablets',
                       visible: true,
                       items: 5,
                       total: 52,
                     },
                     {
-                      name: "Keyboards & Mice",
-                      desc: "Input devices",
+                      name: 'Keyboards & Mice',
+                      desc: 'Input devices',
                       visible: true,
                       items: 5,
                       total: 68,
                     },
                     {
-                      name: "Projectors",
-                      desc: "Conference room projectors",
+                      name: 'Projectors',
+                      desc: 'Conference room projectors',
                       visible: true,
                       items: 2,
                       total: 8,
                     },
                     {
-                      name: "Servers",
-                      desc: "Server hardware",
+                      name: 'Servers',
+                      desc: 'Server hardware',
                       visible: false,
                       items: 1,
                       total: 12,
@@ -190,9 +188,7 @@ const Assets = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-2 pr-4 text-gray-500">
-                        {row.desc}
-                      </td>
+                      <td className="py-2 pr-4 text-gray-500">{row.desc}</td>
                       <td className="py-2 pr-4">
                         {row.visible ? (
                           <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-50 text-[11px] text-green-600">

@@ -5,15 +5,15 @@ import TestimonialSection from '../components/TestimonialSection';
 import Footer from '../components/Footer';
 
 const Home = () => {
-    return ( 
+  return (
     <>
-        <Navbar />
-        <Hero />
-        <FeatureSection />
-        <TestimonialSection />
-        <Footer />
+      <Navbar />
+      <Hero />
+      <FeatureSection />
+      <TestimonialSection />
+      <Footer />
     </>
-     );
-}
- 
+  );
+};
+
 export default Home;

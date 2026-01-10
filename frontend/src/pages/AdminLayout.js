@@ -1,6 +1,6 @@
 // AdminLayout.jsx
-import React from "react";
-import { Outlet, NavLink } from "react-router-dom";
+import React from 'react';
+import { Outlet, NavLink } from 'react-router-dom';
 import {
   Squares2X2Icon,
   CubeIcon,
@@ -12,18 +12,18 @@ import {
   UsersIcon,
   Cog6ToothIcon,
   BellIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 const navItems = [
-  { label: "Overview", icon: Squares2X2Icon, to: "/admin" },
-  { label: "Assets", icon: CubeIcon, to: "/admin/assets" },
-  { label: "Categories", icon: FolderIcon, to: "/admin/categories" },
-  { label: "Assignments", icon: ClipboardDocumentListIcon, to: "/admin/assignments" },
-  { label: "Tickets", icon: TicketIcon, to: "/admin/tickets" },
-  { label: "Lost & Found", icon: ExclamationTriangleIcon, to: "/admin/lost-found" },
-  { label: "Chat", icon: ChatBubbleBottomCenterTextIcon, to: "/admin/chat" },
-  { label: "Users", icon: UsersIcon, to: "/admin/users" },
-  { label: "Settings", icon: Cog6ToothIcon, to: "/admin/settings" },
+  { label: 'Overview', icon: Squares2X2Icon, to: '/admin' },
+  { label: 'Assets', icon: CubeIcon, to: '/admin/assets' },
+  { label: 'Categories', icon: FolderIcon, to: '/admin/categories' },
+  { label: 'Assignments', icon: ClipboardDocumentListIcon, to: '/admin/assignments' },
+  { label: 'Tickets', icon: TicketIcon, to: '/admin/tickets' },
+  { label: 'Lost & Found', icon: ExclamationTriangleIcon, to: '/admin/lost-found' },
+  { label: 'Chat', icon: ChatBubbleBottomCenterTextIcon, to: '/admin/chat' },
+  { label: 'Users', icon: UsersIcon, to: '/admin/users' },
+  { label: 'Settings', icon: Cog6ToothIcon, to: '/admin/settings' },
 ];
 
 const AdminLayout = () => {
@@ -44,8 +44,8 @@ const AdminLayout = () => {
               key={label}
               to={to}
               className={({ isActive }) =>
-                "w-full flex items-center px-3 py-2 rounded-lg " +
-                (isActive ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50")
+                'w-full flex items-center px-3 py-2 rounded-lg ' +
+                (isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50')
               }
             >
               <Icon className="w-5 h-5 mr-3" />

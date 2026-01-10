@@ -1,33 +1,31 @@
-import {useState} from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
-import PasswordInput from "../components/PasswordInput";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
+import PasswordInput from '../components/PasswordInput';
 
 const API_URL = 'http://localhost:8000/api';
 
 const Signup = () => {
-
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [workEmail, setWorkEmail] = useState("");
-  const [organization, setOrganization] = useState("");
-  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [workEmail, setWorkEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setLoading(true);
 
     const name = `${firstName} ${lastName}`.trim();
 
     try {
       const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name,
@@ -39,28 +37,36 @@ const Signup = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Signup failed");
+        setError(data.message || 'Signup failed');
         setLoading(false);
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
       // navigate("/dashboard");
-      console.log("Signup successful");
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-    return ( 
-       <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+  return (
+    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
       <div className="pt-6 pl-8">
-        <Link to="/" className="flex items-center text-gray-400 hover:text-gray-900 text-sm font-medium">
-          <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <Link
+          to="/"
+          className="flex items-center text-gray-400 hover:text-gray-900 text-sm font-medium"
+        >
+          <svg
+            className="mr-2 h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
           Back to home
@@ -76,7 +82,9 @@ const Signup = () => {
           </div>
         </div>
         <div className="w-full max-w-md mx-auto bg-white py-10 px-8 rounded-2xl shadow border border-gray-100">
-          <h2 className="text-xl mb-2 font-normal text-center text-gray-700">Create your account</h2>
+          <h2 className="text-xl mb-2 font-normal text-center text-gray-700">
+            Create your account
+          </h2>
 
           {error && (
             <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
@@ -134,14 +142,14 @@ const Signup = () => {
             <div className="flex items-center mb-4">
               <input type="checkbox" className="mr-2 h-4 w-4 rounded border-gray-300" required />
               <span className="text-xs text-gray-600">
-                I agree to the{" "}
-                <a href="#" className="text-blue-500 hover:underline font-medium">
+                I agree to the{' '}
+                <Link to="/terms" className="text-blue-500 hover:underline font-medium">
                   Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="text-blue-500 hover:underline font-medium">
+                </Link>{' '}
+                and{' '}
+                <Link to="/privacy" className="text-blue-500 hover:underline font-medium">
                   Privacy Policy
-                </a>
+                </Link>
               </span>
             </div>
             <button
@@ -149,7 +157,7 @@ const Signup = () => {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white py-2.5 rounded-lg font-medium text-base transition"
             >
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 
@@ -166,8 +174,8 @@ const Signup = () => {
                   const idToken = credentialResponse.credential;
 
                   const res = await fetch(`${API_URL}/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idToken }),
                   });
 
@@ -178,16 +186,16 @@ const Signup = () => {
                     return;
                   }
 
-                  localStorage.setItem("token", data.token);
-                  localStorage.setItem("user", JSON.stringify(data.user));
+                  localStorage.setItem('token', data.token);
+                  localStorage.setItem('user', JSON.stringify(data.user));
 
-                  navigate("/dashboard");
+                  navigate('/dashboard');
                 } catch (err) {
-                  console.error("Google login error", err);
+                  console.error('Google login error', err);
                 }
               }}
               onError={() => {
-                console.error("Google Login Failed");
+                console.error('Google Login Failed');
               }}
               shape="pill"
               width="100%"
@@ -207,7 +215,7 @@ const Signup = () => {
         </div>
       </div>
     </div>
-     );
-}
- 
+  );
+};
+
 export default Signup;

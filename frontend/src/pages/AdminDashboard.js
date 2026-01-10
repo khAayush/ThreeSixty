@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Squares2X2Icon,
   CubeIcon,
@@ -12,7 +12,7 @@ import {
   BellIcon,
   CheckCircleIcon,
   ClockIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
   return (
@@ -24,30 +24,26 @@ const AdminDashboard = () => {
           <div className="w-9 h-9 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xs font-semibold mr-2">
             360°
           </div>
-          <span className="font-semibold text-gray-900 text-sm">
-            ThreeSixty
-          </span>
+          <span className="font-semibold text-gray-900 text-sm">ThreeSixty</span>
         </div>
 
         {/* Nav with Heroicons */}
         <nav className="flex-1 px-3 pt-4 text-sm">
           {[
-            { label: "Overview", icon: Squares2X2Icon },
-            { label: "Assets", icon: CubeIcon },
-            { label: "Categories", icon: FolderIcon },
-            { label: "Assignments", icon: ClipboardDocumentListIcon },
-            { label: "Tickets", icon: TicketIcon },
-            { label: "Lost & Found", icon: ExclamationTriangleIcon },
-            { label: "Chat", icon: ChatBubbleBottomCenterTextIcon },
-            { label: "Users", icon: UsersIcon },
-            { label: "Settings", icon: Cog6ToothIcon },
+            { label: 'Overview', icon: Squares2X2Icon },
+            { label: 'Assets', icon: CubeIcon },
+            { label: 'Categories', icon: FolderIcon },
+            { label: 'Assignments', icon: ClipboardDocumentListIcon },
+            { label: 'Tickets', icon: TicketIcon },
+            { label: 'Lost & Found', icon: ExclamationTriangleIcon },
+            { label: 'Chat', icon: ChatBubbleBottomCenterTextIcon },
+            { label: 'Users', icon: UsersIcon },
+            { label: 'Settings', icon: Cog6ToothIcon },
           ].map((item, idx) => (
             <button
               key={item.label}
               className={`w-full flex items-center px-3 py-2 rounded-lg mb-1 ${
-                idx === 0
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-50"
+                idx === 0 ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
               <item.icon className="w-5 h-5 mr-3" />
@@ -83,9 +79,7 @@ const AdminDashboard = () => {
         <main className="flex-1 px-8 py-6 space-y-6">
           {/* Header */}
           <section>
-            <h1 className="text-sm font-semibold text-gray-900">
-              Dashboard Overview
-            </h1>
+            <h1 className="text-sm font-semibold text-gray-900">Dashboard Overview</h1>
             <p className="text-xs text-gray-500 mt-1">
               Monitor your organization&apos;s assets and requests
             </p>
@@ -95,25 +89,25 @@ const AdminDashboard = () => {
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               {
-                label: "Total Assets",
+                label: 'Total Assets',
                 value: 10,
-                iconBg: "bg-blue-50",
+                iconBg: 'bg-blue-50',
                 Icon: CubeIcon,
-                iconColor: "text-blue-500",
+                iconColor: 'text-blue-500',
               },
               {
-                label: "In Stock",
+                label: 'In Stock',
                 value: 3,
-                iconBg: "bg-green-50",
+                iconBg: 'bg-green-50',
                 Icon: CheckCircleIcon,
-                iconColor: "text-green-500",
+                iconColor: 'text-green-500',
               },
               {
-                label: "Assigned",
+                label: 'Assigned',
                 value: 5,
-                iconBg: "bg-purple-50",
+                iconBg: 'bg-purple-50',
                 Icon: CubeIcon,
-                iconColor: "text-purple-500",
+                iconColor: 'text-purple-500',
               },
             ].map((card) => (
               <div
@@ -122,9 +116,7 @@ const AdminDashboard = () => {
               >
                 <div>
                   <p className="text-xs text-gray-500 mb-1">{card.label}</p>
-                  <p className="text-2xl font-semibold text-gray-900">
-                    {card.value}
-                  </p>
+                  <p className="text-2xl font-semibold text-gray-900">{card.value}</p>
                 </div>
                 <div
                   className={`w-10 h-10 rounded-2xl flex items-center justify-center ${card.iconBg}`}
@@ -139,25 +131,25 @@ const AdminDashboard = () => {
           <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               {
-                label: "Damaged/In Repair",
+                label: 'Damaged/In Repair',
                 value: 2,
-                iconBg: "bg-red-50",
+                iconBg: 'bg-red-50',
                 Icon: ExclamationTriangleIcon,
-                iconColor: "text-red-500",
+                iconColor: 'text-red-500',
               },
               {
-                label: "Open Tickets",
+                label: 'Open Tickets',
                 value: 3,
-                iconBg: "bg-yellow-50",
+                iconBg: 'bg-yellow-50',
                 Icon: TicketIcon,
-                iconColor: "text-yellow-500",
+                iconColor: 'text-yellow-500',
               },
               {
-                label: "Pending Requests",
+                label: 'Pending Requests',
                 value: 3,
-                iconBg: "bg-orange-50",
+                iconBg: 'bg-orange-50',
                 Icon: ClockIcon,
-                iconColor: "text-orange-500",
+                iconColor: 'text-orange-500',
               },
             ].map((card) => (
               <div
@@ -166,9 +158,7 @@ const AdminDashboard = () => {
               >
                 <div>
                   <p className="text-xs text-gray-500 mb-1">{card.label}</p>
-                  <p className="text-2xl font-semibold text-gray-900">
-                    {card.value}
-                  </p>
+                  <p className="text-2xl font-semibold text-gray-900">{card.value}</p>
                 </div>
                 <div
                   className={`w-10 h-10 rounded-2xl flex items-center justify-center ${card.iconBg}`}
@@ -182,9 +172,7 @@ const AdminDashboard = () => {
           {/* Pending asset requests table */}
           <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="mb-3">
-              <h2 className="text-sm font-semibold text-gray-900">
-                Pending Asset Requests
-              </h2>
+              <h2 className="text-sm font-semibold text-gray-900">Pending Asset Requests</h2>
             </div>
 
             <div className="overflow-x-auto">
@@ -194,32 +182,29 @@ const AdminDashboard = () => {
                     <th className="py-2 pr-4">Employee</th>
                     <th className="py-2 pr-4">Requested Item</th>
                     <th className="py-2 pr-4">Reason</th>
-                    <th className="py-2 pr-4 whitespace-nowrap">
-                      Request Date
-                    </th>
+                    <th className="py-2 pr-4 whitespace-nowrap">Request Date</th>
                     <th className="py-2 pr-2 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {[
                     {
-                      name: "Jessica Williams",
-                      item: "Laptops",
-                      reason:
-                        "Need laptop for new project work - current one is outdated.",
-                      date: "Dec 12, 4:15 PM",
+                      name: 'Jessica Williams',
+                      item: 'Laptops',
+                      reason: 'Need laptop for new project work - current one is outdated.',
+                      date: 'Dec 12, 4:15 PM',
                     },
                     {
-                      name: "David Park",
-                      item: "Monitors",
-                      reason: "Additional monitor for dual-screen setup",
-                      date: "Dec 13, 8:00 PM",
+                      name: 'David Park',
+                      item: 'Monitors',
+                      reason: 'Additional monitor for dual-screen setup',
+                      date: 'Dec 13, 8:00 PM',
                     },
                     {
-                      name: "Amanda Foster",
-                      item: "Mobile Devices",
-                      reason: "Company phone for client communications",
-                      date: "Dec 13, 2:45 PM",
+                      name: 'Amanda Foster',
+                      item: 'Mobile Devices',
+                      reason: 'Company phone for client communications',
+                      date: 'Dec 13, 2:45 PM',
                     },
                   ].map((row) => (
                     <tr key={row.name}>
@@ -229,12 +214,8 @@ const AdminDashboard = () => {
                           {row.item}
                         </span>
                       </td>
-                      <td className="py-2 pr-4 text-gray-500 text-xs">
-                        {row.reason}
-                      </td>
-                      <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">
-                        {row.date}
-                      </td>
+                      <td className="py-2 pr-4 text-gray-500 text-xs">{row.reason}</td>
+                      <td className="py-2 pr-4 text-gray-500 whitespace-nowrap">{row.date}</td>
                       <td className="py-2 pr-2">
                         <div className="flex items-center justify-end space-x-2">
                           <button className="px-3 py-1.5 rounded-full border border-gray-200 text-gray-700 text-xs hover:bg-gray-50">

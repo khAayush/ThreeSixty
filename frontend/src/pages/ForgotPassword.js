@@ -1,41 +1,41 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = 'http://localhost:8000/api';
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setMessage("");
+    setError('');
+    setMessage('');
     setLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
 
       const data = await res.json();
-      setMessage(data.message || "If that email exists, reset instructions have been sent.");
+      setMessage(data.message || 'If that email exists, reset instructions have been sent.');
       // if (data.resetToken) {
       //   console.log("DEV reset token:", data.resetToken);
       // }
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-    return ( 
-      <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
+  return (
+    <div className="min-h-screen flex flex-col bg-[#f7f8fa]">
       <div className="pt-6 pl-8">
         <Link
           to="/"
@@ -129,7 +129,7 @@ const ForgotPassword = () => {
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium text-base transition disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Sending..." : "Send Reset Link"}
+              {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
           </form>
 
@@ -143,7 +143,7 @@ const ForgotPassword = () => {
         </div>
       </div>
     </div>
-     );
-}
- 
+  );
+};
+
 export default ForgotPassword;
