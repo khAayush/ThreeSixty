@@ -1,17 +1,6 @@
 import React from 'react';
-import {
-  Squares2X2Icon,
-  CubeIcon,
-  FolderIcon,
-  ClipboardDocumentListIcon,
-  TicketIcon,
-  ExclamationTriangleIcon,
-  ChatBubbleBottomCenterTextIcon,
-  UsersIcon,
-  Cog6ToothIcon,
-  BellIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import { BellIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import AdminSidebar from '../../components/AdminSidebar';
 
 const users = [
   {
@@ -75,41 +64,7 @@ const users = [
 const UsersPage = () => {
   return (
     <div className="min-h-screen flex bg-[#f5f7fb] text-gray-800">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="h-16 flex items-center px-4 border-b border-gray-200">
-          <div className="w-9 h-9 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xs font-semibold mr-2">
-            360°
-          </div>
-          <span className="font-semibold text-gray-900 text-sm">ThreeSixty</span>
-        </div>
-
-        <nav className="flex-1 px-3 pt-4 text-sm space-y-1">
-          {[
-            { label: 'Overview', icon: Squares2X2Icon },
-            { label: 'Assets', icon: CubeIcon },
-            { label: 'Categories', icon: FolderIcon },
-            { label: 'Assignments', icon: ClipboardDocumentListIcon },
-            { label: 'Tickets', icon: TicketIcon },
-            { label: 'Lost & Found', icon: ExclamationTriangleIcon },
-            { label: 'Chat', icon: ChatBubbleBottomCenterTextIcon },
-            { label: 'Users', icon: UsersIcon },
-            { label: 'Settings', icon: Cog6ToothIcon },
-          ].map((item) => (
-            <button
-              key={item.label}
-              className={`w-full flex items-center px-3 py-2 rounded-lg ${
-                item.label === 'Users'
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <item.icon className="w-5 h-5 mr-3" />
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
+      <AdminSidebar active="Users" />
 
       {/* Main column */}
       <div className="flex-1 flex flex-col">
