@@ -33,7 +33,8 @@ const routeMap = {
   Settings: '/admin-settings',
 };
 
-const AdminSidebar = ({ active = 'Overview', items = defaultItems }) => {
+const AdminSidebar = ({ active = 'Overview', items = defaultItems, onSelect }) => {
+  const useSelect = typeof onSelect === 'function';
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
       <div className="h-16 flex items-center px-4 border-b border-gray-200">
@@ -46,6 +47,23 @@ const AdminSidebar = ({ active = 'Overview', items = defaultItems }) => {
       <nav className="flex-1 px-3 pt-4 text-sm space-y-1">
         {items.map((item) => {
           const to = routeMap[item.label] || '/admin-dashboard';
+          if (useSelect) {
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => onSelect(item.label)}
+                className={`w-full flex items-center px-3 py-2 rounded-lg ${
+                  item.label === active
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <item.icon className="w-5 h-5 mr-3" />
+                <span>{item.label}</span>
+              </button>
+            );
+          }
           return (
             <NavLink
               key={item.label}

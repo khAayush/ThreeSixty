@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import AdminSidebar from '../../components/AdminSidebar';
 
-const Assignment = () => {
+const AssignmentContent = () => {
   const [activeTab, setActiveTab] = useState('requests');
 
   const requests = [
@@ -70,84 +70,82 @@ const Assignment = () => {
   ];
 
   return (
-    <div className="min-h-screen flex bg-[#f5f7fb] text-gray-800">
-      <AdminSidebar active="Assignments" />
+    <main className="flex-1 px-8 py-6">
+      {/* Header */}
+      <section className="mb-5">
+        <h1 className="text-sm font-semibold text-gray-900">Assignments &amp; Requests</h1>
+        <p className="text-xs text-gray-500 mt-1">Manage asset requests and track assignments</p>
+      </section>
 
-      {/* Main column */}
-      <div className="flex-1 flex flex-col">
-        {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <span className="font-semibold text-gray-900">ThreeSixty</span>
-            <span className="text-gray-400">•</span>
-            <span>Herald College Kathmandu</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="text-gray-500 hover:text-gray-700">
-              <BellIcon className="w-5 h-5" />
-            </button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
-                SB
-              </div>
-              <span className="text-sm text-gray-700">Sabina Bharati</span>
-            </div>
-          </div>
-        </header>
+      {/* Card */}
+      <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+        {/* Tabs */}
+        <div className="flex items-center mb-4">
+          <button
+            onClick={() => setActiveTab('requests')}
+            className={`px-4 py-1.5 rounded-full text-xs font-medium flex items-center ${
+              activeTab === 'requests' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            Requests
+            <span
+              className={`ml-2 px-2 py-0.5 rounded-full text-[11px] ${
+                activeTab === 'requests' ? 'bg-white/10' : 'bg-white text-gray-600'
+              }`}
+            >
+              {requests.length}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab('assignments')}
+            className={`ml-2 px-4 py-1.5 rounded-full text-xs ${
+              activeTab === 'assignments' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            Assignments
+          </button>
+        </div>
 
-        {/* Content */}
-        <main className="flex-1 px-8 py-6">
-          {/* Header */}
-          <section className="mb-5">
-            <h1 className="text-sm font-semibold text-gray-900">Assignments &amp; Requests</h1>
-            <p className="text-xs text-gray-500 mt-1">
-              Manage asset requests and track assignments
-            </p>
-          </section>
-
-          {/* Card */}
-          <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-            {/* Tabs */}
-            <div className="flex items-center mb-4">
-              <button
-                onClick={() => setActiveTab('requests')}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium flex items-center ${
-                  activeTab === 'requests' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600'
-                }`}
-              >
-                Requests
-                <span
-                  className={`ml-2 px-2 py-0.5 rounded-full text-[11px] ${
-                    activeTab === 'requests' ? 'bg-white/10' : 'bg-white text-gray-600'
-                  }`}
-                >
-                  {requests.length}
-                </span>
-              </button>
-              <button
-                onClick={() => setActiveTab('assignments')}
-                className={`ml-2 px-4 py-1.5 rounded-full text-xs ${
-                  activeTab === 'assignments'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-600'
-                }`}
-              >
-                Assignments
-              </button>
-            </div>
-
-            {/* Content switches here */}
-            {activeTab === 'requests' ? (
-              <RequestsTable requests={requests} />
-            ) : (
-              <AssignmentsTable assignments={assignments} />
-            )}
-          </section>
-        </main>
-      </div>
-    </div>
+        {/* Content switches here */}
+        {activeTab === 'requests' ? (
+          <RequestsTable requests={requests} />
+        ) : (
+          <AssignmentsTable assignments={assignments} />
+        )}
+      </section>
+    </main>
   );
 };
+
+const Assignment = () => (
+  <div className="min-h-screen flex bg-[#f5f7fb] text-gray-800">
+    <AdminSidebar active="Assignments" />
+    <div className="flex-1 flex flex-col">
+      {/* Top bar */}
+      <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+        <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <span className="font-semibold text-gray-900">ThreeSixty</span>
+          <span className="text-gray-400">•</span>
+          <span>Herald College Kathmandu</span>
+        </div>
+        <div className="flex items-center space-x-4">
+          <button className="text-gray-500 hover:text-gray-700">
+            <BellIcon className="w-5 h-5" />
+          </button>
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
+              SB
+            </div>
+            <span className="text-sm text-gray-700">Sabina Bharati</span>
+          </div>
+        </div>
+      </header>
+      <AssignmentContent />
+    </div>
+  </div>
+);
+
+export { AssignmentContent };
 
 const RequestsTable = ({ requests }) => (
   <div className="overflow-x-auto">

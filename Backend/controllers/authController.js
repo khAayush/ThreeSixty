@@ -258,4 +258,27 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, googleSignIn, setPassword, forgotPassword, resetPassword };
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const userId = req.user && (req.user.userId || req.user.id);
+    if (!userId) return res.status(401).json({ message: 'Not authenticated' });
+
+    const user = await User.findById(userId).populate('orgId');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        org: user.orgId ? { id: user.orgId._id, name: user.orgId.name, domain: user.orgId.domain, status: user.orgId.status } : null,
+        hasPassword: !!user.passwordHash,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, login, googleSignIn, setPassword, forgotPassword, resetPassword, getCurrentUser };
