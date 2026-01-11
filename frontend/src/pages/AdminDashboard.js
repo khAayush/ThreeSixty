@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import { AssetsContent } from './admin/Assets';
 import { AssignmentContent } from './admin/Assignment';
@@ -224,6 +224,31 @@ const AdminDashboard = () => {
       .join('')
       .toUpperCase();
 
+  // dropdown state & handlers
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } catch (e) {}
+    setUser(null);
+    setOrg(null);
+    setMenuOpen(false);
+    navigate('/login');
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'Assets':
@@ -254,14 +279,42 @@ const AdminDashboard = () => {
             <button className="text-gray-500 hover:text-gray-700">
               <BellIcon className="w-5 h-5" />
             </button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
-                {initials(user?.name || 'SB')}
-              </div>
-              <div className="text-sm text-gray-700">
-                <div className="font-medium">{user ? user.name : 'Loading...'}</div>
-                <div className="text-xs text-gray-500">{user && user.role ? user.role : ''}</div>
-              </div>
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((s) => !s)}
+                className="flex items-center space-x-2 focus:outline-none"
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
+                  {initials(user?.name || 'SB')}
+                </div>
+                <div className="text-sm text-gray-700 text-left">
+                  <div className="font-medium">{user ? user.name : 'Loading...'}</div>
+                  <div className="text-xs text-gray-500">{user && user.role ? user.role : ''}</div>
+                </div>
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-lg shadow-lg z-50">
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate('/profile');
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Edit profile
+                  </button>
+                  <div className="border-t border-gray-100" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
