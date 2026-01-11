@@ -1,0 +1,19 @@
+const express = require('express');
+const {
+  createAsset,
+  listAssets,
+  getAsset,
+  updateAsset,
+  deleteAsset,
+} = require('../controllers/assetsController');
+const { requireAuth } = require('../middleware/authMiddleware');
+
+const router = express.Router();
+
+router.get('/', requireAuth, listAssets);
+router.post('/', requireAuth, createAsset);
+router.get('/:id', requireAuth, getAsset);
+router.put('/:id', requireAuth, updateAsset);
+router.delete('/:id', requireAuth, deleteAsset);
+
+module.exports = router;

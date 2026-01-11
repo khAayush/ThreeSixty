@@ -9,7 +9,7 @@ const Field = ({ label, children }) => (
 
 const API_URL = 'http://localhost:8000/api';
 
-const AddAssetModal = ({ isOpen, onClose, onSave }) => {
+const AddAssetModal = ({ isOpen, onClose, onSave, initialData = null }) => {
   const [name, setName] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState([]);
@@ -43,6 +43,31 @@ const AddAssetModal = ({ isOpen, onClose, onSave }) => {
     if (isOpen) load();
   }, [isOpen]);
 
+  // populate when editing
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name || '');
+      setAssetId(initialData.assetId || '');
+      setStatus(initialData.status || 'In-Stock');
+      setAssetType(initialData.assetType || 'Fixed');
+      setNotes(initialData.notes || '');
+      // if category is object
+      const catVal = (initialData.category && (initialData.category.id || initialData.category._id || initialData.category.name)) || initialData.category || '';
+      setCategoryId(catVal);
+      setAddingCategory(false);
+      setNewCategory('');
+    } else if (!isOpen) {
+      // reset when modal closed and not editing
+      setName('');
+      setAssetId('');
+      setStatus('In-Stock');
+      setAssetType('Fixed');
+      setNotes('');
+      setAddingCategory(false);
+      setNewCategory('');
+    }
+  }, [initialData, isOpen]);
+
   if (!isOpen) return null;
 
   const submit = async (e) => {
@@ -53,9 +78,13 @@ const AddAssetModal = ({ isOpen, onClose, onSave }) => {
     if (addingCategory && newCategory) {
       // try to create category on backend
       try {
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_URL}/categories`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify({ name: newCategory }),
         });
         if (res.ok) {
