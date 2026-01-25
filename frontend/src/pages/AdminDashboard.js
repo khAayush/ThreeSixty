@@ -239,6 +239,11 @@ const AdminDashboard = () => {
 
         const data = await res.json();
         if (data && data.user) {
+          // Check if user is Admin
+          if (data.user.role !== 'Admin') {
+            navigate('/employee-dashboard');
+            return;
+          }
           setUser(data.user);
           setOrg(data.user.org || null);
           try {
