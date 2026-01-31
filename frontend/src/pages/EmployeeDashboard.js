@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Squares2X2Icon,
   CubeIcon,
@@ -12,6 +13,70 @@ import {
 } from '@heroicons/react/24/outline';
 
 const EmployeeDashboard = () => {
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [userError, setUserError] = useState(null);
+  const navigate = useNavigate();
+
+  // profile menu state & handlers
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } catch (e) {}
+    setUser(null);
+    setMenuOpen(false);
+    navigate('/login');
+  }; 
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoadingUser(true);
+      setUserError(null);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:8000/api/auth/me', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || 'Failed to load user');
+        }
+        const data = await res.json();
+        if (mounted) {
+          setUser(data.user || null);
+          // if user is not an EMPLOYEE, redirect to admin dashboard
+          if (data.user && data.user.role && data.user.role !== 'EMPLOYEE') {
+            navigate('/admin-dashboard', { replace: true });
+          }
+        }
+      } catch (e) {
+        if (mounted) setUserError(e.message || 'Failed to load');
+      } finally {
+        if (mounted) setLoadingUser(false);
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
+
   return (
     <div className="min-h-screen flex bg-[#f5f7fb] text-gray-800">
       {/* Sidebar */}
@@ -56,17 +121,49 @@ const EmployeeDashboard = () => {
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <span className="font-semibold text-gray-900">ThreeSixty</span>
             <span className="text-gray-400">•</span>
-            <span>Herald College Kathmandu</span>
+            <span>{user?.org?.name || 'Herald College Kathmandu'}</span>
           </div>
           <div className="flex items-center space-x-4">
             <button className="text-gray-500 hover:text-gray-700">
               <BellIcon className="h-5 w-5" />
             </button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
-                SG
-              </div>
-              <span className="text-sm text-gray-700">Samip Gyawali</span>
+
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((s) => !s)}
+                className="flex items-center space-x-2 focus:outline-none"
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">
+                  {user?.name ? user.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'U'}
+                </div>
+                <div className="text-sm text-gray-700 text-left">
+                  <div className="font-medium">{user ? user.name : 'Loading...'}</div>
+                  <div className="text-xs text-gray-500">{user && user.role ? user.role : ''}</div>
+                </div>
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-lg shadow-lg z-50">
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate('/profile');
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Edit profile
+                  </button>
+                  <div className="border-t border-gray-100" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -76,12 +173,11 @@ const EmployeeDashboard = () => {
           {/* Welcome + top cards */}
           <section className="space-y-4">
             <div>
-              <h1 className="text-sm font-semibold text-gray-900">Welcome back, Samip!</h1>
-              <p className="text-xs text-gray-500 mt-1">
-                Here&apos;s what&apos;s happening with your assets and requests
-              </p>
-            </div>
-
+                <h1 className="text-sm font-semibold text-gray-900">Welcome back, {user?.name ? user.name.split(' ')[0] : 'there'}!</h1>
+                <p className="text-xs text-gray-500 mt-1">
+                  Here&apos;s what&apos;s happening with your assets and requests
+                </p>
+              </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <TopStatCard label="My Assets" value="3" description="Currently assigned to you" />
               <TopStatCard label="Pending Requests" value="1" description="Awaiting approval" />
