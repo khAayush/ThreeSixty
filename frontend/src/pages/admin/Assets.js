@@ -12,6 +12,7 @@ import {
 import AdminSidebar from '../../components/AdminSidebar';
 import AddAssetModal from '../../components/AddAssetModal';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import AssetViewModal from '../../components/AssetViewModal';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -26,6 +27,9 @@ const AssetsContent = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [categoryOpen, setCategoryOpen] = useState(false);
+  // view modal states
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewAssetId, setViewAssetId] = useState(null);
 
   const fetchAssets = useCallback(async () => {
     setLoading(true);
@@ -124,6 +128,11 @@ const AssetsContent = () => {
     setEditing(asset);
     setOpen(true);
   };
+
+  const handleView = (asset) => {
+    setViewAssetId(asset && (asset._id || asset.id || asset));
+    setViewOpen(true);
+  }; 
 
   const filteredAssets = assets.filter((row) => {
     const q = (search || '').trim().toLowerCase();
@@ -304,7 +313,7 @@ const AssetsContent = () => {
                     </td>
                     <td className="py-2 pr-2">
                       <div className="flex items-center justify-end space-x-2 text-gray-500">
-                        <button className="p-1.5 rounded-lg hover:bg-gray-100">
+                        <button onClick={() => handleView(row)} className="p-1.5 rounded-lg hover:bg-gray-100">
                           <EyeIcon className="w-4 h-4" />
                         </button>
                         <button
@@ -328,6 +337,15 @@ const AssetsContent = () => {
           </table>
         </div>
       </section>
+      <AssetViewModal
+        isOpen={viewOpen}
+        onClose={() => {
+          setViewOpen(false);
+          setViewAssetId(null);
+        }}
+        assetId={viewAssetId}
+      />
+
       <ConfirmDialog
         isOpen={confirmOpen}
         onClose={() => {

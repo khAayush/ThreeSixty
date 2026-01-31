@@ -240,7 +240,7 @@ const AdminDashboard = () => {
         const data = await res.json();
         if (data && data.user) {
           // Check if user is Admin
-          if (data.user.role !== 'Admin') {
+          if (data.user.role.toUpperCase() !== 'ADMIN') {
             navigate('/employee-dashboard');
             return;
           }
