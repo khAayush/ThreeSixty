@@ -7,22 +7,25 @@ import PasswordInput from "../components/PasswordInput";
 import { showLoading, showSuccess, showError, showPending } from "../utils/toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAINS;
-const FILTERED_EMAIL_NAMES = import.meta.env.VITE_FILTERED_EMAIL_NAMES
-  ? import.meta.env.VITE_FILTERED_EMAIL_NAMES.split(",")
-  : [];
 
 const Login = ({ setCurrentUser }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState({ allowedEmailDomains: [], filteredEmailNames: [] });
+
+  useEffect(() => {
+    // Fetch settings for client-side Google login validation
+    fetch(`${API_URL}/settings`)
+      .then((r) => r.json())
+      .then((data) => { if (data.settings) setSettings(data.settings); })
+      .catch(() => {});
+  }, []);
 
   // Check for existing token on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // const token = document.cookie.split("; ").find(row => row.startsWith("token="))?.split("=")[1];
     if (token) {
       const userStr = localStorage.getItem("user");
       if (userStr) {
@@ -76,16 +79,19 @@ const Login = ({ setCurrentUser }) => {
                   const emailDomain = userEmail.split("@")[1];
                   const emailName = userEmail.split("@")[0];
 
+                  const { allowedEmailDomains, filteredEmailNames } = settings;
+
                   if (
-                    FILTERED_EMAIL_NAMES.some((name) =>
-                      emailName.startsWith(name),
-                    )
+                    filteredEmailNames.some((name) => emailName.startsWith(name))
                   ) {
                     showError(`This email is not allowed to login.`, toastId);
                     return;
                   }
 
-                  if (emailDomain !== ALLOWED_EMAIL_DOMAIN) {
+                  if (
+                    allowedEmailDomains.length > 0 &&
+                    !allowedEmailDomains.includes(emailDomain)
+                  ) {
                     showError(
                       `Please use your organization email to login.`,
                       toastId,

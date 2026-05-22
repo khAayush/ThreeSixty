@@ -12,6 +12,7 @@ import inventoryRouter from "./routes/inventory.route.js";
 import assignmentRouter from "./routes/assignment.route.js";
 import dashboardRouter from "./routes/dashboard.route.js";
 import notificationRouter from "./routes/notification.route.js";
+import settingsRouter from "./routes/settings.route.js";
 import { createServer } from "http";
 import { initSocket } from "./utils/socket.js";
 
@@ -42,6 +43,7 @@ app.use("/api/inventory",   inventoryRouter);
 app.use("/api/assignments", assignmentRouter);
 app.use("/api/dashboard",   dashboardRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/settings", settingsRouter);
 
 // server.listen(process.env.PORT, async () => {
 //   connectDB();

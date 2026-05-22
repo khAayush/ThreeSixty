@@ -29,7 +29,7 @@ const navItems = [
 
   { id: 'users', label: 'Users', icon: UsersIcon, path: '/users', roles: ['admin', 'manager'] },
 
-  { id: 'settings', label: 'Settings', icon: Cog6ToothIcon, path: '/settings', roles: ['admin', 'manager'] },
+  { id: 'settings', label: 'Settings', icon: Cog6ToothIcon, path: '/settings', roles: ['manager'] },
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {

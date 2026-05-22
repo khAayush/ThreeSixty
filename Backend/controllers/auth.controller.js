@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import Settings from "../models/settings.model.js";
 import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail.js";
 import { notifyRole } from "../utils/createNotification.js";
@@ -391,17 +392,14 @@ export const googleAuth = async (req, res) => {
     const emailPrefix = emailParts[0];
     const emailDomain = emailParts[1];
 
-    const allowedDomains = (process.env.ALLOWED_EMAIL_DOMAINS || "")
-      .split(",")
-      .map((d) => d.trim());
-    if (!allowedDomains.includes(emailDomain)) {
+    const settings = await Settings.findOne();
+    const allowedDomains = settings?.allowedEmailDomains ?? [];
+    if (allowedDomains.length > 0 && !allowedDomains.includes(emailDomain)) {
       return res.status(403).json({ message: "Login not authorized" });
     }
 
     // 2. Validate email prefix (filtered names)
-    const filteredPrefixes = (process.env.FILTERED_EMAIL_NAMES || "")
-      .split(",")
-      .map((p) => p.trim());
+    const filteredPrefixes = settings?.filteredEmailNames ?? [];
     if (filteredPrefixes.includes(emailPrefix)) {
       return res.status(403).json({ message: "Login not authorized" });
     }

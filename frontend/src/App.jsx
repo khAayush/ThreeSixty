@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Route, Routes } from "react-router";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -25,6 +25,9 @@ import EmployeeTicketsPage from "./pages/EmployeeTicketsPage";
 import EmployeeLostFound from "./pages/EmployeeLostAndFoundPage";
 import EmployeeInventoryPage from "./pages/EmployeeInventoryPage";
 import EmployeeAssignmentPage from "./pages/EmployeeAssignmentPage";
+import SettingsPage from "./pages/SettingsPage";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -35,6 +38,19 @@ const App = () => {
       return null;
     }
   });
+
+  useEffect(() => {
+    fetch(`${API_URL}/settings`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.settings?.brandColor) {
+          const color = data.settings.brandColor;
+          document.documentElement.style.setProperty("--color-brand", color);
+          localStorage.setItem("brandColor", color);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -159,6 +175,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={["employee"]}>
               <EmployeeAssignmentPage onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <SettingsPage onLogout={handleLogout} />
             </ProtectedRoute>
           }
         />

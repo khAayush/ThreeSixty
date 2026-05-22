@@ -9,15 +9,15 @@ import {
 import NotificationBell from "./NotificationBell";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const INSTITUTION_NAME = import.meta.env.VITE_INSTITUTION_NAME;
 
 const Header = ({
   onMenuClick,
-  institutionName = INSTITUTION_NAME,
+  institutionName: institutionNameProp,
   onLogout,
 }) => {
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [institutionName, setInstitutionName] = useState(institutionNameProp || "");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -99,6 +99,18 @@ const Header = ({
     return () => {
       window.removeEventListener("profileUpdated", fetchUserProfile);
     };
+  }, []);
+
+  useEffect(() => {
+    if (institutionNameProp) return;
+    fetch(`${API_URL}/settings`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.settings?.organizationName) {
+          setInstitutionName(data.settings.organizationName);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {

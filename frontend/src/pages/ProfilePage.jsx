@@ -11,7 +11,6 @@ import toast, { Toaster } from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Compress an image File to a base64 JPEG (max 400px, 80% quality)
 const compressImage = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -238,12 +237,11 @@ const ProfilePage = ({ onLogout }) => {
             <div>
               <h5 className="font-bold text-slate-800 text-sm">Google Account</h5>
               <p className="text-slate-500 text-xs mt-1 leading-relaxed">
-                Your account is managed by Google. Email and password cannot be changed here.
-                Profile picture is synced from your Google account.
+                Your account is managed by Google. Name, email and profile picture is synced from your Google account.
               </p>
             </div>
           </div>
-        ) : userRole.toLowerCase() === "admin" || userRole.toLowerCase() === "manager" ? (
+        ) : userRole.toLowerCase() === "admin" ? (
           <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex items-start gap-4 mt-8">
             <div className="bg-white p-2 rounded-lg shadow-sm text-blue-500">
               <ShieldCheckIcon className="w-6 h-6" />
@@ -253,6 +251,18 @@ const ProfilePage = ({ onLogout }) => {
               <p className="text-slate-500 text-xs mt-1 leading-relaxed">
                 You can change your account information or delete your account from the{" "}
                 <a href="/users" className="text-blue-500 hover:underline font-semibold">Users</a> tab.
+              </p>
+            </div>
+          </div>
+        ) : userRole.toLowerCase() === "manager" ? (
+          <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex items-start gap-4 mt-8">
+            <div className="bg-white p-2 rounded-lg shadow-sm text-blue-500">
+              <ShieldCheckIcon className="w-6 h-6" />
+            </div>
+            <div>
+              <h5 className="font-bold text-slate-800 text-sm">Account Security</h5>
+              <p className="text-slate-500 text-xs mt-1 leading-relaxed">
+                This account is used to set up the system and has elevated permissions. Making changes to this account may affect system functionality.
               </p>
             </div>
           </div>
