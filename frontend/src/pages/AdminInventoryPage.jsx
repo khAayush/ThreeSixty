@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import toast from "react-hot-toast";
-import { PlusIcon, ChevronRightIcon, ArrowLeftIcon, ClipboardDocumentListIcon, XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, ChevronRightIcon, ArrowLeftIcon, ClipboardDocumentListIcon, XMarkIcon, MagnifyingGlassIcon, ArrowUpTrayIcon, CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 import { Modal, Field, ModalActions } from "../components/inventory/InventoryModal";
 import AssetDetailModal from "../components/inventory/AssetDetailModal";
@@ -61,6 +61,11 @@ const AdminInventoryPage = ({ onLogout }) => {
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsQuery, setLogsQuery] = useState("");
+  const [csvModal, setCsvModal] = useState(false);
+  const [csvRows, setCsvRows] = useState([]);       // parsed preview rows
+  const [csvError, setCsvError] = useState("");
+  const [csvResults, setCsvResults] = useState(null); // post-submit results
+  const [csvSubmitting, setCsvSubmitting] = useState(false);
 
   // ── API helper ───────────────────────────────────────────────────────────────
 
@@ -360,6 +365,91 @@ const AdminInventoryPage = ({ onLogout }) => {
     finally { setSubmitting(false); }
   };
 
+  const openCsvModal = () => {
+    setCsvRows([]);
+    setCsvError("");
+    setCsvResults(null);
+    setCsvModal(true);
+  };
+
+  const parseCsv = (text) => {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return { rows: [], error: "CSV must have a header row and at least one data row" };
+
+    const header = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/[\s_]/g, ""));
+    const catIdx  = header.findIndex((h) => h === "category");
+    const typeIdx = header.findIndex((h) => ["categorytype", "type"].includes(h));
+    const nameIdx = header.findIndex((h) => ["unitname", "name"].includes(h));
+    const tagIdx  = header.findIndex((h) => ["basetag", "tag"].includes(h));
+    const qtyIdx  = header.findIndex((h) => ["quantity", "count", "initialcount"].includes(h));
+
+    if ([catIdx, typeIdx, nameIdx, tagIdx, qtyIdx].some((i) => i === -1))
+      return { rows: [], error: 'Headers must include: category, categoryType, unitName, baseTag, quantity' };
+
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(",").map((c) => c.trim());
+      if (cols.every((c) => !c)) continue;
+      rows.push({
+        category:     cols[catIdx]  || "",
+        categoryType: cols[typeIdx] || "",
+        unitName:     cols[nameIdx] || "",
+        baseTag:      cols[tagIdx]  || "",
+        quantity:     cols[qtyIdx]  || "",
+      });
+    }
+    return { rows, error: "" };
+  };
+
+  const handleCsvFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.name.endsWith(".csv")) { setCsvError("Please upload a .csv file"); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const { rows, error } = parseCsv(ev.target.result);
+      setCsvError(error);
+      setCsvRows(rows);
+      setCsvResults(null);
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const downloadTemplate = () => {
+    const content = [
+      "category,categoryType,unitName,baseTag,quantity",
+      "Laptops,assignable,Dell Latitude,DELL-LAT,5",
+      "Laptops,assignable,HP ProBook,HP-PRO,3",
+      "Monitors,fixed,Samsung 27in,SAM-MON,10",
+    ].join("\n");
+    const blob = new Blob([content], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "bulk_import_template.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCsvSubmit = async () => {
+    if (!csvRows.length) return;
+    setCsvSubmitting(true);
+    try {
+      const res = await inventoryFetch("/bulk-import", {
+        method: "POST",
+        body: JSON.stringify({ rows: csvRows }),
+      });
+      if (!res) return;
+      const data = await res.json();
+      if (data.success) {
+        setCsvResults(data.data);
+        fetchCategories();
+        const ok = data.data.filter((r) => r.success).length;
+        if (ok > 0) toast.success(`${ok} row(s) imported successfully`);
+      } else toast.error(data.message);
+    } catch { toast.error("CSV import failed"); }
+    finally { setCsvSubmitting(false); }
+  };
+
   const openLogsModal = async () => {
     setLogsModal(true);
     setLogsQuery("");
@@ -374,7 +464,7 @@ const AdminInventoryPage = ({ onLogout }) => {
     finally { setLogsLoading(false); }
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────────
+  // Render
 
   const pageTitle =
     view === "categories" ? "Inventory"
@@ -436,12 +526,20 @@ const AdminInventoryPage = ({ onLogout }) => {
               </button>
             )}
             {view === "categories" && (
-              <button
-                onClick={() => openModal("createCategory")}
-                className="flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-xl font-semibold text-sm hover:bg-brand/90 transition-colors"
-              >
-                <PlusIcon className="w-4 h-4" /> New Category
-              </button>
+              <>
+                <button
+                  onClick={openCsvModal}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors"
+                >
+                  <ArrowUpTrayIcon className="w-4 h-4" /> Import CSV
+                </button>
+                <button
+                  onClick={() => openModal("createCategory")}
+                  className="flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-xl font-semibold text-sm hover:bg-brand/90 transition-colors"
+                >
+                  <PlusIcon className="w-4 h-4" /> New Category
+                </button>
+              </>
             )}
             {view === "units" && (
               <button
@@ -640,6 +738,175 @@ const AdminInventoryPage = ({ onLogout }) => {
           {...confirm}
           onClose={() => setConfirm(null)}
         />
+      )}
+
+      {/* ── CSV Import Modal ─────────────────────────────────────────────────── */}
+      {csvModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl flex flex-col max-h-[85vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <ArrowUpTrayIcon className="w-5 h-5 text-brand" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800">Bulk Import from CSV</h3>
+                  <p className="text-xs text-slate-400">Creates or updates categories, units, and assets in one go</p>
+                </div>
+              </div>
+              <button onClick={() => setCsvModal(false)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors">
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
+              {!csvResults ? (
+                <>
+                  {/* Upload area */}
+                  <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center">
+                    <ArrowUpTrayIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500 mb-1">Required columns:</p>
+                    <p className="font-mono text-xs font-semibold text-slate-700 mb-3">category, categoryType, unitName, baseTag, quantity</p>
+                    <p className="text-xs text-slate-400 mb-3">categoryType must be <span className="font-semibold">fixed</span> or <span className="font-semibold">assignable</span></p>
+                    <div className="flex items-center justify-center gap-3">
+                      <label className="cursor-pointer px-4 py-2 bg-brand text-white rounded-xl text-sm font-semibold hover:bg-brand/90 transition-colors">
+                        Choose File
+                        <input type="file" accept=".csv" className="hidden" onChange={handleCsvFile} />
+                      </label>
+                      <button onClick={downloadTemplate} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors">
+                        Download Template
+                      </button>
+                    </div>
+                  </div>
+
+                  {csvError && (
+                    <div className="flex items-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
+                      <ExclamationCircleIcon className="w-4 h-4 shrink-0" />
+                      {csvError}
+                    </div>
+                  )}
+
+                  {/* Preview table */}
+                  {csvRows.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{csvRows.length} row{csvRows.length !== 1 ? "s" : ""} detected</p>
+                      <div className="border border-slate-200 rounded-xl overflow-hidden">
+                        <table className="w-full text-sm">
+                          <thead className="bg-slate-50">
+                            <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                              <th className="px-4 py-2.5">#</th>
+                              <th className="px-4 py-2.5">Category</th>
+                              <th className="px-4 py-2.5">Type</th>
+                              <th className="px-4 py-2.5">Unit Name</th>
+                              <th className="px-4 py-2.5">Base Tag</th>
+                              <th className="px-4 py-2.5">Qty</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {csvRows.map((row, i) => {
+                              const miss = (v) => v || <span className="text-red-400 italic">missing</span>;
+                              const validType = ["fixed","assignable"].includes(row.categoryType?.toLowerCase());
+                              return (
+                                <tr key={i} className="hover:bg-slate-50">
+                                  <td className="px-4 py-2.5 text-slate-400 text-xs">{i + 1}</td>
+                                  <td className="px-4 py-2.5 font-medium text-slate-800">{miss(row.category)}</td>
+                                  <td className="px-4 py-2.5">
+                                    {row.categoryType
+                                      ? <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${validType ? "bg-slate-100 text-slate-600" : "bg-red-50 text-red-500"}`}>{row.categoryType}</span>
+                                      : <span className="text-red-400 italic text-xs">missing</span>}
+                                  </td>
+                                  <td className="px-4 py-2.5 text-slate-700">{miss(row.unitName)}</td>
+                                  <td className="px-4 py-2.5 font-mono text-xs text-slate-600">{miss(row.baseTag)}</td>
+                                  <td className="px-4 py-2.5 text-slate-700">{miss(row.quantity)}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* Results view */
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${csvResults.every(r => r.success) ? "bg-emerald-50" : "bg-amber-50"}`}>
+                      <CheckCircleIcon className={`w-5 h-5 ${csvResults.every(r => r.success) ? "text-emerald-500" : "text-amber-500"}`} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-800">Import Complete</p>
+                      <p className="text-xs text-slate-400">
+                        {csvResults.filter(r => r.success).length} succeeded, {csvResults.filter(r => !r.success).length} failed
+                      </p>
+                    </div>
+                  </div>
+                  <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50">
+                        <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                          <th className="px-4 py-2.5">Category</th>
+                          <th className="px-4 py-2.5">Unit</th>
+                          <th className="px-4 py-2.5">Base Tag</th>
+                          <th className="px-4 py-2.5">Result</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {csvResults.map((r, i) => (
+                          <tr key={i} className="hover:bg-slate-50">
+                            <td className="px-4 py-2.5 text-slate-600 text-xs">
+                              {r.category}
+                              {r.categoryCreated && <span className="ml-1 px-1 py-0.5 bg-purple-50 text-purple-600 text-[10px] font-bold rounded">NEW</span>}
+                            </td>
+                            <td className="px-4 py-2.5 font-medium text-slate-800">{r.unitName}</td>
+                            <td className="px-4 py-2.5 font-mono text-xs text-slate-600">{r.baseTag}</td>
+                            <td className="px-4 py-2.5">
+                              {r.success ? (
+                                <span className="flex items-center gap-1 text-xs font-semibold">
+                                  <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                  <span className={r.action === "stock_added" ? "text-blue-600" : "text-emerald-600"}>
+                                    {r.action === "stock_added" ? `+${r.assetsCreated} stock added` : `${r.assetsCreated} asset${r.assetsCreated !== 1 ? "s" : ""} created`}
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-1 text-red-500 text-xs font-semibold">
+                                  <ExclamationCircleIcon className="w-3.5 h-3.5 shrink-0" /> {r.error}
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-3 border-t border-slate-100 shrink-0 flex items-center justify-end gap-3">
+              <button onClick={() => setCsvModal(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">
+                {csvResults ? "Close" : "Cancel"}
+              </button>
+              {!csvResults && (
+                <button
+                  onClick={handleCsvSubmit}
+                  disabled={csvRows.length === 0 || !!csvError || csvSubmitting}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-brand rounded-xl hover:bg-brand/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {csvSubmitting ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <ArrowUpTrayIcon className="w-4 h-4" />
+                  )}
+                  Import {csvRows.length > 0 ? `${csvRows.length} Unit${csvRows.length !== 1 ? "s" : ""}` : ""}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ── Inventory Logs Modal (manager only) ─────────────────────────────── */}

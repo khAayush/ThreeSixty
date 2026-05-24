@@ -4,7 +4,7 @@ import { requireAdmin, requireManager } from "../middlewares/admin.middleware.js
 import {
   getCategories, createCategory, updateCategory, deleteCategory,
   browseInventory,
-  getUnitsByCategory, createUnit, addStock,
+  getUnitsByCategory, createUnit, addStock, bulkImport,
   getAssetsByUnit, getAssetDetails, updateAssetStatus, updateAssetLocation,
   deleteAsset, markAssetLost, getAllAssetLogs,
 } from "../controllers/inventory.controller.js";
@@ -24,6 +24,7 @@ router.delete("/categories/:id", verifyToken, requireAdmin, deleteCategory);
 router.get("/categories/:categoryId/units", verifyToken, getUnitsByCategory);
 router.post("/units", verifyToken, requireAdmin, createUnit);
 router.post("/units/:unitId/stock", verifyToken, requireAdmin, addStock);
+router.post("/bulk-import", verifyToken, requireAdmin, bulkImport);
 
 // Asset logs - manager only
 router.get("/logs", verifyToken, requireManager, getAllAssetLogs);

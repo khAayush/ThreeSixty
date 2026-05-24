@@ -240,6 +240,93 @@ export const createUnit = async (req, res) => {
   }
 };
 
+export const bulkImport = async (req, res) => {
+  try {
+    const { rows } = req.body;
+    if (!Array.isArray(rows) || rows.length === 0)
+      return res.status(400).json({ success: false, message: "rows array is required" });
+
+    const userId = uid(req);
+    const results = [];
+
+    for (const row of rows) {
+      try {
+        const categoryName = row.category?.trim();
+        const categoryType = row.categoryType?.trim().toLowerCase();
+        const unitName     = row.unitName?.trim();
+        const baseTag      = row.baseTag?.trim().toUpperCase();
+        const quantity     = parseInt(row.quantity);
+
+        if (!categoryName || !categoryType || !unitName || !baseTag || isNaN(quantity) || quantity < 1) {
+          results.push({ category: row.category, unitName: row.unitName, baseTag: row.baseTag, success: false, error: "Missing or invalid fields" });
+          continue;
+        }
+        if (!["fixed", "assignable"].includes(categoryType)) {
+          results.push({ category: categoryName, unitName, baseTag, success: false, error: 'categoryType must be "fixed" or "assignable"' });
+          continue;
+        }
+
+        // ── Find or create category ──────────────────────────────────────────
+        let category = await Category.findOne({ name: { $regex: new RegExp(`^${categoryName}$`, "i") }, type: categoryType });
+        let categoryCreated = false;
+        if (!category) {
+          category = await Category.create({ name: categoryName, type: categoryType, description: "" });
+          categoryCreated = true;
+          InventoryLog.create({ actionType: "CATEGORY_CREATED", entityName: category.name, details: `Type: ${categoryType} (via CSV import)`, performedBy: userId }).catch(() => {});
+        }
+
+        // ── Find or create unit ──────────────────────────────────────────────
+        let unit = await ItemUnit.findOne({ baseTag, categoryId: category._id });
+
+        if (unit) {
+          // Unit exists → add stock
+          const startIdx = unit.totalCount;
+          const assetDocs = Array.from({ length: quantity }, (_, i) => ({
+            unitId: unit._id,
+            categoryId: category._id,
+            tag: `${baseTag}-${(startIdx + i + 1).toString().padStart(2, "0")}`,
+            status: "Healthy",
+            isLost: false,
+            createdBy: userId,
+            ...(categoryType === "fixed" ? { location: null } : { isAssigned: false }),
+          }));
+          await Asset.insertMany(assetDocs);
+          await ItemUnit.findByIdAndUpdate(unit._id, { $inc: { totalCount: quantity } });
+          InventoryLog.create({ actionType: "STOCK_ADDED", entityName: unit.name, details: `${quantity} asset(s) added via CSV import`, performedBy: userId }).catch(() => {});
+          results.push({ category: categoryName, unitName: unit.name, baseTag, success: true, action: "stock_added", assetsCreated: quantity, categoryCreated });
+        } else {
+          // Unit doesn't exist → create unit + assets
+          unit = await ItemUnit.create({ categoryId: category._id, name: unitName, baseTag, totalCount: quantity });
+          const assetDocs = Array.from({ length: quantity }, (_, i) => ({
+            unitId: unit._id,
+            categoryId: category._id,
+            tag: `${baseTag}-${(i + 1).toString().padStart(2, "0")}`,
+            status: "Healthy",
+            isLost: false,
+            createdBy: userId,
+            ...(categoryType === "fixed" ? { location: null } : { isAssigned: false }),
+          }));
+          await Asset.insertMany(assetDocs);
+          InventoryLog.create({ actionType: "UNIT_CREATED", entityName: unitName, details: `${quantity} asset(s) created via CSV import (${baseTag})`, performedBy: userId }).catch(() => {});
+          results.push({ category: categoryName, unitName, baseTag, success: true, action: "unit_created", assetsCreated: quantity, categoryCreated });
+        }
+      } catch (err) {
+        results.push({
+          category: row.category,
+          unitName: row.unitName,
+          baseTag: row.baseTag,
+          success: false,
+          error: err.code === 11000 ? "Duplicate tag detected" : err.message,
+        });
+      }
+    }
+
+    res.json({ success: true, data: results });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 export const addStock = async (req, res) => {
   try {
     const { unitId } = req.params;
