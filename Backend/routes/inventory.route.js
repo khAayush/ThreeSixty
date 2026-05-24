@@ -1,12 +1,12 @@
-import express from "express";
+﻿import express from "express";
 import { verifyToken } from "../middlewares/auth.middleware.js";
-import { requireAdmin } from "../middlewares/admin.middleware.js";
+import { requireAdmin, requireManager } from "../middlewares/admin.middleware.js";
 import {
   getCategories, createCategory, updateCategory, deleteCategory,
   browseInventory,
   getUnitsByCategory, createUnit, addStock,
   getAssetsByUnit, getAssetDetails, updateAssetStatus, updateAssetLocation,
-  deleteAsset, markAssetLost,
+  deleteAsset, markAssetLost, getAllAssetLogs,
 } from "../controllers/inventory.controller.js";
 
 const router = express.Router();
@@ -14,7 +14,7 @@ const router = express.Router();
 // Employee browse
 router.get("/browse", verifyToken, browseInventory);
 
-// Categories — read: all roles; write: admin only
+// Categories - read: all roles; write: admin only
 router.get("/categories", verifyToken, getCategories);
 router.post("/categories", verifyToken, requireAdmin, createCategory);
 router.put("/categories/:id", verifyToken, requireAdmin, updateCategory);
@@ -24,6 +24,9 @@ router.delete("/categories/:id", verifyToken, requireAdmin, deleteCategory);
 router.get("/categories/:categoryId/units", verifyToken, getUnitsByCategory);
 router.post("/units", verifyToken, requireAdmin, createUnit);
 router.post("/units/:unitId/stock", verifyToken, requireAdmin, addStock);
+
+// Asset logs - manager only
+router.get("/logs", verifyToken, requireManager, getAllAssetLogs);
 
 // Assets
 router.get("/units/:unitId/assets", verifyToken, getAssetsByUnit);

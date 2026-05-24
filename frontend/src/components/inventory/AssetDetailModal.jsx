@@ -1,4 +1,4 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
+﻿import { XMarkIcon } from "@heroicons/react/24/outline";
 import { STATUS_COLORS, fmtDate } from "./inventoryUtils";
 
 const AssetDetailModal = ({ asset, logs, onClose }) => {
@@ -70,7 +70,7 @@ const AssetDetailModal = ({ asset, logs, onClose }) => {
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
                 Created By
               </p>
-              <p className="text-sm text-slate-700">{asset.createdBy?.name || "—"}</p>
+              <p className="text-sm text-slate-700">{asset.createdBy?.name || "-"}</p>
             </div>
           </div>
 

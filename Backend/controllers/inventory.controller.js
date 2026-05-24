@@ -1,9 +1,10 @@
-import Category from "../models/category.model.js";
+﻿import Category from "../models/category.model.js";
 import ItemUnit from "../models/itemunit.model.js";
 import Asset from "../models/asset.model.js";
 import AssetLog from "../models/assetlog.model.js";
 import Assignment from "../models/assignment.model.js";
 import LostAndFound from "../models/lostandfound.model.js";
+import InventoryLog from "../models/inventorylog.model.js";
 
 const uid = (req) => req.user._id || req.user.id;
 
@@ -39,6 +40,14 @@ export const createCategory = async (req, res) => {
       return res.status(400).json({ success: false, message: "name and type are required" });
 
     const cat = await Category.create({ name: name.trim(), type, description: description || "" });
+
+    InventoryLog.create({
+      actionType: "CATEGORY_CREATED",
+      entityName: cat.name,
+      details: `Type: ${type}`,
+      performedBy: uid(req),
+    }).catch(() => {});
+
     res.status(201).json({ success: true, data: cat });
   } catch (err) {
     if (err.code === 11000)
@@ -78,6 +87,13 @@ export const deleteCategory = async (req, res) => {
     const cat = await Category.findByIdAndDelete(req.params.id);
     if (!cat)
       return res.status(404).json({ success: false, message: "Category not found" });
+
+    InventoryLog.create({
+      actionType: "CATEGORY_DELETED",
+      entityName: cat.name,
+      details: `Type: ${cat.type}`,
+      performedBy: uid(req),
+    }).catch(() => {});
 
     res.json({ success: true, message: "Category deleted" });
   } catch (err) {
@@ -207,11 +223,18 @@ export const createUnit = async (req, res) => {
       }))
     );
 
+    InventoryLog.create({
+      actionType: "UNIT_CREATED",
+      entityName: unit.name,
+      details: `${count} asset(s) created with base tag ${baseTag}`,
+      performedBy: userId,
+    }).catch(() => {});
+
     res.status(201).json({ success: true, data: { unit, assetsCreated: assets.length } });
   } catch (err) {
     console.error("createUnit:", err);
     if (err.code === 11000)
-      return res.status(409).json({ success: false, message: "Duplicate tag — adjust count or base tag" });
+      return res.status(409).json({ success: false, message: "Duplicate tag - adjust count or base tag" });
 
     res.status(500).json({ success: false, message: err.message });
   }
@@ -253,6 +276,13 @@ export const addStock = async (req, res) => {
         comment: `Asset ${a.tag} added to stock`,
       }))
     );
+
+    InventoryLog.create({
+      actionType: "STOCK_ADDED",
+      entityName: unit.name,
+      details: `${count} asset(s) added`,
+      performedBy: userId,
+    }).catch(() => {});
 
     res.json({ success: true, data: { assetsCreated: assets.length } });
   } catch (err) {
@@ -297,6 +327,20 @@ export const getAssetDetails = async (req, res) => {
       .sort({ changedAt: -1 });
 
     res.json({ success: true, data: { asset, logs } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const getAllAssetLogs = async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 200, 500);
+    const logs = await InventoryLog.find()
+      .populate("performedBy", "name")
+      .sort({ performedAt: -1 })
+      .limit(limit);
+
+    res.json({ success: true, data: logs });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -347,9 +391,20 @@ export const deleteAsset = async (req, res) => {
     // Nullify any pending assignment suggestions pointing to this asset
     await Assignment.updateMany({ assetId: asset._id, status: "Pending" }, { $set: { assetId: null } });
 
+    const unit = await ItemUnit.findById(asset.unitId);
+    const assetTag = asset.tag;
+    const unitName = unit?.name || assetTag;
+
     await AssetLog.deleteMany({ assetId: asset._id });
     await asset.deleteOne();
     await ItemUnit.findByIdAndUpdate(asset.unitId, { $inc: { totalCount: -1 } });
+
+    InventoryLog.create({
+      actionType: "ASSET_DELETED",
+      entityName: unitName,
+      details: `Asset ${assetTag} deleted`,
+      performedBy: uid(req),
+    }).catch(() => {});
 
     res.json({ success: true, message: "Asset deleted" });
   } catch (err) {

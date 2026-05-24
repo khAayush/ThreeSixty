@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+﻿import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
@@ -103,7 +103,7 @@ export const initSocket = (httpServer) => {
           senderIds.forEach((sid) => io.to(sid).emit("message:status", payload));
         }
       } catch (err) {
-        // silent — non-critical
+        // silent - non-critical
       }
     });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import StatCard from "../components/StatCard";
 import {
@@ -97,10 +97,10 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by name, code, or reporter"
+              placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand focus:bg-white transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm outline-none transition-all"
             />
           </div>
         </div>

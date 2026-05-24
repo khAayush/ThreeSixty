@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 /**
@@ -52,7 +52,7 @@ const ConfirmModal = ({
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 autoFocus
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-300 resize-none"
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-700 outline-none resize-none"
               />
               <p className="text-xs text-slate-400 mt-1">This field is required</p>
             </div>

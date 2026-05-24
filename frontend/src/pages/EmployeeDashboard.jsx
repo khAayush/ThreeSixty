@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import Layout from "../components/Layout";
 import StatCard from "../components/StatCard";
@@ -15,7 +15,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
+  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
 
 const ASSIGNMENT_STATUS_STYLES = {
   Pending:  "bg-amber-50 text-amber-600",
@@ -83,9 +83,9 @@ const EmployeeDashboard = ({ onLogout }) => {
 
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10">
-          <StatCard label="Assigned Assets"  value={loading ? "—" : assignedCount} icon={CubeIcon}    iconBg="bg-blue-50"   iconColor="text-blue-500"   />
-          <StatCard label="Pending Requests" value={loading ? "—" : pendingCount}  icon={ClockIcon}   iconBg="bg-orange-50" iconColor="text-orange-500" />
-          <StatCard label="Tickets Created"  value={loading ? "—" : ticketCount}   icon={TicketIcon}  iconBg="bg-yellow-50" iconColor="text-yellow-500" />
+          <StatCard label="Assigned Assets"  value={loading ? "-" : assignedCount} icon={CubeIcon}    iconBg="bg-blue-50"   iconColor="text-blue-500"   />
+          <StatCard label="Pending Requests" value={loading ? "-" : pendingCount}  icon={ClockIcon}   iconBg="bg-orange-50" iconColor="text-orange-500" />
+          <StatCard label="Tickets Created"  value={loading ? "-" : ticketCount}   icon={TicketIcon}  iconBg="bg-yellow-50" iconColor="text-yellow-500" />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -121,7 +121,7 @@ const EmployeeDashboard = ({ onLogout }) => {
                         <CubeIcon className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-800">{a.unitId?.name || "—"}</p>
+                        <p className="text-sm font-bold text-slate-800">{a.unitId?.name || "-"}</p>
                         {a.assetId?.tag && (
                           <p className="text-[10px] font-mono text-slate-400">{a.assetId.tag}</p>
                         )}

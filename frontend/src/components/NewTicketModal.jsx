@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 const NewTicketModal = ({ isOpen, onClose, onSubmit }) => {
@@ -64,7 +64,7 @@ const NewTicketModal = ({ isOpen, onClose, onSubmit }) => {
               value={formData.title}
               onChange={handleChange}
               placeholder="e.g., Laptop performance issues"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition text-slate-800 placeholder-slate-400"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg outline-none transition text-slate-800 placeholder-slate-400"
               required
             />
           </div>
@@ -80,7 +80,7 @@ const NewTicketModal = ({ isOpen, onClose, onSubmit }) => {
               onChange={handleChange}
               placeholder="Describe your issue or request in detail..."
               rows="4"
-              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand transition text-slate-800 placeholder-slate-400 resize-none"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg outline-none transition text-slate-800 placeholder-slate-400 resize-none"
               required
             />
           </div>

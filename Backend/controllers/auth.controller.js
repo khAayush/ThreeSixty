@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+﻿import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import Settings from "../models/settings.model.js";
@@ -123,7 +123,7 @@ export const login = async (req, res) => {
       day: "numeric",
     });
 
-    // JWT carries only the identifiers — verifyToken fetches the full user from DB
+    // JWT carries only the identifiers - verifyToken fetches the full user from DB
     const token = jwt.sign(
       {
         userId: user._id,
@@ -294,7 +294,7 @@ export const deleteAccount = async (req, res) => {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    // manager account is immutable — no one can terminate it via this endpoint
+    // manager account is immutable - no one can terminate it via this endpoint
     if (targetUser.role === "manager") {
       return res.status(403).json({
         message: "The manager account cannot be terminated",
@@ -489,7 +489,7 @@ export const googleAuth = async (req, res) => {
       day: "numeric",
     });
 
-    // JWT carries only the identifiers — verifyToken fetches the full user from DB
+    // JWT carries only the identifiers - verifyToken fetches the full user from DB
     const token = jwt.sign(
       {
         userId: user._id,
@@ -678,7 +678,7 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
-    // Google accounts manage their own credentials — silently skip
+    // Google accounts manage their own credentials - silently skip
     if (user.isGoogleAccount) {
       return res.status(200).json({
         message: "If this email is registered, an OTP has been sent.",

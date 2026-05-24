@@ -1,4 +1,4 @@
-export const STATUS_COLORS = {
+﻿export const STATUS_COLORS = {
   Healthy: "bg-emerald-100 text-emerald-700",
   Damaged: "bg-amber-100 text-amber-700",
   "Out-For-Repair": "bg-blue-100 text-blue-700",
@@ -11,7 +11,7 @@ export const TYPE_COLORS = {
 };
 
 export const inputCls =
-  "w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/30";
+  "w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none";
 
 export const fmtDate = (d) =>
   d
@@ -22,4 +22,4 @@ export const fmtDate = (d) =>
         hour: "numeric",
         minute: "2-digit",
       })
-    : "—";
+    : "-";

@@ -1,4 +1,4 @@
-import User from "../models/user.model.js";
+﻿import User from "../models/user.model.js";
 
 export const updateProfileImage = async (req, res) => {
   const { profileImage } = req.body;
@@ -42,7 +42,7 @@ export const updateProfileImage = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    // manager is a system-level account — never expose it in user lists
+    // manager is a system-level account - never expose it in user lists
     const users = await User.find({ role: { $ne: "manager" } }).select("-password");
     res.json(users);
   } catch (err) {
@@ -87,7 +87,7 @@ export const updateUserProfile = async (req, res) => {
     const updateFields = {};
     if (name !== undefined) updateFields.name = name;
 
-    // Google accounts: email is owned by Google — reject changes
+    // Google accounts: email is owned by Google - reject changes
     if (email !== undefined) {
       if (targetUser.isGoogleAccount) {
         return res.status(403).json({

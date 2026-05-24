@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../components/Layout";
 import toast from "react-hot-toast";
 import { showLoading, showSuccess, showError } from "../utils/toast";
@@ -8,7 +8,7 @@ import ApproveModal from "../components/ApproveModal";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
+  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
 
 const STATUS_STYLES = {
   Pending:   "bg-amber-50 text-amber-600",
@@ -217,11 +217,11 @@ const RequestsTable = ({ rows, onApprove, onReject }) => (
         : rows.map((a) => (
           <tr key={a._id} className="hover:bg-slate-50 transition-colors">
             <td className="px-6 py-4">
-              <p className="font-semibold text-slate-800">{a.requestedBy?.name || "—"}</p>
+              <p className="font-semibold text-slate-800">{a.requestedBy?.name || "-"}</p>
               <p className="text-xs text-slate-400">{a.requestedBy?.email}</p>
             </td>
-            <td className="px-6 py-4 text-sm font-medium text-slate-700">{a.unitId?.name || "—"}</td>
-            <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "—"}</td>
+            <td className="px-6 py-4 text-sm font-medium text-slate-700">{a.unitId?.name || "-"}</td>
+            <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "-"}</td>
             <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">1</td>
             <td className="px-6 py-4 text-sm text-slate-400 whitespace-nowrap">{fmtDate(a.createdAt)}</td>
             <td className="px-6 py-4">
@@ -260,10 +260,10 @@ const AssignmentsTable = ({ rows, onReturn, onAskReturn }) => (
         ? <EmptyRow cols={6} message="No active assignments" />
         : rows.map((a) => (
           <tr key={a._id} className="hover:bg-slate-50 transition-colors">
-            <td className="px-6 py-4 font-semibold text-slate-800">{a.assignedTo?.name || "—"}</td>
-            <td className="px-6 py-4 text-sm text-slate-600">{a.unitId?.name || "—"}</td>
-            <td className="px-6 py-4 font-mono text-sm text-slate-700">{a.assetId?.tag || "—"}</td>
-            <td className="px-6 py-4 text-sm text-slate-400">{a.assignedBy?.name || "—"}</td>
+            <td className="px-6 py-4 font-semibold text-slate-800">{a.assignedTo?.name || "-"}</td>
+            <td className="px-6 py-4 text-sm text-slate-600">{a.unitId?.name || "-"}</td>
+            <td className="px-6 py-4 font-mono text-sm text-slate-700">{a.assetId?.tag || "-"}</td>
+            <td className="px-6 py-4 text-sm text-slate-400">{a.assignedBy?.name || "-"}</td>
             <td className="px-6 py-4 text-sm text-slate-400 whitespace-nowrap">{fmtDate(a.assignedAt)}</td>
             <td className="px-6 py-4">
               <div className="flex items-center gap-2">
@@ -301,13 +301,13 @@ const HistoryTable = ({ rows }) => (
         ? <EmptyRow cols={6} message="No history yet" />
         : rows.map((a) => (
           <tr key={a._id} className="hover:bg-slate-50 transition-colors">
-            <td className="px-6 py-4 font-semibold text-slate-800">{a.requestedBy?.name || "—"}</td>
-            <td className="px-6 py-4 text-sm text-slate-600">{a.unitId?.name || "—"}</td>
-            <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "—"}</td>
+            <td className="px-6 py-4 font-semibold text-slate-800">{a.requestedBy?.name || "-"}</td>
+            <td className="px-6 py-4 text-sm text-slate-600">{a.unitId?.name || "-"}</td>
+            <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "-"}</td>
             <td className="px-6 py-4 text-sm text-slate-400 whitespace-nowrap">
               {a.status === "Returned" ? fmtDate(a.returnedAt) : fmtDate(a.updatedAt || a.createdAt)}
             </td>
-            <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">{a.adminNote || a.note || "—"}</td>
+            <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">{a.adminNote || a.note || "-"}</td>
             <td className="px-6 py-4">
               <span className={`px-2 py-1 rounded-lg text-xs font-bold ${STATUS_STYLES[a.status]}`}>{a.status}</span>
             </td>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router";
 import {
   Bars3Icon,
@@ -154,7 +154,7 @@ const Header = ({
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center space-x-3 group cursor-pointer focus:outline-none"
+            className="flex items-center space-x-3 group cursor-pointer outline-none"
           >
             <div className="text-right hidden md:block">
               <p className="text-sm font-bold text-slate-800 leading-none mb-1 group-hover:text-brand transition-colors">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../components/Layout";
 import toast from "react-hot-toast";
 import { CubeIcon, MagnifyingGlassIcon, ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -126,7 +126,7 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
             <select
               value={filterCatId}
               onChange={(e) => setFilterCatId(e.target.value)}
-              className="appearance-none pl-4 pr-9 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand cursor-pointer"
+              className="appearance-none pl-4 pr-9 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 shadow-sm outline-none cursor-pointer"
             >
               <option value="">All Categories</option>
               {catalog.map((cat) => (
@@ -142,7 +142,7 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
               placeholder="Search assets…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
+              className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 shadow-sm outline-none"
             />
           </div>
         </div>

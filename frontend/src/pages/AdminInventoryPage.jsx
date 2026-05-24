@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import toast from "react-hot-toast";
-import { PlusIcon, ChevronRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, ChevronRightIcon, ArrowLeftIcon, ClipboardDocumentListIcon, XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import { Modal, Field, ModalActions } from "../components/inventory/InventoryModal";
 import AssetDetailModal from "../components/inventory/AssetDetailModal";
@@ -13,8 +13,29 @@ import { inputCls } from "../components/inventory/inventoryUtils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+const fmtDateTime = (d) =>
+  d ? new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-";
+
+const ACTION_STYLES = {
+  CATEGORY_CREATED: "bg-purple-50 text-purple-700",
+  CATEGORY_DELETED: "bg-orange-50 text-orange-700",
+  UNIT_CREATED:     "bg-emerald-50 text-emerald-700",
+  STOCK_ADDED:      "bg-blue-50 text-blue-700",
+  ASSET_DELETED:    "bg-red-50 text-red-600",
+};
+
+const ACTION_LABELS = {
+  CATEGORY_CREATED: "Category Created",
+  CATEGORY_DELETED: "Category Deleted",
+  UNIT_CREATED:     "Unit Created",
+  STOCK_ADDED:      "Stock Added",
+  ASSET_DELETED:    "Asset Deleted",
+};
+
 const AdminInventoryPage = ({ onLogout }) => {
   const token = localStorage.getItem("token");
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const isManager = currentUser.role === "manager";
   const authHeaders = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
@@ -36,6 +57,10 @@ const AdminInventoryPage = ({ onLogout }) => {
   const [form, setForm] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [confirm, setConfirm] = useState(null);
+  const [logsModal, setLogsModal] = useState(false);
+  const [logs, setLogs] = useState([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [logsQuery, setLogsQuery] = useState("");
 
   // ── API helper ───────────────────────────────────────────────────────────────
 
@@ -303,7 +328,7 @@ const AdminInventoryPage = ({ onLogout }) => {
 
   const handleToggleLost = (asset) => {
     if (asset.isLost) {
-      // Mark as found — no location needed, call directly
+      // Mark as found - no location needed, call directly
       (async () => {
         try {
           const res = await inventoryFetch(`/assets/${asset._id}/lost`, { method: "PATCH" });
@@ -314,7 +339,7 @@ const AdminInventoryPage = ({ onLogout }) => {
         } catch { toast.error("Failed to mark asset as found"); }
       })();
     } else {
-      // Mark as lost — open modal to collect location
+      // Mark as lost - open modal to collect location
       openModal("markLost", asset);
     }
   };
@@ -335,12 +360,26 @@ const AdminInventoryPage = ({ onLogout }) => {
     finally { setSubmitting(false); }
   };
 
+  const openLogsModal = async () => {
+    setLogsModal(true);
+    setLogsQuery("");
+    setLogsLoading(true);
+    try {
+      const res = await inventoryFetch("/logs");
+      if (!res) return;
+      const data = await res.json();
+      if (data.success) setLogs(data.data);
+      else toast.error(data.message);
+    } catch { toast.error("Failed to load logs"); }
+    finally { setLogsLoading(false); }
+  };
+
   // ── Render ────────────────────────────────────────────────────────────────────
 
   const pageTitle =
     view === "categories" ? "Inventory"
-    : view === "units" ? `${selectedCategory?.name} — Units`
-    : `${selectedUnit?.name} — Assets`;
+    : view === "units" ? `${selectedCategory?.name} - Units`
+    : `${selectedUnit?.name} - Assets`;
 
   return (
     <Layout onLogout={onLogout}>
@@ -380,6 +419,14 @@ const AdminInventoryPage = ({ onLogout }) => {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {isManager && (
+              <button
+                onClick={openLogsModal}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors"
+              >
+                <ClipboardDocumentListIcon className="w-4 h-4" /> View Logs
+              </button>
+            )}
             {view !== "categories" && (
               <button
                 onClick={goBack}
@@ -453,8 +500,8 @@ const AdminInventoryPage = ({ onLogout }) => {
             <Field label="Type">
               <select value={form.type || ""} onChange={(e) => setForm({ ...form, type: e.target.value })} className={inputCls}>
                 <option value="">Select type…</option>
-                <option value="fixed">Fixed — location-based, cannot be assigned</option>
-                <option value="assignable">Assignable — can be assigned to employees</option>
+                <option value="fixed">Fixed - location-based, cannot be assigned</option>
+                <option value="assignable">Assignable - can be assigned to employees</option>
               </select>
             </Field>
             <Field label="Description" hint="Optional">
@@ -492,7 +539,7 @@ const AdminInventoryPage = ({ onLogout }) => {
       )}
 
       {modal?.type === "createUnit" && (
-        <Modal title={`New Unit — ${selectedCategory?.name}`} onClose={closeModal}>
+        <Modal title={`New Unit - ${selectedCategory?.name}`} onClose={closeModal}>
           <div className="space-y-4">
             <Field label="Unit Name">
               <input type="text" placeholder="e.g. Sony TV" value={form.name || ""}
@@ -515,7 +562,7 @@ const AdminInventoryPage = ({ onLogout }) => {
       )}
 
       {modal?.type === "addStock" && (
-        <Modal title={`Add Stock — ${modal.data?.name}`} onClose={closeModal}>
+        <Modal title={`Add Stock - ${modal.data?.name}`} onClose={closeModal}>
           <div className="space-y-4">
             <p className="text-sm text-slate-500">
               Current total: <span className="font-semibold text-slate-700">{modal.data?.totalCount}</span> units
@@ -531,7 +578,7 @@ const AdminInventoryPage = ({ onLogout }) => {
       )}
 
       {modal?.type === "changeStatus" && (
-        <Modal title={`Change Status — ${modal.data?.tag}`} onClose={closeModal}>
+        <Modal title={`Change Status - ${modal.data?.tag}`} onClose={closeModal}>
           <Field label="New Status">
             <select
               value={form.status || modal.data?.status || ""}
@@ -548,7 +595,7 @@ const AdminInventoryPage = ({ onLogout }) => {
       )}
 
       {modal?.type === "changeLocation" && (
-        <Modal title={`Set Location — ${modal.data?.tag}`} onClose={closeModal}>
+        <Modal title={`Set Location - ${modal.data?.tag}`} onClose={closeModal}>
           <div className="space-y-4">
             <p className="text-sm text-slate-500">
               Current: <span className="font-semibold text-slate-700">{modal.data?.location || "In-Store"}</span>
@@ -564,7 +611,7 @@ const AdminInventoryPage = ({ onLogout }) => {
       )}
 
       {modal?.type === "markLost" && (
-        <Modal title={`Mark as Lost — ${modal.data?.tag}`} onClose={closeModal}>
+        <Modal title={`Mark as Lost - ${modal.data?.tag}`} onClose={closeModal}>
           <div className="space-y-4">
             <p className="text-sm text-slate-500">
               This will mark the asset as lost and create an open report visible in the Lost &amp; Found section.
@@ -593,6 +640,106 @@ const AdminInventoryPage = ({ onLogout }) => {
           {...confirm}
           onClose={() => setConfirm(null)}
         />
+      )}
+
+      {/* ── Inventory Logs Modal (manager only) ─────────────────────────────── */}
+      {logsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl flex flex-col max-h-[85vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center">
+                  <ClipboardDocumentListIcon className="w-5 h-5 text-slate-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-800">Inventory Logs</h3>
+                  <p className="text-xs text-slate-400">Category, unit, and stock changes - most recent first</p>
+                </div>
+              </div>
+              <button onClick={() => setLogsModal(false)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors">
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Search bar */}
+            <div className="px-6 py-3 border-b border-slate-100 shrink-0">
+              <div className="relative max-w-sm">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search logs"
+                  value={logsQuery}
+                  onChange={(e) => setLogsQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="overflow-y-auto flex-1">
+              {logsLoading ? (
+                <div className="flex items-center justify-center h-48">
+                  <div className="w-7 h-7 border-4 border-brand/30 border-t-brand rounded-full animate-spin" />
+                </div>
+              ) : (() => {
+                const q = logsQuery.trim().toLowerCase();
+                const filteredLogs = q
+                  ? logs.filter(
+                      (l) =>
+                        (l.entityName || "").toLowerCase().includes(q) ||
+                        (ACTION_LABELS[l.actionType] || l.actionType).toLowerCase().includes(q) ||
+                        (l.performedBy?.name || "").toLowerCase().includes(q)
+                    )
+                  : logs;
+                return filteredLogs.length === 0 ? (
+                  <div className="flex items-center justify-center h-48 text-slate-400 text-sm font-semibold">
+                    {logs.length === 0 ? "No logs found" : "No results match your search"}
+                  </div>
+                ) : (
+                  <table className="w-full min-w-200 text-sm">
+                    <thead className="sticky top-0 bg-slate-50 z-10">
+                      <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        <th className="px-6 py-3">Date & Time</th>
+                        <th className="px-6 py-3">Entity</th>
+                        <th className="px-6 py-3">Action</th>
+                        <th className="px-6 py-3">Details</th>
+                        <th className="px-6 py-3">By</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredLogs.map((log) => (
+                        <tr key={log._id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-6 py-3 text-slate-500 whitespace-nowrap">{fmtDateTime(log.performedAt)}</td>
+                          <td className="px-6 py-3 font-semibold text-slate-800">{log.entityName || "-"}</td>
+                          <td className="px-6 py-3">
+                            <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wide ${ACTION_STYLES[log.actionType] || "bg-slate-100 text-slate-500"}`}>
+                              {ACTION_LABELS[log.actionType] || log.actionType.replace(/_/g, " ")}
+                            </span>
+                          </td>
+                          <td className="px-6 py-3 text-slate-500 max-w-64 truncate">{log.details || "-"}</td>
+                          <td className="px-6 py-3 text-slate-600 font-medium whitespace-nowrap">{log.performedBy?.name || "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                );
+              })()}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-3 border-t border-slate-100 shrink-0 flex items-center justify-between">
+              <span className="text-xs text-slate-400">
+                {logsQuery.trim()
+                  ? `${logs.filter((l) => [l.entityName, ACTION_LABELS[l.actionType] || l.actionType, l.performedBy?.name].some((v) => (v || "").toLowerCase().includes(logsQuery.trim().toLowerCase()))).length} of ${logs.length} record${logs.length !== 1 ? "s" : ""}`
+                  : `${logs.length} record${logs.length !== 1 ? "s" : ""}`}
+              </span>
+              <button onClick={() => setLogsModal(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </Layout>
   );

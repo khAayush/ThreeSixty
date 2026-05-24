@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import Layout from "../components/Layout";
 import {
   PencilIcon,
@@ -185,7 +185,7 @@ const ProfilePage = ({ onLogout }) => {
                   </div>
                 )}
 
-                {/* Upload pencil — hidden for Google accounts */}
+                {/* Upload pencil - hidden for Google accounts */}
                 {!user?.isGoogleAccount && (
                   <button
                     type="button"

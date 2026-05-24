@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import Layout from "../components/Layout";
 import {
   BuildingOffice2Icon,
@@ -70,7 +70,7 @@ const TagInput = ({ tags, onAdd, onRemove, placeholder, saving }) => {
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={saving}
-          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 outline-none disabled:opacity-50"
         />
         <button
           type="button"
@@ -160,13 +160,13 @@ const SettingsPage = ({ onLogout }) => {
     }
   };
 
-  // Used by preset swatches — does not touch customColor
+  // Used by preset swatches - does not touch customColor
   const previewColor = (color) => {
     setBrandColor(color);
     document.documentElement.style.setProperty("--color-brand", color);
   };
 
-  // Used by the color picker — updates customColor and persists it locally
+  // Used by the color picker - updates customColor and persists it locally
   const handleCustomColorChange = (color) => {
     setCustomColor(color);
     localStorage.setItem("customBrandColor", color);
@@ -281,7 +281,7 @@ const SettingsPage = ({ onLogout }) => {
                   value={organizationName}
                   onChange={(e) => setOrganizationName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && saveOrgName()}
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 outline-none"
                   placeholder="e.g. Herald College Kathmandu"
                 />
                 <button
@@ -316,7 +316,7 @@ const SettingsPage = ({ onLogout }) => {
                     type="button"
                     title={c.name}
                     onClick={() => previewColor(c.value)}
-                    className="relative w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 focus:outline-none"
+                    className="relative w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 outline-none"
                     style={{
                       backgroundColor: c.value,
                       borderColor:

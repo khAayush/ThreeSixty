@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useChat } from "../../contexts/ChatContext";
 import { Check, CheckCheck, Clock, Pencil, Trash2, X } from "lucide-react";
 import { format } from "date-fns";
@@ -82,7 +82,7 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
     ? (() => { try { return format(new Date(message.createdAt), "h:mm a"); } catch { return ""; } })()
     : "";
 
-  // Action buttons — not shown for image messages in edit mode (can't edit an image)
+  // Action buttons - not shown for image messages in edit mode (can't edit an image)
   const ActionButtons = () => (
     <div className="flex items-center gap-1 mr-1">
       {!isImage && (
@@ -129,7 +129,7 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
         {!isMine && !isLastInGroup && <div className="w-7 h-7 shrink-0" />}
 
         <div className={`flex flex-col max-w-[70%] ${isMine ? "items-end" : "items-start"}`}>
-          {/* Edit input — only for text messages */}
+          {/* Edit input - only for text messages */}
           {editing && !isImage ? (
             <div className="flex gap-2 items-center w-full">
               <input
@@ -140,7 +140,7 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
                   if (e.key === "Enter") handleEdit();
                   if (e.key === "Escape") setEditing(false);
                 }}
-                className="flex-1 px-3 py-2 text-sm bg-slate-100 border border-brand/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand focus:bg-white transition-all"
+                className="flex-1 px-3 py-2 text-sm bg-slate-100 border border-brand/30 rounded-xl outline-none transition-all"
               />
               <button
                 onClick={handleEdit}

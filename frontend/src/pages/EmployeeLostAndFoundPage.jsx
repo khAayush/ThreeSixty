@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import {
   MagnifyingGlassIcon,
@@ -406,7 +406,7 @@ const EmployeeLostFound = ({ onLogout }) => {
                 onChange={handleInputChange} 
                 type="text" 
                 placeholder="e.g., HER/IT/MOB-001" 
-                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-[#ff6b00]/20 transition-all outline-none" 
+                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm outline-none transition-all" 
               />
             </div>
             <div>
@@ -417,7 +417,7 @@ const EmployeeLostFound = ({ onLogout }) => {
                 onChange={handleInputChange} 
                 type="text" 
                 placeholder="e.g., Samsung Galaxy S24" 
-                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-[#ff6b00]/20 transition-all outline-none" 
+                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm outline-none transition-all" 
               />
             </div>
             <div>
@@ -428,7 +428,7 @@ const EmployeeLostFound = ({ onLogout }) => {
                 onChange={handleInputChange} 
                 type="text" 
                 placeholder="e.g., Academics A" 
-                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-[#ff6b00]/20 transition-all outline-none" 
+                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm outline-none transition-all" 
               />
             </div>
           </div>
@@ -453,7 +453,7 @@ const EmployeeLostFound = ({ onLogout }) => {
                 onChange={handleInputChange} 
                 type="text" 
                 placeholder="e.g., HER/IT/HUB-001 (optional)" 
-                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-[#ff6b00]/20 transition-all outline-none" 
+                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm outline-none transition-all" 
               />
             </div>
             <div>
@@ -464,7 +464,7 @@ const EmployeeLostFound = ({ onLogout }) => {
                 onChange={handleInputChange} 
                 type="text" 
                 placeholder="Describe the item..." 
-                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-[#ff6b00]/20 transition-all outline-none" 
+                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm outline-none transition-all" 
               />
             </div>
             <div>
@@ -475,7 +475,7 @@ const EmployeeLostFound = ({ onLogout }) => {
                 onChange={handleInputChange} 
                 type="text" 
                 placeholder="e.g., LT-04" 
-                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm focus:ring-2 focus:ring-[#ff6b00]/20 transition-all outline-none" 
+                className="w-full bg-slate-50 border-none rounded-xl p-3.5 text-sm outline-none transition-all" 
               />
             </div>
           </div>

@@ -1,4 +1,4 @@
-import {
+﻿import {
   createContext,
   useContext,
   useEffect,
@@ -19,7 +19,7 @@ export const ChatProvider = ({ currentUser, children }) => {
   const [typing, setTyping] = useState({});
   const typingTimers = useRef({});
 
-  // Init socket — re-runs whenever the logged-in user changes
+  // Init socket - re-runs whenever the logged-in user changes
   useEffect(() => {
     // Always reset state when user changes
     setConversations([]);

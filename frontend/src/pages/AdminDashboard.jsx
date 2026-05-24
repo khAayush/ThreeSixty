@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import Layout from "../components/Layout";
 import StatCard from "../components/StatCard";
@@ -18,7 +18,7 @@ import {
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
+  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
 
 const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -99,12 +99,12 @@ const Dashboard = ({ onLogout }) => {
 
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10">
-          <StatCard label="Total Assets"       value={loading ? "—" : s.totalAssets}     icon={CubeIcon}                iconBg="bg-blue-50"   iconColor="text-blue-500"   />
-          <StatCard label="In Stock"            value={loading ? "—" : s.inStock}          icon={CheckCircleIcon}         iconBg="bg-emerald-50" iconColor="text-emerald-500" />
-          <StatCard label="Assigned"            value={loading ? "—" : s.assigned}         icon={CubeIcon}                iconBg="bg-purple-50"  iconColor="text-purple-500"  />
-          <StatCard label="Damaged / In Repair" value={loading ? "—" : s.damagedOrRepair}  icon={ExclamationTriangleIcon} iconBg="bg-red-50"     iconColor="text-red-500"    />
-          <StatCard label="Open Tickets"        value={loading ? "—" : s.openTickets}      icon={TicketIcon}              iconBg="bg-amber-50"   iconColor="text-amber-500"   />
-          <StatCard label="Pending Requests"    value={loading ? "—" : s.pendingRequests}  icon={ClockIcon}               iconBg="bg-orange-50"  iconColor="text-orange-500"  />
+          <StatCard label="Total Assets"       value={loading ? "-" : s.totalAssets}     icon={CubeIcon}                iconBg="bg-blue-50"   iconColor="text-blue-500"   />
+          <StatCard label="In Stock"            value={loading ? "-" : s.inStock}          icon={CheckCircleIcon}         iconBg="bg-emerald-50" iconColor="text-emerald-500" />
+          <StatCard label="Assigned"            value={loading ? "-" : s.assigned}         icon={CubeIcon}                iconBg="bg-purple-50"  iconColor="text-purple-500"  />
+          <StatCard label="Damaged / In Repair" value={loading ? "-" : s.damagedOrRepair}  icon={ExclamationTriangleIcon} iconBg="bg-red-50"     iconColor="text-red-500"    />
+          <StatCard label="Open Tickets"        value={loading ? "-" : s.openTickets}      icon={TicketIcon}              iconBg="bg-amber-50"   iconColor="text-amber-500"   />
+          <StatCard label="Pending Requests"    value={loading ? "-" : s.pendingRequests}  icon={ClockIcon}               iconBg="bg-orange-50"  iconColor="text-orange-500"  />
         </div>
 
         {/* Bottom two-column grid */}
@@ -141,8 +141,8 @@ const Dashboard = ({ onLogout }) => {
                     <div key={req._id} className="px-5 py-3.5 hover:bg-slate-50/50 transition-colors">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="font-semibold text-slate-700 text-sm truncate">{req.requestedBy?.name || "—"}</p>
-                          <p className="text-xs text-slate-400 truncate">{req.unitId?.name || "—"}</p>
+                          <p className="font-semibold text-slate-700 text-sm truncate">{req.requestedBy?.name || "-"}</p>
+                          <p className="text-xs text-slate-400 truncate">{req.unitId?.name || "-"}</p>
                           <p className="text-xs text-slate-400 mt-0.5">{fmtDate(req.createdAt)}</p>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">

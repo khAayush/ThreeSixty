@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useChat } from "../../contexts/ChatContext";
 import { formatDistanceToNow } from "date-fns";
 import { MagnifyingGlassIcon, PhotoIcon } from "@heroicons/react/24/outline";
@@ -54,7 +54,7 @@ const ConversationList = ({ currentUser, onSelect }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search people..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-100 border-none rounded-xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:bg-white transition-all"
+            className="w-full pl-9 pr-3 py-2 bg-slate-100 border-none rounded-xl text-sm text-slate-700 placeholder-slate-400 outline-none transition-all"
           />
         </div>
       </div>

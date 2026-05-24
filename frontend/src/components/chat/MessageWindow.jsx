@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { useChat } from "../../contexts/ChatContext";
 import MessageBubble from "./MessageBubble";
 import { ChevronLeft } from "lucide-react";
@@ -203,7 +203,7 @@ const MessageWindow = ({ currentUser, activeUser, onBack }) => {
         <div ref={bottomRef} />
       </div>
 
-      {/* Image preview — thumbnail + cancel only; the main send button handles sending */}
+      {/* Image preview - thumbnail + cancel only; the main send button handles sending */}
       {imagePreview && (
         <div className="px-4 py-2 border-t border-slate-100 bg-slate-50 shrink-0">
           <div className="relative inline-block">
@@ -247,7 +247,7 @@ const MessageWindow = ({ currentUser, activeUser, onBack }) => {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={`Message ${displayName}…`}
-          className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand focus:bg-white transition-all resize-none max-h-32 overflow-y-auto leading-relaxed"
+          className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 outline-none focus:bg-white transition-all resize-none max-h-32 overflow-y-auto leading-relaxed"
           style={{ minHeight: "42px" }}
         />
         <button

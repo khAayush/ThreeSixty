@@ -30,12 +30,13 @@ const ChatPage = ({ currentUser, onLogout }) => {
 
   return (
     <Layout onLogout={onLogout}>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">Messages</h1>
-        <p className="text-sm text-slate-500 mt-1">Chat with your colleagues</p>
-      </div>
+      <div className="p-6 flex flex-col gap-6 h-[calc(100vh-4rem)]">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Messages</h1>
+          <p className="text-sm text-slate-500 mt-1">Chat with your colleagues</p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 h-[calc(100vh-180px)] min-h-0">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 min-h-0">
         {/* Left */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-0 overflow-hidden">
           <ConversationList
@@ -77,6 +78,7 @@ const ChatPage = ({ currentUser, onLogout }) => {
             </div>
           )}
         </div>
+      </div>
       </div>
     </Layout>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import StatCard from "../components/StatCard";
 import {
@@ -77,7 +77,7 @@ const UsersPage = ({ onLogout }) => {
   const canTerminate = (targetUser) => {
     if (targetUser.role === "manager") return false;
     if (targetUser.role === "admin") return currentRole === "manager";
-    return true; // employee — both admin and manager can terminate
+    return true; // employee - both admin and manager can terminate
   };
 
   const canChangePassword = (targetUser) => {
@@ -519,7 +519,7 @@ const UsersPage = ({ onLogout }) => {
                 placeholder="Search Users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand/20 outline-none transition-all"
+                className="w-full pl-9 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm outline-none transition-all"
               />
             </div>
           </div>
@@ -550,7 +550,7 @@ const UsersPage = ({ onLogout }) => {
           />
         </div>
 
-        {/* Users — grouped by role, each section collapsible */}
+        {/* Users - grouped by role, each section collapsible */}
         {isLoading ? (
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-8 text-center text-sm text-slate-500">
             Loading users...
@@ -797,7 +797,7 @@ const UsersPage = ({ onLogout }) => {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none transition-all"
                   placeholder="e.g. Jane Doe"
                 />
               </div>
@@ -807,7 +807,7 @@ const UsersPage = ({ onLogout }) => {
                   Email Address
                   {editingUser?.isGoogleAccount && (
                     <span className="ml-2 text-xs font-normal text-blue-500">
-                      (Google — read-only)
+                      (Google - read-only)
                     </span>
                   )}
                 </label>
@@ -819,7 +819,7 @@ const UsersPage = ({ onLogout }) => {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   disabled={!!editingUser?.isGoogleAccount}
-                  className={`w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand/20 outline-none transition-all ${
+                  className={`w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none transition-all ${
                     editingUser?.isGoogleAccount
                       ? "opacity-60 cursor-not-allowed"
                       : ""
@@ -840,7 +840,7 @@ const UsersPage = ({ onLogout }) => {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand/20 outline-none transition-all"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none transition-all"
                     placeholder="••••••••"
                   />
                 </div>
@@ -855,11 +855,11 @@ const UsersPage = ({ onLogout }) => {
                   onChange={(e) =>
                     setFormData({ ...formData, role: e.target.value })
                   }
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none transition-all"
                 >
                   <option value="employee">Employee</option>
                   <option value="admin">Admin</option>
-                  {/* "manager" is intentionally excluded — only seeded, never created via UI */}
+                  {/* "manager" is intentionally excluded - only seeded, never created via UI */}
                 </select>
               </div>
 
@@ -922,7 +922,7 @@ const UsersPage = ({ onLogout }) => {
                       newPassword: e.target.value,
                     })
                   }
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none transition-all"
                   placeholder="Enter new password"
                 />
               </div>
@@ -941,7 +941,7 @@ const UsersPage = ({ onLogout }) => {
                       confirmPassword: e.target.value,
                     })
                   }
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-brand/20 outline-none transition-all"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none transition-all"
                   placeholder="Confirm new password"
                 />
               </div>
@@ -1067,7 +1067,7 @@ const UsersPage = ({ onLogout }) => {
 // ── User Detail Modal ─────────────────────────────────────────────────────────
 
 const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
+  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
 
 const UserDetailModal = ({ user, token, onClose }) => {
   const [assignments, setAssignments] = useState([]);
@@ -1091,7 +1091,7 @@ const UserDetailModal = ({ user, token, onClose }) => {
         const data = await res.json();
         if (data.success) setAssignments(data.data);
       } catch {
-        // silently fail — not critical
+        // silently fail - not critical
       } finally {
         setLoading(false);
       }
@@ -1179,8 +1179,8 @@ const UserDetailModal = ({ user, token, onClose }) => {
                       <CubeIcon className="w-4 h-4 text-brand" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-700">{a.unitId?.name || "—"}</p>
-                      <p className="text-xs font-mono text-slate-400">{a.assetId?.tag || "—"}</p>
+                      <p className="text-sm font-semibold text-slate-700">{a.unitId?.name || "-"}</p>
+                      <p className="text-xs font-mono text-slate-400">{a.assetId?.tag || "-"}</p>
                     </div>
                   </div>
                   <div className="text-right">

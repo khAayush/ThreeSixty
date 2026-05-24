@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 const PasswordInput = ({
@@ -27,7 +27,7 @@ const PasswordInput = ({
           name={name}
           autoComplete={autoComplete}
           type={show ? 'text' : 'password'}
-          className={`w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${className}`}
+          className={`w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 placeholder-gray-400 outline-none transition ${className}`}
           placeholder={placeholder}
           required={required}
           value={value}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+﻿import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../components/Layout";
 import toast from "react-hot-toast";
 import { CubeIcon, ClockIcon, CheckCircleIcon, ArchiveBoxIcon, XMarkIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
@@ -7,7 +7,7 @@ import { showLoading, showSuccess, showError } from "../utils/toast";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
+  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
 
 const STATUS_STYLES = {
   Pending:   "bg-amber-50 text-amber-600",
@@ -225,13 +225,13 @@ const EmployeeInventoryPage = ({ onLogout }) => {
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Asset Tag</label>
                   <div className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono text-slate-600">
-                    {reportLostModal.assignment.assetId?.tag || "—"}
+                    {reportLostModal.assignment.assetId?.tag || "-"}
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Item</label>
                   <div className="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 truncate">
-                    {reportLostModal.assignment.unitId?.name || "—"}
+                    {reportLostModal.assignment.unitId?.name || "-"}
                   </div>
                 </div>
               </div>
@@ -245,7 +245,7 @@ const EmployeeInventoryPage = ({ onLogout }) => {
                   onChange={(e) => setLostLocation(e.target.value)}
                   placeholder="e.g., Conference Room B, Floor 3"
                   autoFocus
-                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 outline-none"
                 />
               </div>
             </div>
@@ -314,8 +314,8 @@ const PendingTable = ({ rows, onCancelRequest }) => (
         <tbody className="divide-y divide-slate-100">
           {rows.map((a) => (
             <tr key={a._id} className="hover:bg-slate-50 transition-colors">
-              <td className="px-6 py-4 font-semibold text-slate-800">{a.unitId?.name || "—"}</td>
-              <td className="px-6 py-4 text-sm text-slate-500 max-w-60 truncate">{a.note || "—"}</td>
+              <td className="px-6 py-4 font-semibold text-slate-800">{a.unitId?.name || "-"}</td>
+              <td className="px-6 py-4 text-sm text-slate-500 max-w-60 truncate">{a.note || "-"}</td>
               <td className="px-6 py-4 text-sm text-slate-500">{fmtDate(a.createdAt)}</td>
               <td className="px-6 py-4">
                 <span className={`px-2 py-1 rounded-lg text-xs font-bold ${STATUS_STYLES[a.status]}`}>
@@ -358,9 +358,9 @@ const AssignedTable = ({ rows, onReportLost, lostReportMap, onCancelLostReport }
             const isLost = a.assetId?.isLost && lostReportMap[tag];
             return (
               <tr key={a._id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-6 py-4 font-mono text-sm font-semibold text-slate-800">{tag || "—"}</td>
-                <td className="px-6 py-4 font-semibold text-slate-700">{a.unitId?.name || "—"}</td>
-                <td className="px-6 py-4 text-sm text-slate-500">{a.assignedBy?.name || "—"}</td>
+                <td className="px-6 py-4 font-mono text-sm font-semibold text-slate-800">{tag || "-"}</td>
+                <td className="px-6 py-4 font-semibold text-slate-700">{a.unitId?.name || "-"}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{a.assignedBy?.name || "-"}</td>
                 <td className="px-6 py-4 text-sm text-slate-500">{fmtDate(a.assignedAt)}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 rounded-lg text-xs font-bold ${STATUS_STYLES[a.status]}`}>
@@ -409,13 +409,13 @@ const HistoryTable = ({ rows }) => (
         <tbody className="divide-y divide-slate-100">
           {rows.map((a) => (
             <tr key={a._id} className="hover:bg-slate-50 transition-colors">
-              <td className="px-6 py-4 font-semibold text-slate-700">{a.unitId?.name || "—"}</td>
-              <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "—"}</td>
+              <td className="px-6 py-4 font-semibold text-slate-700">{a.unitId?.name || "-"}</td>
+              <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "-"}</td>
               <td className="px-6 py-4 text-sm text-slate-500">
                 {a.status === "Returned" ? fmtDate(a.returnedAt) : fmtDate(a.createdAt)}
               </td>
               <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">
-                {a.adminNote || a.note || "—"}
+                {a.adminNote || a.note || "-"}
               </td>
               <td className="px-6 py-4">
                 <span className={`px-2 py-1 rounded-lg text-xs font-bold ${STATUS_STYLES[a.status]}`}>
