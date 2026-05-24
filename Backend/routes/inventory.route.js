@@ -6,6 +6,7 @@ import {
   browseInventory,
   getUnitsByCategory, createUnit, addStock,
   getAssetsByUnit, getAssetDetails, updateAssetStatus, updateAssetLocation,
+  deleteAsset, markAssetLost,
 } from "../controllers/inventory.controller.js";
 
 const router = express.Router();
@@ -29,5 +30,7 @@ router.get("/units/:unitId/assets", verifyToken, getAssetsByUnit);
 router.get("/assets/:id", verifyToken, getAssetDetails);
 router.patch("/assets/:id/status", verifyToken, requireAdmin, updateAssetStatus);
 router.patch("/assets/:id/location", verifyToken, requireAdmin, updateAssetLocation);
+router.patch("/assets/:id/lost", verifyToken, requireAdmin, markAssetLost);
+router.delete("/assets/:id", verifyToken, requireAdmin, deleteAsset);
 
 export default router;

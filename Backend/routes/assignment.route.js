@@ -10,6 +10,8 @@ import {
   rejectRequest,
   processReturn,
   requestReturn,
+  cancelRequest,
+  cancelRequestsByUnit,
 } from "../controllers/assignment.controller.js";
 
 const router = express.Router();
@@ -17,6 +19,8 @@ const router = express.Router();
 // Employee routes
 router.post("/request", verifyToken, createRequest);
 router.get("/my", verifyToken, getMyAssignments);
+router.patch("/cancel-unit/:unitId", verifyToken, cancelRequestsByUnit);
+router.patch("/:id/cancel", verifyToken, cancelRequest);
 
 // Admin routes
 router.get("/", verifyToken, requireAdmin, getAssignments);

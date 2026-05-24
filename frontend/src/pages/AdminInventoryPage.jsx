@@ -283,6 +283,58 @@ const AdminInventoryPage = ({ onLogout }) => {
     finally { setSubmitting(false); }
   };
 
+  const handleDeleteAsset = (asset) => {
+    setConfirm({
+      title: "Delete Asset",
+      message: `Delete asset "${asset.tag}"? This cannot be undone.`,
+      confirmLabel: "Delete",
+      danger: true,
+      onConfirm: async () => {
+        try {
+          const res = await inventoryFetch(`/assets/${asset._id}`, { method: "DELETE" });
+          if (!res) return;
+          const data = await res.json();
+          if (data.success) { toast.success("Asset deleted"); fetchAssets(selectedUnit._id); }
+          else toast.error(data.message);
+        } catch { toast.error("Failed to delete asset"); }
+      },
+    });
+  };
+
+  const handleToggleLost = (asset) => {
+    if (asset.isLost) {
+      // Mark as found — no location needed, call directly
+      (async () => {
+        try {
+          const res = await inventoryFetch(`/assets/${asset._id}/lost`, { method: "PATCH" });
+          if (!res) return;
+          const data = await res.json();
+          if (data.success) { toast.success("Asset marked as found"); fetchAssets(selectedUnit._id); }
+          else toast.error(data.message);
+        } catch { toast.error("Failed to mark asset as found"); }
+      })();
+    } else {
+      // Mark as lost — open modal to collect location
+      openModal("markLost", asset);
+    }
+  };
+
+  const handleMarkLost = async () => {
+    if (!form.location?.trim()) return toast.error("Last known location is required");
+    setSubmitting(true);
+    try {
+      const res = await inventoryFetch(`/assets/${modal.data._id}/lost`, {
+        method: "PATCH",
+        body: JSON.stringify({ location: form.location }),
+      });
+      if (!res) return;
+      const data = await res.json();
+      if (data.success) { toast.success("Asset marked as lost"); fetchAssets(selectedUnit._id); closeModal(); }
+      else toast.error(data.message);
+    } catch { toast.error("Failed to mark asset as lost"); }
+    finally { setSubmitting(false); }
+  };
+
   // ── Render ────────────────────────────────────────────────────────────────────
 
   const pageTitle =
@@ -382,6 +434,8 @@ const AdminInventoryPage = ({ onLogout }) => {
             onChangeLocation={(asset) =>
               openModal("changeLocation", { ...asset, location: asset.location || "" })
             }
+            onDelete={handleDeleteAsset}
+            onMarkLost={handleToggleLost}
           />
         )}
       </div>
@@ -423,8 +477,8 @@ const AdminInventoryPage = ({ onLogout }) => {
             </Field>
             <Field label="Type">
               <select value={form.type || ""} onChange={(e) => setForm({ ...form, type: e.target.value })} className={inputCls}>
-                <option value="fixed">Fixed — location-based, cannot be assigned</option>
-                <option value="assignable">Assignable — can be assigned to employees</option>
+                <option value="fixed">Fixed</option>
+                <option value="assignable">Assignable</option>
               </select>
             </Field>
             <Field label="Description" hint="Optional">
@@ -506,6 +560,27 @@ const AdminInventoryPage = ({ onLogout }) => {
             </Field>
           </div>
           <ModalActions onCancel={closeModal} onConfirm={handleUpdateLocation} confirmLabel="Set Location" loading={submitting} />
+        </Modal>
+      )}
+
+      {modal?.type === "markLost" && (
+        <Modal title={`Mark as Lost — ${modal.data?.tag}`} onClose={closeModal}>
+          <div className="space-y-4">
+            <p className="text-sm text-slate-500">
+              This will mark the asset as lost and create an open report visible in the Lost &amp; Found section.
+            </p>
+            <Field label="Last Known Location">
+              <input
+                type="text"
+                placeholder="e.g. Conference Room B, Floor 3"
+                value={form.location || ""}
+                onChange={(e) => setForm({ ...form, location: e.target.value })}
+                className={inputCls}
+                autoFocus
+              />
+            </Field>
+          </div>
+          <ModalActions onCancel={closeModal} onConfirm={handleMarkLost} confirmLabel="Mark as Lost" loading={submitting} />
         </Modal>
       )}
 

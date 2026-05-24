@@ -18,6 +18,7 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
   const [search, setSearch] = useState("");
   const [filterCatId, setFilterCatId] = useState("");
   const [requestModal, setRequestModal] = useState(null); // { unit }
+  const [requestQty, setRequestQty] = useState(1);
   const [submitting, setSubmitting] = useState(false);
 
   const authFetch = (path, opts = {}) =>
@@ -67,7 +68,23 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
   }, [catalog, filterCatId, search]);
 
   const openRequest = (unit) => {
+    setRequestQty(1);
     setRequestModal({ unit });
+  };
+
+  const handleCancelUnit = async (unitId) => {
+    try {
+      const res = await authFetch(`/assignments/cancel-unit/${unitId}`, { method: "PATCH" });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Request cancelled");
+        setPendingUnitIds((prev) => { const next = new Set(prev); next.delete(unitId); return next; });
+      } else {
+        toast.error(data.message);
+      }
+    } catch {
+      toast.error("Failed to cancel request");
+    }
   };
 
   const submitRequest = async () => {
@@ -76,7 +93,7 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
     try {
       const res = await authFetch("/assignments/request", {
         method: "POST",
-        body: JSON.stringify({ unitId: requestModal.unit._id }),
+        body: JSON.stringify({ unitId: requestModal.unit._id, quantity: requestQty }),
       });
       const data = await res.json();
       if (data.success) {
@@ -157,6 +174,7 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
                       unit={unit}
                       isPending={pendingUnitIds.has(unit._id)}
                       onRequest={() => openRequest(unit)}
+                      onCancel={() => handleCancelUnit(unit._id)}
                     />
                   ))}
                 </div>
@@ -179,12 +197,35 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
-            <div className="px-6 py-4">
+            <div className="px-6 py-4 space-y-4">
               <p className="text-sm text-slate-500">
                 Submit a request for{" "}
                 <span className="font-semibold text-slate-700">{requestModal.unit.name}</span>.
                 An admin will review and assign a specific unit to you.
               </p>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Quantity
+                </label>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setRequestQty((q) => Math.max(1, q - 1))}
+                    disabled={requestQty <= 1}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 disabled:opacity-40 transition-colors"
+                  >
+                    −
+                  </button>
+                  <span className="w-8 text-center font-bold text-slate-800">{requestQty}</span>
+                  <button
+                    onClick={() => setRequestQty((q) => Math.min(requestModal.unit.availableCount, q + 1))}
+                    disabled={requestQty >= requestModal.unit.availableCount}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 disabled:opacity-40 transition-colors"
+                  >
+                    +
+                  </button>
+                  <span className="text-xs text-slate-400">of {requestModal.unit.availableCount} available</span>
+                </div>
+              </div>
             </div>
             <div className="flex items-center justify-end gap-3 px-6 pb-5">
               <button
@@ -208,9 +249,8 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
   );
 };
 
-const UnitCard = ({ unit, isPending, onRequest }) => {
+const UnitCard = ({ unit, isPending, onRequest, onCancel }) => {
   const isOOS = unit.availableCount === 0;
-  const disabled = isOOS || isPending;
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-4">
@@ -221,7 +261,7 @@ const UnitCard = ({ unit, isPending, onRequest }) => {
         {isOOS ? (
           <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">Out of stock</span>
         ) : isPending ? (
-          <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Requested</span>
+          <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Pending</span>
         ) : (
           <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
             {unit.availableCount} available
@@ -232,7 +272,7 @@ const UnitCard = ({ unit, isPending, onRequest }) => {
       <p className="font-semibold text-slate-800 leading-snug">{unit.name}</p>
 
       <div className="flex items-center gap-4 text-xs text-slate-500">
-        <span>Total: <span className="font-semibold text-slate-700">{unit.totalCount}</span></span>
+        <span>Total: <span className="font-semibold text-slate-700">{unit.assetCount ?? unit.totalCount}</span></span>
         <span>
           Available:{" "}
           <span className={`font-semibold ${isOOS ? "text-slate-400" : "text-emerald-600"}`}>
@@ -241,19 +281,24 @@ const UnitCard = ({ unit, isPending, onRequest }) => {
         </span>
       </div>
 
-      <button
-        disabled={disabled}
-        onClick={onRequest}
-        className={`w-full py-2 rounded-xl text-sm font-semibold transition-colors ${
-          isOOS
-            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-            : isPending
-            ? "bg-amber-50 text-amber-600 cursor-not-allowed"
-            : "bg-brand text-white hover:bg-brand/90"
-        }`}
-      >
-        {isOOS ? "Out of Stock" : isPending ? "Request Pending" : "Request"}
-      </button>
+      {isPending ? (
+        <button
+          onClick={onCancel}
+          className="w-full py-2 rounded-xl text-sm font-semibold transition-colors bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+        >
+          Cancel Request
+        </button>
+      ) : (
+        <button
+          disabled={isOOS}
+          onClick={onRequest}
+          className={`w-full py-2 rounded-xl text-sm font-semibold transition-colors ${
+            isOOS ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-brand text-white hover:bg-brand/90"
+          }`}
+        >
+          {isOOS ? "Out of Stock" : "Request"}
+        </button>
+      )}
     </div>
   );
 };

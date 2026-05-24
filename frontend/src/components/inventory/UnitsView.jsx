@@ -34,7 +34,7 @@ const UnitsView = ({ units, onViewAssets, onAddStock }) => (
                       {unit.baseTag}
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-bold text-slate-700">{unit.totalCount}</td>
+                  <td className="px-6 py-4 font-bold text-slate-700">{unit.assetCount ?? unit.totalCount}</td>
                   <td className="px-6 py-4 font-semibold text-emerald-600">{sc.Healthy || 0}</td>
                   <td className="px-6 py-4 font-semibold text-amber-600">{sc.Damaged || 0}</td>
                   <td className="px-6 py-4 font-semibold text-blue-600">{sc["Out-For-Repair"] || 0}</td>

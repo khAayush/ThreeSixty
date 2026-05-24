@@ -9,6 +9,8 @@ const notificationSchema = new mongoose.Schema(
         "user:pending_approval",
         "asset:request_new",
         "asset:request_updated",
+        "asset:request_cancelled",
+        "asset:returned",
         "ticket:new",
         "ticket:closed",
         "lostfound:new",

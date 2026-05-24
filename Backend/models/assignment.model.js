@@ -13,7 +13,7 @@ const assignmentSchema = new mongoose.Schema(
     receivedBy:  { type: mongoose.Schema.Types.ObjectId, ref: "user", default: null },
     status: {
       type: String,
-      enum: ["Pending", "Approved", "Rejected", "Returned"],
+      enum: ["Pending", "Approved", "Rejected", "Returned", "Cancelled"],
       default: "Pending",
     },
     note:      { type: String, default: "" }, // employee reason

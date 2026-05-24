@@ -19,7 +19,8 @@ const populate = (q) =>
 
 export const createRequest = async (req, res) => {
   try {
-    const { unitId, note } = req.body;
+    const { unitId, note, quantity = 1 } = req.body;
+    const qty = Math.max(1, parseInt(quantity) || 1);
     if (!unitId) return res.status(400).json({ success: false, message: "unitId is required" });
 
     const unit = await ItemUnit.findById(unitId);
@@ -29,27 +30,30 @@ export const createRequest = async (req, res) => {
     const dupe = await Assignment.findOne({ unitId, requestedBy: uid(req), status: "Pending" });
     if (dupe) return res.status(409).json({ success: false, message: "You already have a pending request for this item" });
 
-    // Pick first available asset as suggestion (not yet locked)
-    const suggested = await Asset.findOne({ unitId, status: "Healthy", isAssigned: { $ne: true } });
-    if (!suggested) return res.status(409).json({ success: false, message: "No available assets in this unit" });
+    // Pick available assets as suggestions (one per requested quantity)
+    const available = await Asset.find({ unitId, status: "Healthy", isAssigned: { $ne: true } }).limit(qty);
+    if (available.length < qty)
+      return res.status(409).json({ success: false, message: `Only ${available.length} unit(s) available` });
 
-    const assignment = await Assignment.create({
-      unitId,
-      assetId: suggested._id,
-      requestedBy: uid(req),
-      note: note?.trim() || "",
-    });
+    const assignments = await Assignment.insertMany(
+      available.map((a) => ({
+        unitId,
+        assetId: a._id,
+        requestedBy: uid(req),
+        note: note?.trim() || "",
+      }))
+    );
 
     // Notify all admins/managers of the new request
     await notifyRole(
       ["admin", "manager"],
       "asset:request_new",
       "New Asset Request",
-      `${req.user.name} requested "${unit?.name || "an asset"}".`,
-      { requestId: assignment._id.toString(), actorName: req.user.name },
+      `${req.user.name} requested ${qty > 1 ? `${qty}x ` : ""}"${unit?.name || "an asset"}".`,
+      { requestId: assignments[0]._id.toString(), actorName: req.user.name },
     );
 
-    res.status(201).json({ success: true, data: assignment });
+    res.status(201).json({ success: true, data: assignments });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -190,9 +194,62 @@ export const requestReturn = async (req, res) => {
   }
 };
 
+export const cancelRequest = async (req, res) => {
+  try {
+    const assignment = await Assignment.findById(req.params.id).populate("unitId", "name");
+    if (!assignment) return res.status(404).json({ success: false, message: "Assignment not found" });
+    if (assignment.requestedBy.toString() !== uid(req).toString())
+      return res.status(403).json({ success: false, message: "Not authorized to cancel this request" });
+    if (assignment.status !== "Pending")
+      return res.status(400).json({ success: false, message: "Only pending requests can be cancelled" });
+
+    assignment.status = "Cancelled";
+    await assignment.save();
+
+    await notifyRole(
+      ["admin", "manager"],
+      "asset:request_cancelled",
+      "Asset Request Cancelled",
+      `${req.user.name} cancelled their request for "${assignment.unitId?.name || "an asset"}".`,
+      { requestId: assignment._id.toString(), actorName: req.user.name },
+    );
+
+    res.json({ success: true, data: assignment });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const cancelRequestsByUnit = async (req, res) => {
+  try {
+    const { unitId } = req.params;
+    const unit = await ItemUnit.findById(unitId);
+
+    const result = await Assignment.updateMany(
+      { unitId, requestedBy: uid(req), status: "Pending" },
+      { $set: { status: "Cancelled" } },
+    );
+
+    if (result.matchedCount === 0)
+      return res.status(404).json({ success: false, message: "No pending requests found for this unit" });
+
+    await notifyRole(
+      ["admin", "manager"],
+      "asset:request_cancelled",
+      "Asset Request Cancelled",
+      `${req.user.name} cancelled their request for "${unit?.name || "an asset"}".`,
+      { actorName: req.user.name },
+    );
+
+    res.json({ success: true, message: `${result.modifiedCount} request(s) cancelled` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 export const processReturn = async (req, res) => {
   try {
-    const assignment = await Assignment.findById(req.params.id);
+    const assignment = await Assignment.findById(req.params.id).populate("unitId", "name");
     if (!assignment) return res.status(404).json({ success: false, message: "Assignment not found" });
     if (assignment.status !== "Approved") return res.status(400).json({ success: false, message: "Only approved assignments can be returned" });
 
@@ -205,6 +262,14 @@ export const processReturn = async (req, res) => {
     assignment.returnedAt = new Date();
     assignment.receivedBy = uid(req);
     await assignment.save();
+
+    await createNotification(
+      assignment.assignedTo,
+      "asset:returned",
+      "Asset Return Processed",
+      `Your return of "${assignment.unitId?.name || "an asset"}" has been processed. Thank you!`,
+      { requestId: assignment._id.toString(), status: "Returned" },
+    );
 
     res.json({ success: true, data: assignment });
   } catch (err) {

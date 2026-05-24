@@ -2,6 +2,8 @@ import Category from "../models/category.model.js";
 import ItemUnit from "../models/itemunit.model.js";
 import Asset from "../models/asset.model.js";
 import AssetLog from "../models/assetlog.model.js";
+import Assignment from "../models/assignment.model.js";
+import LostAndFound from "../models/lostandfound.model.js";
 
 const uid = (req) => req.user._id || req.user.id;
 
@@ -93,12 +95,20 @@ export const browseInventory = async (req, res) => {
     const units = await ItemUnit.find({ categoryId: { $in: catIds } }).sort({ name: 1 });
     const unitIds = units.map((u) => u._id);
 
-    // availableCount = Healthy AND not assigned (works for both fixed & assignable)
-    const availAgg = await Asset.aggregate([
-      { $match: { unitId: { $in: unitIds }, status: "Healthy", isAssigned: { $ne: true } } },
-      { $group: { _id: "$unitId", count: { $sum: 1 } } },
+    const [availAgg, totalAgg] = await Promise.all([
+      // availableCount = Healthy AND not assigned
+      Asset.aggregate([
+        { $match: { unitId: { $in: unitIds }, status: "Healthy", isAssigned: { $ne: true } } },
+        { $group: { _id: "$unitId", count: { $sum: 1 } } },
+      ]),
+      // assetCount = actual number of asset documents (source of truth)
+      Asset.aggregate([
+        { $match: { unitId: { $in: unitIds } } },
+        { $group: { _id: "$unitId", count: { $sum: 1 } } },
+      ]),
     ]);
     const availMap = Object.fromEntries(availAgg.map((a) => [a._id.toString(), a.count]));
+    const totalMap = Object.fromEntries(totalAgg.map((a) => [a._id.toString(), a.count]));
 
     const unitsByCategory = {};
     units.forEach((u) => {
@@ -107,6 +117,7 @@ export const browseInventory = async (req, res) => {
       unitsByCategory[catId].push({
         ...u.toObject(),
         availableCount: availMap[u._id.toString()] || 0,
+        assetCount: totalMap[u._id.toString()] || 0,
       });
     });
 
@@ -139,10 +150,14 @@ export const getUnitsByCategory = async (req, res) => {
       countMap[uid][_id.status] = count;
     });
 
-    const data = units.map((u) => ({
-      ...u.toObject(),
-      statusCounts: countMap[u._id.toString()] || {},
-    }));
+    const data = units.map((u) => {
+      const sc = countMap[u._id.toString()] || {};
+      return {
+        ...u.toObject(),
+        statusCounts: sc,
+        assetCount: Object.values(sc).reduce((sum, v) => sum + v, 0),
+      };
+    });
     res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -310,6 +325,96 @@ export const updateAssetStatus = async (req, res) => {
       changedBy: uid(req),
       changedAt: new Date(),
     });
+
+    res.json({ success: true, data: asset });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const deleteAsset = async (req, res) => {
+  try {
+    const asset = await Asset.findById(req.params.id);
+    if (!asset) return res.status(404).json({ success: false, message: "Asset not found" });
+
+    const ageMs = Date.now() - new Date(asset.createdAt).getTime();
+    if (ageMs > 3 * 24 * 60 * 60 * 1000)
+      return res.status(403).json({ success: false, message: "Assets can only be deleted within 3 days of creation" });
+
+    if (asset.isAssigned)
+      return res.status(409).json({ success: false, message: "Cannot delete an assigned asset" });
+
+    // Nullify any pending assignment suggestions pointing to this asset
+    await Assignment.updateMany({ assetId: asset._id, status: "Pending" }, { $set: { assetId: null } });
+
+    await AssetLog.deleteMany({ assetId: asset._id });
+    await asset.deleteOne();
+    await ItemUnit.findByIdAndUpdate(asset.unitId, { $inc: { totalCount: -1 } });
+
+    res.json({ success: true, message: "Asset deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const markAssetLost = async (req, res) => {
+  try {
+    const { location } = req.body || {};
+    const asset = await Asset.findById(req.params.id).populate("unitId", "name");
+    if (!asset) return res.status(404).json({ success: false, message: "Asset not found" });
+
+    if (!asset.isLost) {
+      // ── Marking as lost ──────────────────────────────────────────────────────
+      if (!location?.trim())
+        return res.status(400).json({ success: false, message: "Last known location is required" });
+
+      asset.isLost = true;
+      await asset.save();
+
+      await LostAndFound.create({
+        assetCode: asset.tag,
+        assetName: asset.unitId?.name || asset.tag,
+        location: location.trim(),
+        type: "lost",
+        status: "open",
+        createdBy: uid(req),
+        createdByName: req.user.name || "Admin",
+      });
+
+      await AssetLog.create({
+        assetId: asset._id,
+        actionType: "LOST_STATUS_CHANGE",
+        fromStatus: "Not Lost",
+        toStatus: "Lost",
+        changedBy: uid(req),
+        changedAt: new Date(),
+        comment: `Marked as lost by admin. Last known location: ${location.trim()}`,
+      });
+    } else {
+      // ── Marking as found ─────────────────────────────────────────────────────
+      asset.isLost = false;
+      await asset.save();
+
+      await LostAndFound.updateMany(
+        { assetCode: asset.tag, type: "lost", status: "open" },
+        {
+          status: "resolved",
+          resolvedBy: uid(req),
+          resolvedByName: req.user.name || "Admin",
+          resolvedAt: new Date(),
+        },
+      );
+
+      await AssetLog.create({
+        assetId: asset._id,
+        actionType: "LOST_STATUS_CHANGE",
+        fromStatus: "Lost",
+        toStatus: "Not Lost",
+        changedBy: uid(req),
+        changedAt: new Date(),
+        comment: "Marked as found by admin",
+      });
+    }
 
     res.json({ success: true, data: asset });
   } catch (err) {

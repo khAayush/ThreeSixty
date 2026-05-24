@@ -10,10 +10,11 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 const STATUS_STYLES = {
-  Pending:  "bg-amber-50 text-amber-600",
-  Approved: "bg-blue-50 text-blue-600",
-  Rejected: "bg-red-50 text-red-500",
-  Returned: "bg-emerald-50 text-emerald-600",
+  Pending:   "bg-amber-50 text-amber-600",
+  Approved:  "bg-blue-50 text-blue-600",
+  Rejected:  "bg-red-50 text-red-500",
+  Returned:  "bg-emerald-50 text-emerald-600",
+  Cancelled: "bg-slate-100 text-slate-500",
 };
 
 const TABS = [
@@ -72,7 +73,7 @@ const EmployeeInventoryPage = ({ onLogout }) => {
   const tabData = useMemo(() => ({
     pending:  assignments.filter((a) => a.status === "Pending"),
     assigned: assignments.filter((a) => a.status === "Approved"),
-    history:  assignments.filter((a) => a.status === "Returned" || a.status === "Rejected"),
+    history:  assignments.filter((a) => a.status === "Returned" || a.status === "Rejected" || a.status === "Cancelled"),
   }), [assignments]);
 
   const openReportLost = (assignment) => {
@@ -109,6 +110,26 @@ const EmployeeInventoryPage = ({ onLogout }) => {
       showError("Failed to submit report", toastId);
     } finally {
       setSubmittingLost(false);
+    }
+  };
+
+  const handleCancelRequest = async (assignmentId) => {
+    const toastId = showLoading("Cancelling request…");
+    try {
+      const res = await fetch(`${API_URL}/assignments/${assignmentId}/cancel`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: authHeaders,
+      });
+      const data = await res.json();
+      if (data.success) {
+        showSuccess("Request cancelled", toastId);
+        await loadData();
+      } else {
+        showError(data.message || "Failed to cancel", toastId);
+      }
+    } catch {
+      showError("Failed to cancel request", toastId);
     }
   };
 
@@ -175,7 +196,7 @@ const EmployeeInventoryPage = ({ onLogout }) => {
             <div className="w-8 h-8 border-4 border-brand/30 border-t-brand rounded-full animate-spin" />
           </div>
         ) : (
-          <TabContent tab={activeTab} rows={tabData[activeTab]} onReportLost={openReportLost} lostReportMap={lostReportMap} onCancelLostReport={handleCancelLostReport} />
+          <TabContent tab={activeTab} rows={tabData[activeTab]} onReportLost={openReportLost} lostReportMap={lostReportMap} onCancelLostReport={handleCancelLostReport} onCancelRequest={handleCancelRequest} />
         )}
       </div>
 
@@ -258,7 +279,7 @@ const Empty = ({ message }) => (
   </div>
 );
 
-const TabContent = ({ tab, rows, onReportLost, lostReportMap, onCancelLostReport }) => {
+const TabContent = ({ tab, rows, onReportLost, lostReportMap, onCancelLostReport, onCancelRequest }) => {
   if (rows.length === 0) {
     const messages = {
       pending:  "No pending requests",
@@ -272,12 +293,12 @@ const TabContent = ({ tab, rows, onReportLost, lostReportMap, onCancelLostReport
     );
   }
 
-  if (tab === "pending") return <PendingTable rows={rows} />;
+  if (tab === "pending") return <PendingTable rows={rows} onCancelRequest={onCancelRequest} />;
   if (tab === "assigned") return <AssignedTable rows={rows} onReportLost={onReportLost} lostReportMap={lostReportMap} onCancelLostReport={onCancelLostReport} />;
   return <HistoryTable rows={rows} />;
 };
 
-const PendingTable = ({ rows }) => (
+const PendingTable = ({ rows, onCancelRequest }) => (
   <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
     <div className="overflow-x-auto">
       <table className="w-full min-w-125">
@@ -287,6 +308,7 @@ const PendingTable = ({ rows }) => (
             <th className="px-6 py-3">Reason</th>
             <th className="px-6 py-3">Requested On</th>
             <th className="px-6 py-3">Status</th>
+            <th className="px-6 py-3">Action</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -299,6 +321,14 @@ const PendingTable = ({ rows }) => (
                 <span className={`px-2 py-1 rounded-lg text-xs font-bold ${STATUS_STYLES[a.status]}`}>
                   {a.status}
                 </span>
+              </td>
+              <td className="px-6 py-4">
+                <button
+                  onClick={() => onCancelRequest(a._id)}
+                  className="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors whitespace-nowrap"
+                >
+                  Cancel
+                </button>
               </td>
             </tr>
           ))}

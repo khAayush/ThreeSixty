@@ -1,7 +1,10 @@
-import { CubeIcon } from "@heroicons/react/24/outline";
+import { CubeIcon, TrashIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { STATUS_COLORS } from "./inventoryUtils";
 
-const AssetsView = ({ assets, categoryType, onViewDetail, onChangeStatus, onChangeLocation }) => (
+const withinThreeDays = (createdAt) =>
+  Date.now() - new Date(createdAt).getTime() <= 3 * 24 * 60 * 60 * 1000;
+
+const AssetsView = ({ assets, categoryType, onViewDetail, onChangeStatus, onChangeLocation, onDelete, onMarkLost }) => (
   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
     {assets.length === 0 ? (
       <div className="flex flex-col items-center justify-center py-16 text-slate-400">
@@ -66,9 +69,29 @@ const AssetsView = ({ assets, categoryType, onViewDetail, onChangeStatus, onChan
                     {categoryType === "fixed" && (
                       <button
                         onClick={() => onChangeLocation(asset)}
-                        className="px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-200 transition-colors"
+                        className="flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-medium hover:bg-slate-200 transition-colors"
                       >
+                        <MapPinIcon className="w-3 h-3" />
                         Location
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onMarkLost(asset)}
+                      className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                        asset.isLost
+                          ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                          : "bg-amber-50 text-amber-600 hover:bg-amber-100"
+                      }`}
+                    >
+                      {asset.isLost ? "Mark Found" : "Mark Lost"}
+                    </button>
+                    {withinThreeDays(asset.createdAt) && !asset.isAssigned && (
+                      <button
+                        onClick={() => onDelete(asset)}
+                        className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors"
+                        title="Delete asset (available within 3 days of creation)"
+                      >
+                        <TrashIcon className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>

@@ -171,7 +171,15 @@ const TicketsPage = ({ onLogout }) => {
                 </div>
               ) : (
                 <div className="space-y-2 p-4">
-                  {tickets.filter(t => t.status === activeTab).map((ticket) => {
+                  {tickets
+                    .filter(t => t.status === activeTab)
+                    .sort((a, b) => {
+                      if (activeTab === "Closed") {
+                        return new Date(b.resolvedDate || b.updatedAt) - new Date(a.resolvedDate || a.updatedAt);
+                      }
+                      return new Date(b.createdAt) - new Date(a.createdAt);
+                    })
+                    .map((ticket) => {
                     const isActive = selectedTicket?._id === ticket._id;
                     return (
                       <button
@@ -204,7 +212,7 @@ const TicketsPage = ({ onLogout }) => {
                               {ticket.status}
                             </span>
                             <span className="text-xs font-medium text-slate-400 shrink-0">
-                              {formatDate(ticket.createdAt)}
+                              {formatDate(ticket.status === "Closed" ? (ticket.resolvedDate || ticket.updatedAt) : ticket.createdAt)}
                             </span>
                           </div>
                         </div>

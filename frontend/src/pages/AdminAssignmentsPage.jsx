@@ -11,10 +11,11 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 const STATUS_STYLES = {
-  Pending:  "bg-amber-50 text-amber-600",
-  Approved: "bg-blue-50 text-blue-600",
-  Rejected: "bg-red-50 text-red-500",
-  Returned: "bg-emerald-50 text-emerald-600",
+  Pending:   "bg-amber-50 text-amber-600",
+  Approved:  "bg-blue-50 text-blue-600",
+  Rejected:  "bg-red-50 text-red-500",
+  Returned:  "bg-emerald-50 text-emerald-600",
+  Cancelled: "bg-slate-100 text-slate-500",
 };
 
 const AdminAssignmentsPage = ({ onLogout }) => {
@@ -53,7 +54,7 @@ const AdminAssignmentsPage = ({ onLogout }) => {
   const { pending, active, history } = useMemo(() => ({
     pending: assignments.filter((a) => a.status === "Pending"),
     active:  assignments.filter((a) => a.status === "Approved"),
-    history: assignments.filter((a) => a.status === "Returned" || a.status === "Rejected"),
+    history: assignments.filter((a) => a.status === "Returned" || a.status === "Rejected" || a.status === "Cancelled"),
   }), [assignments]);
 
   const handleReject = (a) => {
@@ -207,7 +208,7 @@ const RequestsTable = ({ rows, onApprove, onReject }) => (
     <thead className="bg-slate-50">
       <tr>
         <Th>Employee</Th><Th>Requested Item</Th><Th>Tentative Asset</Th>
-        <Th>Reason</Th><Th>Request Date</Th><Th>Actions</Th>
+        <Th>Quantity</Th><Th>Request Date</Th><Th>Actions</Th>
       </tr>
     </thead>
     <tbody className="divide-y divide-slate-100">
@@ -221,7 +222,7 @@ const RequestsTable = ({ rows, onApprove, onReject }) => (
             </td>
             <td className="px-6 py-4 text-sm font-medium text-slate-700">{a.unitId?.name || "—"}</td>
             <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "—"}</td>
-            <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">{a.note || "—"}</td>
+            <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">1</td>
             <td className="px-6 py-4 text-sm text-slate-400 whitespace-nowrap">{fmtDate(a.createdAt)}</td>
             <td className="px-6 py-4">
               <div className="flex items-center gap-2">
@@ -304,9 +305,9 @@ const HistoryTable = ({ rows }) => (
             <td className="px-6 py-4 text-sm text-slate-600">{a.unitId?.name || "—"}</td>
             <td className="px-6 py-4 font-mono text-sm text-slate-500">{a.assetId?.tag || "—"}</td>
             <td className="px-6 py-4 text-sm text-slate-400 whitespace-nowrap">
-              {a.status === "Returned" ? fmtDate(a.returnedAt) : fmtDate(a.createdAt)}
+              {a.status === "Returned" ? fmtDate(a.returnedAt) : fmtDate(a.updatedAt || a.createdAt)}
             </td>
-            <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">{a.adminNote || "—"}</td>
+            <td className="px-6 py-4 text-sm text-slate-400 max-w-48 truncate">{a.adminNote || a.note || "—"}</td>
             <td className="px-6 py-4">
               <span className={`px-2 py-1 rounded-lg text-xs font-bold ${STATUS_STYLES[a.status]}`}>{a.status}</span>
             </td>
