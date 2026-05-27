@@ -1,4 +1,5 @@
-﻿import User from "../models/user.model.js";
+﻿import bcrypt from "bcryptjs";
+import User from "../models/user.model.js";
 
 export const updateProfileImage = async (req, res) => {
   const { profileImage } = req.body;
@@ -59,6 +60,56 @@ export const getUserProfile = async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error("Error fetching user profile:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  try {
+    // only the account owner can change their own password
+    if (String(req.user._id) !== String(req.params.id)) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.isGoogleAccount) {
+      return res.status(403).json({ message: "Password cannot be changed for Google accounts" });
+    }
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current and new password are required" });
+    }
+
+    const pwValid =
+      newPassword.length >= 6 &&
+      /[a-z]/.test(newPassword) &&
+      /[A-Z]/.test(newPassword) &&
+      /\d/.test(newPassword) &&
+      /[@$!%*?&]/.test(newPassword);
+
+    if (!pwValid) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters and include uppercase, lowercase, a digit, and a special character (@$!%*?&)",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: "New password must be different from the current one" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await User.findByIdAndUpdate(req.params.id, { password: hashed });
+
+    res.json({ message: "Password changed successfully" });
+  } catch (err) {
     res.status(500).json({ message: "Internal server error" });
   }
 };

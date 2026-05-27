@@ -6,6 +6,9 @@ import {
   EnvelopeIcon,
   CalendarDaysIcon,
   ShieldCheckIcon,
+  KeyIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -46,6 +49,22 @@ const ProfilePage = ({ onLogout }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+
+  const [pwForm, setPwForm] = useState({ current: "", newPwd: "", confirm: "" });
+  const [showPw, setShowPw] = useState({ current: false, newPwd: false, confirm: false });
+  const [pwErrors, setPwErrors] = useState([]);
+  const [pwError, setPwError] = useState("");
+  const [changingPw, setChangingPw] = useState(false);
+
+  const validatePassword = (pw) => {
+    const errors = [];
+    if (pw.length < 6)           errors.push("At least 6 characters");
+    if (!/[a-z]/.test(pw))       errors.push("One lowercase letter");
+    if (!/[A-Z]/.test(pw))       errors.push("One uppercase letter");
+    if (!/\d/.test(pw))          errors.push("One digit");
+    if (!/[@$!%*?&]/.test(pw))   errors.push("One special character (@$!%*?&)");
+    return errors;
+  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -119,6 +138,34 @@ const ProfilePage = ({ onLogout }) => {
       toast.error(err.message || "Upload failed", { id: loadingToast });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPwError("");
+    const { current, newPwd, confirm } = pwForm;
+    if (!current || !newPwd || !confirm) { setPwError("All fields are required"); return; }
+    if (pwErrors.length > 0) { setPwError("Please fix the password requirements below"); return; }
+    if (newPwd !== confirm) { setPwError("New passwords do not match"); return; }
+
+    setChangingPw(true);
+    try {
+      const userId = user._id || user.id;
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/users/${userId}/password`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword: current, newPassword: newPwd }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setPwError(data.message || "Failed to change password"); return; }
+      toast.success("Password changed successfully");
+      setPwForm({ current: "", newPwd: "", confirm: "" });
+    } catch {
+      setPwError("Something went wrong. Please try again.");
+    } finally {
+      setChangingPw(false);
     }
   };
 
@@ -232,46 +279,60 @@ const ProfilePage = ({ onLogout }) => {
             <div>
               <h5 className="font-bold text-slate-800 text-sm">Google Account</h5>
               <p className="text-slate-500 text-xs mt-1 leading-relaxed">
-                Your account is managed by Google. Name, email and profile picture is synced from your Google account.
-              </p>
-            </div>
-          </div>
-        ) : userRole.toLowerCase() === "admin" ? (
-          <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex items-start gap-4 mt-8">
-            <div className="bg-white p-2 rounded-lg shadow-sm text-blue-500">
-              <ShieldCheckIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <h5 className="font-bold text-slate-800 text-sm">Account Security</h5>
-              <p className="text-slate-500 text-xs mt-1 leading-relaxed">
-                You can change your account information or delete your account from the{" "}
-                <a href="/users" className="text-blue-500 hover:underline font-semibold">Users</a> tab.
-              </p>
-            </div>
-          </div>
-        ) : userRole.toLowerCase() === "manager" ? (
-          <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex items-start gap-4 mt-8">
-            <div className="bg-white p-2 rounded-lg shadow-sm text-blue-500">
-              <ShieldCheckIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <h5 className="font-bold text-slate-800 text-sm">Account Security</h5>
-              <p className="text-slate-500 text-xs mt-1 leading-relaxed">
-                This account is used to set up the system and has elevated permissions. Making changes to this account may affect system functionality.
+                Your account is managed by Google. Name, email and profile picture are synced from your Google account.
               </p>
             </div>
           </div>
         ) : (
-          <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-6 flex items-start gap-4 mt-8">
-            <div className="bg-white p-2 rounded-lg shadow-sm text-emerald-500">
-              <ShieldCheckIcon className="w-6 h-6" />
+          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm mt-8">
+            <div className="px-6 py-4 border-b border-slate-50 bg-slate-50/30 flex items-center gap-2">
+              <KeyIcon className="w-4 h-4 text-slate-500" />
+              <h4 className="font-bold text-slate-700">Change Password</h4>
             </div>
-            <div>
-              <h5 className="font-bold text-slate-800 text-sm">Account Security</h5>
-              <p className="text-slate-500 text-xs mt-1 leading-relaxed">
-                Your account is verified. Contact your IT administrator to change your account
-                information or delete your account.
-              </p>
+            <div className="p-6 space-y-4 max-w-md">
+              <PwField
+                label="Current Password"
+                value={pwForm.current}
+                show={showPw.current}
+                onChange={(v) => setPwForm((f) => ({ ...f, current: v }))}
+                onToggle={() => setShowPw((s) => ({ ...s, current: !s.current }))}
+              />
+              <PwField
+                label="New Password"
+                value={pwForm.newPwd}
+                show={showPw.newPwd}
+                onChange={(v) => {
+                  setPwForm((f) => ({ ...f, newPwd: v }));
+                  setPwErrors(v ? validatePassword(v) : []);
+                  setPwError("");
+                }}
+                onToggle={() => setShowPw((s) => ({ ...s, newPwd: !s.newPwd }))}
+              />
+              {pwErrors.length > 0 && (
+                <div className="mt-1 p-3 bg-red-50 rounded-xl">
+                  <p className="text-xs text-red-600 font-medium mb-1">Password must include:</p>
+                  <ul className="text-xs text-red-600 space-y-0.5">
+                    {pwErrors.map((e, i) => <li key={i}>• {e}</li>)}
+                  </ul>
+                </div>
+              )}
+              <PwField
+                label="Confirm New Password"
+                value={pwForm.confirm}
+                show={showPw.confirm}
+                onChange={(v) => setPwForm((f) => ({ ...f, confirm: v }))}
+                onToggle={() => setShowPw((s) => ({ ...s, confirm: !s.confirm }))}
+              />
+              {pwError && (
+                <p className="text-sm text-red-500 font-medium">{pwError}</p>
+              )}
+              <button
+                onClick={handleChangePassword}
+                disabled={changingPw || pwErrors.length > 0}
+                className="px-5 py-2.5 bg-brand text-white text-sm font-bold rounded-xl hover:brightness-110 transition-all shadow-sm shadow-brand/20 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {changingPw ? "Updating…" : "Update Password"}
+              </button>
             </div>
           </div>
         )}
@@ -286,6 +347,29 @@ const InfoItem = ({ icon, label, value }) => (
     <div>
       <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
       <p className="text-sm font-bold text-slate-700">{value}</p>
+    </div>
+  </div>
+);
+
+const PwField = ({ label, value, show, onChange, onToggle }) => (
+  <div>
+    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type={show ? "text" : "password"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-2.5 pr-10 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition"
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+      >
+        {show ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+      </button>
     </div>
   </div>
 );
