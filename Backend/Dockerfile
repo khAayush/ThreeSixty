@@ -17,7 +17,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Copy backend source code
-COPY backend/ ./backend/
+COPY . .
 
 EXPOSE 5000
 
