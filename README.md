@@ -15,7 +15,7 @@ A self-hosted Inventory Management Platform built with the MERN stack.
 ### 1. Clone and configure
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/khAayush/ThreeSixty.git
 cd ThreeSixty
 
 cp .env.example .env
