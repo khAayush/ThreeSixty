@@ -30,7 +30,7 @@ export const createRequest = async (req, res) => {
     if (dupe) return res.status(409).json({ success: false, message: "You already have a pending request for this item" });
 
     // Pick available assets as suggestions (one per requested quantity)
-    const available = await Asset.find({ unitId, status: "Healthy", isAssigned: { $ne: true } }).limit(qty);
+    const available = await Asset.find({ unitId, status: "Healthy", isAssigned: { $ne: true }, isLost: { $ne: true } }).limit(qty);
     if (available.length < qty)
       return res.status(409).json({ success: false, message: `Only ${available.length} unit(s) available` });
 
@@ -90,6 +90,7 @@ export const getAvailableAssets = async (req, res) => {
       unitId: req.params.unitId,
       status: "Healthy",
       isAssigned: { $ne: true },
+      isLost: { $ne: true },
     }).select("tag _id").sort({ tag: 1 });
     res.json({ success: true, data: assets });
   } catch (err) {

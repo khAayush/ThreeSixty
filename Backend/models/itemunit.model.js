@@ -10,4 +10,7 @@ const itemUnitSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Case-insensitive uniqueness: "Laptop" and "laptop" are the same unit within a category
+itemUnitSchema.index({ name: 1, categoryId: 1 }, { unique: true, collation: { locale: "en", strength: 2 } });
+
 export default mongoose.model("ItemUnit", itemUnitSchema);

@@ -7,6 +7,8 @@ import LostAndFound from "../models/lostandfound.model.js";
 import InventoryLog from "../models/inventorylog.model.js";
 
 const uid = (req) => req.user._id || req.user.id;
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const iname = (s) => new RegExp(`^${escapeRegex(s)}$`, "i");
 
 export const getCategories = async (req, res) => {
   try {
@@ -37,6 +39,9 @@ export const createCategory = async (req, res) => {
     if (!name || !type)
       return res.status(400).json({ success: false, message: "name and type are required" });
 
+    const dupe = await Category.findOne({ name: { $regex: iname(name.trim()) }, type });
+    if (dupe) return res.status(409).json({ success: false, message: "A category with this name and type already exists" });
+
     const cat = await Category.create({ name: name.trim(), type, description: description || "" });
 
     InventoryLog.create({
@@ -49,7 +54,7 @@ export const createCategory = async (req, res) => {
     res.status(201).json({ success: true, data: cat });
   } catch (err) {
     if (err.code === 11000)
-      return res.status(409).json({ success: false, message: "Category name already exists" });
+      return res.status(409).json({ success: false, message: "A category with this name and type already exists" });
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -62,6 +67,16 @@ export const updateCategory = async (req, res) => {
       ...(type && { type }),
       ...(description !== undefined && { description }),
     };
+
+    if (name || type) {
+      const existing = await Category.findById(req.params.id);
+      if (!existing) return res.status(404).json({ success: false, message: "Category not found" });
+      const checkName = name ? name.trim() : existing.name;
+      const checkType = type || existing.type;
+      const dupe = await Category.findOne({ name: { $regex: iname(checkName) }, type: checkType, _id: { $ne: req.params.id } });
+      if (dupe) return res.status(409).json({ success: false, message: "A category with this name and type already exists" });
+    }
+
     const cat = await Category.findByIdAndUpdate(req.params.id, update, {
       new: true,
       runValidators: true,
@@ -71,7 +86,7 @@ export const updateCategory = async (req, res) => {
     res.json({ success: true, data: cat });
   } catch (err) {
     if (err.code === 11000)
-      return res.status(409).json({ success: false, message: "Category name already exists" });
+      return res.status(409).json({ success: false, message: "A category with this name and type already exists" });
     res.status(500).json({ success: false, message: err.message });
   }
 };
@@ -109,7 +124,7 @@ export const browseInventory = async (req, res) => {
 
     const [availAgg, totalAgg] = await Promise.all([
       Asset.aggregate([
-        { $match: { unitId: { $in: unitIds }, status: "Healthy", isAssigned: { $ne: true } } },
+        { $match: { unitId: { $in: unitIds }, status: "Healthy", isAssigned: { $ne: true }, isLost: { $ne: true } } },
         { $group: { _id: "$unitId", count: { $sum: 1 } } },
       ]),
       Asset.aggregate([
@@ -189,7 +204,10 @@ export const createUnit = async (req, res) => {
     baseTag = baseTag.trim().toUpperCase();
     if (await ItemUnit.findOne({ baseTag }))
       return res.status(409).json({ success: false, message: "Base tag already exists" });
-    
+
+    if (await ItemUnit.findOne({ categoryId, name: { $regex: iname(name.trim()) } }))
+      return res.status(409).json({ success: false, message: "A unit with this name already exists in this category" });
+
     const unit = await ItemUnit.create({ categoryId, name: name.trim(), baseTag, totalCount: count });
     const userId = uid(req);
 
