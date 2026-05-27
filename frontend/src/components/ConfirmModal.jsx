@@ -1,13 +1,6 @@
 ﻿import { useState } from "react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
-/**
- * Usage:
- *   setConfirm({ title, message, confirmLabel, danger, onConfirm, requireNote, notePlaceholder })
- *
- *   When requireNote is true, the confirm button stays disabled until a note is typed.
- *   onConfirm receives the note string as its first argument (empty string if no note).
- */
 const ConfirmModal = ({
   title,
   message,

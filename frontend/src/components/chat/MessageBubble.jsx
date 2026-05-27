@@ -16,7 +16,6 @@ const StatusIcon = ({ status }) => {
 const getInitials = (name) =>
   name?.split(" ").map((n) => n[0]).join("").toUpperCase() || "?";
 
-// Full-screen lightbox for image messages
 const Lightbox = ({ src, onClose }) => (
   <div
     className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
@@ -62,7 +61,6 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
 
   const handleDelete = () => deleteMessage(message._id, partnerId);
 
-  // Deleted message placeholder
   if (message.deleted) {
     return (
       <div className={`flex items-center gap-2 mb-3 ${isMine ? "flex-row-reverse" : "flex-row"}`}>
@@ -82,7 +80,7 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
     ? (() => { try { return format(new Date(message.createdAt), "h:mm a"); } catch { return ""; } })()
     : "";
 
-  // Action buttons - not shown for image messages in edit mode (can't edit an image)
+  // images can't be edited, only deleted
   const ActionButtons = () => (
     <div className="flex items-center gap-1 mr-1">
       {!isImage && (
@@ -113,7 +111,6 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
       >
-        {/* Partner avatar */}
         {!isMine && isLastInGroup &&
           (activeUser?.profileImage ? (
             <img
@@ -130,7 +127,6 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
         {!isMine && !isLastInGroup && <div className="w-7 h-7 shrink-0" />}
 
         <div className={`flex flex-col max-w-[70%] ${isMine ? "items-end" : "items-start"}`}>
-          {/* Edit input - only for text messages */}
           {editing && !isImage ? (
             <div className="flex gap-2 items-center w-full">
               <input
@@ -158,7 +154,6 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
             </div>
           ) : (
             <>
-              {/* Bubble */}
               <div
                 className={`relative rounded-2xl shadow-sm overflow-hidden ${
                   isImage
@@ -190,7 +185,6 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
                 )}
               </div>
 
-              {/* Timestamp + status + action buttons */}
               {isLastInGroup && (
                 <div className={`flex items-center gap-1.5 mt-1 px-1 ${isMine ? "flex-row-reverse" : "flex-row"}`}>
                   <span className="text-xs text-slate-400">{timestamp}</span>

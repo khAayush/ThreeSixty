@@ -2,7 +2,6 @@ import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
 import { getIO } from "./socket.js";
 
-/** Create a persisted notification and emit it in real-time to the recipient. */
 export const createNotification = async (userId, type, title, message, data = {}) => {
   try {
     const notification = await Notification.create({ userId, type, title, message, data });
@@ -16,15 +15,6 @@ export const createNotification = async (userId, type, title, message, data = {}
   }
 };
 
-/**
- * Notify all active users with the given roles.
- * @param {string[]} roles
- * @param {string} type
- * @param {string} title
- * @param {string} message
- * @param {object} data
- * @param {string|null} excludeId - skip this user ID (e.g. the actor)
- */
 export const notifyRole = async (roles, type, title, message, data = {}, excludeId = null) => {
   try {
     const query = { role: { $in: roles }, status: { $ne: "terminated" } };

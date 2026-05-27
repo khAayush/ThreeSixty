@@ -55,7 +55,6 @@ const CategoriesView = ({ categories, onManageUnits, onEdit, onDelete }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      {/* Search bar */}
       <div className="px-6 py-3 border-b border-slate-100">
         <div className="relative max-w-xs">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -88,7 +87,11 @@ const CategoriesView = ({ categories, onManageUnits, onEdit, onDelete }) => {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.map((cat) => (
-                <tr key={cat._id} className="hover:bg-slate-50 transition-colors">
+                <tr
+                  key={cat._id}
+                  onClick={() => onManageUnits(cat)}
+                  className="hover:bg-slate-50 transition-colors cursor-pointer"
+                >
                   <td className="px-6 py-4 font-semibold text-slate-800">{cat.name}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-lg text-xs font-bold uppercase ${TYPE_COLORS[cat.type]}`}>
@@ -98,7 +101,7 @@ const CategoriesView = ({ categories, onManageUnits, onEdit, onDelete }) => {
                   <td className="px-6 py-4 text-slate-500 text-sm">
                     {cat.unitCount} Unit{cat.unitCount !== 1 ? "s" : ""}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-2 justify-end">
                       <button
                         onClick={() => onManageUnits(cat)}

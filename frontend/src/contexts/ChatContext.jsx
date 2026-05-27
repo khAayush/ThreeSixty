@@ -20,14 +20,12 @@ export const ChatProvider = ({ currentUser, children }) => {
   const typingTimers = useRef({});
   const conversationsRef = useRef([]);
 
-  // Keep ref in sync so socket handlers always see latest conversations
+  // Socket handlers close over this ref, not the state, so it must stay in sync
   useEffect(() => {
     conversationsRef.current = conversations;
   }, [conversations]);
 
-  // Init socket - re-runs whenever the logged-in user changes
   useEffect(() => {
-    // Always reset state when user changes
     setConversations([]);
     setMessages({});
     setActiveUserId(null);
@@ -39,7 +37,6 @@ export const ChatProvider = ({ currentUser, children }) => {
       return;
     }
 
-    // Disconnect any previous socket before creating a new one
     if (socketRef.current) {
       socketRef.current.disconnect();
       socketRef.current = null;
@@ -58,7 +55,6 @@ export const ChatProvider = ({ currentUser, children }) => {
       toast.error(`Chat connection failed: ${err.message}`);
     });
 
-    // Sent confirmation → reconcile optimistic message
     socket.on("message:sent", (msg) => {
       setMessages((prev) => {
         const partnerId = msg.receiver.toString();
@@ -70,7 +66,6 @@ export const ChatProvider = ({ currentUser, children }) => {
       updateConvLastMessage(msg.receiver.toString(), msg);
     });
 
-    // Incoming message from someone else
     socket.on("message:new", (msg) => {
       const partnerId = msg.sender.toString();
       setMessages((prev) => ({
@@ -90,12 +85,11 @@ export const ChatProvider = ({ currentUser, children }) => {
           ),
         );
       } else {
-        // New conversation — reload from server to get sender profile info
+        // First message from this person
         loadConversations();
       }
     });
 
-    // Status update (delivered / seen)
     socket.on("message:status", ({ messageId, status }) => {
       setMessages((prev) => {
         const updated = {};
@@ -108,7 +102,6 @@ export const ChatProvider = ({ currentUser, children }) => {
       });
     });
 
-    // Edit / delete
     socket.on("message:updated", (updatedMsg) => {
       const partnerId =
         updatedMsg.sender.toString() === currentUser._id.toString()
@@ -123,7 +116,6 @@ export const ChatProvider = ({ currentUser, children }) => {
       }));
     });
 
-    // Typing indicators
     socket.on("typing", ({ fromUserId }) => {
       setTyping((prev) => ({ ...prev, [fromUserId]: true }));
       clearTimeout(typingTimers.current[fromUserId]);
@@ -144,9 +136,8 @@ export const ChatProvider = ({ currentUser, children }) => {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [currentUser?._id]); // ← keyed to user ID primitive, not the whole object
+  }, [currentUser?._id]); // keyed to user ID so a role/profile update doesn't re-init the socket
 
-  // Helpers
   const updateConvLastMessage = (partnerId, msg) => {
     setConversations((prev) =>
       prev.map((c) =>
@@ -170,7 +161,6 @@ export const ChatProvider = ({ currentUser, children }) => {
     }
   }, []);
 
-  // Load conversations on login so the sidebar badge is populated on all pages
   useEffect(() => {
     if (currentUser?._id) loadConversations();
   }, [currentUser?._id, loadConversations]);
@@ -195,7 +185,6 @@ export const ChatProvider = ({ currentUser, children }) => {
     (userId) => {
       setActiveUserId(userId);
       if (!messages[userId]) loadMessages(userId);
-      // Clear unread badge
       setConversations((prev) =>
         prev.map((c) =>
           c.userId.toString() === userId ? { ...c, unreadCount: 0 } : c,

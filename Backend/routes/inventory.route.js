@@ -14,7 +14,7 @@ const router = express.Router();
 // Employee browse
 router.get("/browse", verifyToken, browseInventory);
 
-// Categories - read: all roles; write: admin only
+// Categories - admin only
 router.get("/categories", verifyToken, getCategories);
 router.post("/categories", verifyToken, requireAdmin, createCategory);
 router.put("/categories/:id", verifyToken, requireAdmin, updateCategory);

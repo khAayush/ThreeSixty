@@ -2,7 +2,7 @@ import crypto from "crypto";
 
 const ALGORITHM = "aes-256-gcm";
 
-// Resolved lazily so dotenv.config() has already run before first call
+// Key is resolved lazily so dotenv has loaded before first use
 let _key = null;
 const getKey = () => {
   if (!_key) _key = Buffer.from(process.env.ENCRYPTION_KEY, "hex");
@@ -14,7 +14,7 @@ export const encrypt = (text) => {
   const cipher = crypto.createCipheriv(ALGORITHM, getKey(), iv);
   const encrypted = Buffer.concat([cipher.update(text, "utf8"), cipher.final()]);
   const tag = cipher.getAuthTag();
-  // layout: [12 bytes iv][16 bytes tag][encrypted]
+  // wire format: 12 bytes iv | 16 bytes auth tag | ciphertext
   return Buffer.concat([iv, tag, encrypted]).toString("base64");
 };
 
@@ -28,7 +28,7 @@ export const decrypt = (data) => {
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString("utf8");
   } catch {
-    // Return as-is if decryption fails (e.g. legacy unencrypted messages)
+    // Return as-is if decryption fails 
     return data;
   }
 };

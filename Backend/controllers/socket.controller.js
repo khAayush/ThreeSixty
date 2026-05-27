@@ -5,11 +5,9 @@ import mongoose from "mongoose";
 export const handleSocketConnection = (socket, io) => {
   const userId = socket.userId;
 
-  // Join user into personal room for targeting
   socket.join(String(userId));
   console.log(`User ${userId} connected and joined room ${userId}`);
 
-  // Notify all clients of online users
   const broadcastOnlineUsers = () => {
     const onlineUserIds = Array.from(io.sockets.sockets.values())
       .map((s) => s.userId)
@@ -19,17 +17,11 @@ export const handleSocketConnection = (socket, io) => {
 
   broadcastOnlineUsers();
 
-  /**
-   * Socket: message:send
-   * Payload: { receiverId, content, tempId }
-   * Response: message:sent (to sender), message:new (to receiver)
-   */
   socket.on("message:send", async (payload) => {
     try {
       const { receiverId, content, tempId } = payload;
       const senderId = userId;
 
-      // Validate
       if (!receiverId || !content?.trim()) {
         socket.emit("message:error", {
           tempId,
@@ -62,7 +54,6 @@ export const handleSocketConnection = (socket, io) => {
         return;
       }
 
-      // Check receiver exists and is active
       const receiver = await User.findById(receiverId);
       if (!receiver || receiver.status !== "active") {
         socket.emit("message:error", {
@@ -72,7 +63,6 @@ export const handleSocketConnection = (socket, io) => {
         return;
       }
 
-      // Create message with "sent" status
       const newMessage = await Message.create({
         sender: new mongoose.Types.ObjectId(senderId),
         receiver: new mongoose.Types.ObjectId(receiverId),
@@ -90,23 +80,18 @@ export const handleSocketConnection = (socket, io) => {
         deleted: newMessage.deleted,
         createdAt: newMessage.createdAt,
         updatedAt: newMessage.updatedAt,
-        tempId, // For client reconciliation
+        tempId,
       };
 
-      // Send to sender (confirmation with tempId)
       socket.emit("message:sent", messageData);
-
-      // Send to receiver
       io.to(String(receiverId)).emit("message:new", messageData);
 
-      // Update to "delivered" after emission
       await Message.findByIdAndUpdate(
         newMessage._id,
         { status: "delivered" },
         { new: true }
       );
 
-      // Notify both users of delivery
       io.to(String(senderId)).emit("message:status", {
         messageId: newMessage._id,
         status: "delivered",
@@ -123,11 +108,6 @@ export const handleSocketConnection = (socket, io) => {
     }
   });
 
-  /**
-   * Socket: message:seen
-   * Payload: { messageIds }
-   * Updates all messages to "seen" status
-   */
   socket.on("message:seen", async (payload) => {
     try {
       const { messageIds } = payload;
@@ -135,7 +115,6 @@ export const handleSocketConnection = (socket, io) => {
 
       if (!Array.isArray(messageIds) || messageIds.length === 0) return;
 
-      // Find messages where current user is receiver and status is not already seen
       const messages = await Message.find({
         _id: { $in: messageIds },
         receiver: currentUserId,
@@ -146,13 +125,11 @@ export const handleSocketConnection = (socket, io) => {
 
       const senderIds = new Set(messages.map((m) => String(m.sender)));
 
-      // Update all to "seen"
       await Message.updateMany(
         { _id: { $in: messageIds }, receiver: currentUserId },
         { status: "seen" }
       );
 
-      // Notify both sender and receiver
       messages.forEach((message) => {
         io.to(String(message.sender)).emit("message:status", {
           messageId: message._id,
@@ -168,28 +145,16 @@ export const handleSocketConnection = (socket, io) => {
     }
   });
 
-  /**
-   * Socket: typing
-   * Payload: { toUserId }
-   */
   socket.on("typing", (payload) => {
     const { toUserId } = payload;
     io.to(String(toUserId)).emit("typing", { fromUserId: userId });
   });
 
-  /**
-   * Socket: stopTyping
-   * Payload: { toUserId }
-   */
   socket.on("stopTyping", (payload) => {
     const { toUserId } = payload;
     io.to(String(toUserId)).emit("stopTyping", { fromUserId: userId });
   });
 
-  /**
-   * Socket: message:edit
-   * Payload: { messageId, newContent }
-   */
   socket.on("message:edit", async (payload) => {
     try {
       const { messageId, newContent } = payload;
@@ -200,7 +165,6 @@ export const handleSocketConnection = (socket, io) => {
         return;
       }
 
-      // Verify sender
       if (String(message.sender) !== String(userId)) {
         socket.emit("message:error", {
           message: "Not authorized to edit this message",
@@ -208,7 +172,6 @@ export const handleSocketConnection = (socket, io) => {
         return;
       }
 
-      // Cannot edit deleted messages
       if (message.deleted) {
         socket.emit("message:error", {
           message: "Cannot edit a deleted message",
@@ -216,7 +179,6 @@ export const handleSocketConnection = (socket, io) => {
         return;
       }
 
-      // Update message
       message.content = newContent.trim();
       message.edited = true;
       await message.save();
@@ -233,7 +195,6 @@ export const handleSocketConnection = (socket, io) => {
         updatedAt: message.updatedAt,
       };
 
-      // Emit to both sender and receiver
       io.to(String(userId)).emit("message:updated", updatedMsg);
       io.to(String(message.receiver)).emit("message:updated", updatedMsg);
     } catch (error) {
@@ -242,11 +203,6 @@ export const handleSocketConnection = (socket, io) => {
     }
   });
 
-  /**
-   * Socket: message:delete
-   * Payload: { messageId }
-   * Soft delete (mark deleted = true, content = placeholder)
-   */
   socket.on("message:delete", async (payload) => {
     try {
       const { messageId } = payload;
@@ -257,7 +213,6 @@ export const handleSocketConnection = (socket, io) => {
         return;
       }
 
-      // Verify sender
       if (String(message.sender) !== String(userId)) {
         socket.emit("message:error", {
           message: "Not authorized to delete this message",
@@ -265,7 +220,7 @@ export const handleSocketConnection = (socket, io) => {
         return;
       }
 
-      // Soft delete
+      // Soft delete - content is replaced rather than the record being removed
       message.deleted = true;
       message.content = "This message was deleted";
       await message.save();
@@ -282,7 +237,6 @@ export const handleSocketConnection = (socket, io) => {
         updatedAt: message.updatedAt,
       };
 
-      // Emit to both
       io.to(String(userId)).emit("message:updated", deletedMsg);
       io.to(String(message.receiver)).emit("message:updated", deletedMsg);
     } catch (error) {
@@ -295,7 +249,6 @@ export const handleSocketConnection = (socket, io) => {
     socket.leave(String(userId));
     console.log(`User ${userId} disconnected`);
 
-    // Broadcast updated online users
     const onlineUserIds = Array.from(io.sockets.sockets.values())
       .map((s) => s.userId)
       .filter((id) => id);

@@ -3,10 +3,8 @@ import User from "../models/user.model.js";
 
 export const verifyToken = async (req, res, next) => {
   try {
-    // Check cookies first
     let token = req.cookies.token;
 
-    // Check Authorization header
     if (!token) {
       const authHeader = req.headers.authorization;
 
@@ -21,10 +19,8 @@ export const verifyToken = async (req, res, next) => {
       });
     }
 
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Fetch full user from DB (temp tokens use `userId`, normal tokens use `id`)
+    // temp tokens use `userId`, regular tokens use `id`
     const user = await User.findById(decoded.userId || decoded.id).select("-password");
 
     if (!user) {
@@ -33,9 +29,7 @@ export const verifyToken = async (req, res, next) => {
       });
     }
 
-    // Attach full user object
     req.user = user;
-
     next();
 
   } catch (error) {

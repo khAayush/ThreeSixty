@@ -6,12 +6,13 @@ import {
   CheckCircleIcon,
   XMarkIcon,
   ArrowLeftIcon,
+  BuildingOfficeIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { showLoading, showSuccess, showError } from "../utils/toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Helper functions for styling
 const getInitials = (name) =>
   name
     .split(" ")
@@ -48,11 +49,12 @@ const TicketsPage = ({ onLogout }) => {
   const [resolveNote, setResolveNote] = useState("");
   const [loading, setLoading] = useState(true);
   const [resolving, setResolving] = useState(false);
+  const [notifying, setNotifying] = useState(false);
   const [activeTab, setActiveTab] = useState("Open");
+  const [search, setSearch] = useState("");
 
   const currentAdmin = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // Fetch all tickets on mount
   useEffect(() => {
     fetchTickets();
   }, []);
@@ -80,6 +82,25 @@ const TicketsPage = ({ onLogout }) => {
     setSelectedTicket(ticket);
     setShowDetailOnMobile(true);
     setResolveNote("");
+  };
+
+  const handleNotifyVisit = async () => {
+    if (!selectedTicket) return;
+    setNotifying(true);
+    const toastId = showLoading("Sending visit notification...");
+    try {
+      const res = await fetch(`${API_URL}/tickets/${selectedTicket._id}/notify-visit`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to send notification");
+      showSuccess("Visit notification sent to user!", toastId);
+    } catch (err) {
+      showError("Failed to send notification", toastId);
+      console.error("Notify visit error:", err);
+    } finally {
+      setNotifying(false);
+    }
   };
 
   const handleResolveTicket = async () => {
@@ -118,7 +139,6 @@ const TicketsPage = ({ onLogout }) => {
   return (
     <Layout onLogout={onLogout} >
       <div className="flex flex-col h-[calc(100vh-4rem)] p-4 md:p-8 max-w-7xl mx-auto w-full">
-        {/* Page Header */}
         <div className="mb-6 shrink-0">
           <h2 className="text-2xl font-bold text-slate-800">Support Tickets</h2>
           <p className="text-slate-500 text-sm">
@@ -126,16 +146,24 @@ const TicketsPage = ({ onLogout }) => {
           </p>
         </div>
 
-        {/* Main Grid Layout */}
         <div className="flex-1 flex overflow-hidden bg-slate-50  gap-6">
-          {/* LEFT COLUMN: Ticket List */}
           <div
             className={`
             w-full lg:w-1/3 shrink-0 flex flex-col overflow-hidden pr-2
             ${showDetailOnMobile ? "hidden lg:flex" : "flex"}
           `}
           >
-            {/* Tabs */}
+            <div className="relative shrink-0 mb-2">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search tickets…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition"
+              />
+            </div>
+
             <div className="flex gap-2 border-b border-slate-200 shrink-0 bg-slate-50/50">
               <button
                 onClick={() => setActiveTab("Open")}
@@ -159,25 +187,24 @@ const TicketsPage = ({ onLogout }) => {
               </button>
             </div>
 
-            {/* Tab Content */}
             <div className="flex-1 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center h-full text-slate-400">
                   Loading tickets...
                 </div>
-              ) : tickets.filter(t => t.status === activeTab).length === 0 ? (
+              ) : tickets.filter(t => t.status === activeTab && (!search || t.title?.toLowerCase().includes(search.toLowerCase()) || t.userName?.toLowerCase().includes(search.toLowerCase()))).length === 0 ? (
                 <div className="flex items-center justify-center h-full text-slate-400">
-                  No {activeTab.toLowerCase()} tickets
+                  No {activeTab.toLowerCase()} tickets{search ? " matching your search" : ""}
                 </div>
               ) : (
                 <div className="space-y-2 p-4">
                   {tickets
-                    .filter(t => t.status === activeTab)
+                    .filter(t => t.status === activeTab && (!search || t.title?.toLowerCase().includes(search.toLowerCase()) || t.userName?.toLowerCase().includes(search.toLowerCase())))
                     .sort((a, b) => {
                       if (activeTab === "Closed") {
                         return new Date(b.resolvedDate || b.updatedAt) - new Date(a.resolvedDate || a.updatedAt);
                       }
-                      return new Date(b.createdAt) - new Date(a.createdAt);
+                      return new Date(a.createdAt) - new Date(b.createdAt);
                     })
                     .map((ticket) => {
                     const isActive = selectedTicket?._id === ticket._id;
@@ -224,7 +251,6 @@ const TicketsPage = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Ticket Details */}
           <div
             className={`
             flex-1 bg-white border border-slate-200 rounded-2xl flex flex-col shadow-sm overflow-y-auto h-fit max-h-full
@@ -233,7 +259,6 @@ const TicketsPage = ({ onLogout }) => {
           >
             {selectedTicket ? (
               <>
-                {/* Mobile Back Button */}
                 <div className="lg:hidden p-4 border-b border-slate-100 shrink-0">
                   <button
                     onClick={() => setShowDetailOnMobile(false)}
@@ -244,11 +269,9 @@ const TicketsPage = ({ onLogout }) => {
                   </button>
                 </div>
 
-                {/* 1. Top Section: Avatar, Meta, Title, Description */}
                 <div className="p-6 md:p-8">
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center space-x-4">
-                      {/* Avatar */}
                       <div className="w-12 h-12 rounded-full bg-slate-500 text-white flex items-center justify-center text-lg font-semibold shadow-inner shrink-0 overflow-hidden">
                         {selectedTicket.userImage ? (
                           <img src={selectedTicket.userImage} alt={selectedTicket.userName} className="w-full h-full object-cover" />
@@ -265,7 +288,6 @@ const TicketsPage = ({ onLogout }) => {
                         </p>
                       </div>
                     </div>
-                    {/* Status Badge */}
                     <span
                       className={`px-4 py-1.5 rounded-lg text-sm font-semibold tracking-wide capitalize shrink-0 ${
                         selectedTicket.status === "Open"
@@ -277,7 +299,6 @@ const TicketsPage = ({ onLogout }) => {
                     </span>
                   </div>
 
-                  {/* Title & Description */}
                   <h2 className="text-xl md:text-2xl font-bold text-slate-800">
                     {selectedTicket.title}
                   </h2>
@@ -286,10 +307,8 @@ const TicketsPage = ({ onLogout }) => {
                   </p>
                 </div>
 
-                {/* 2. Bottom Section (Open vs Closed/Resolved state) */}
                 {selectedTicket.status === "Open" ? (
                   <div className="border-t border-slate-100 mt-auto">
-                    {/* Resolution Input */}
                     <div className="p-6 md:p-8 bg-slate-50/30">
                       <textarea
                         value={resolveNote}
@@ -297,7 +316,7 @@ const TicketsPage = ({ onLogout }) => {
                         placeholder="Enter resolution note..."
                         className="w-full bg-slate-100 border-none rounded-xl p-4 text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all resize-none min-h-25 shadow-inner"
                       />
-                      <div className="mt-4 flex justify-start">
+                      <div className="mt-4 flex items-center gap-3">
                         <button
                           onClick={handleResolveTicket}
                           disabled={resolving || !resolveNote.trim()}
@@ -306,12 +325,19 @@ const TicketsPage = ({ onLogout }) => {
                           <CheckCircleIcon className="w-5 h-5 stroke-2" />
                           <span>{resolving ? "Resolving..." : "Resolve"}</span>
                         </button>
+                        <button
+                          onClick={handleNotifyVisit}
+                          disabled={notifying}
+                          className="flex items-center space-x-2 px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm bg-brand text-white hover:bg-brand hover:shadow-brand disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          <BuildingOfficeIcon className="w-5 h-5 stroke-2" />
+                          <span>{notifying ? "Sending..." : "Request Visit"}</span>
+                        </button>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="flex flex-col border-t border-slate-100 mt-auto">
-                    {/* Resolved Note Content */}
                     <div className="p-6 md:p-8">
                       <h4 className="font-bold text-slate-800 text-lg mb-2">
                         Resolution Note
@@ -320,7 +346,6 @@ const TicketsPage = ({ onLogout }) => {
                         {selectedTicket.note || "No resolution note was provided."}
                       </p>
                     </div>
-                    {/* Resolved Footer */}
                     <div className="px-6 md:px-8 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between text-sm text-slate-500 font-medium gap-2">
                       <span>
                         <strong className="text-slate-700">Resolved on:</strong>{" "}

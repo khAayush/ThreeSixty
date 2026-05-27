@@ -4,6 +4,7 @@ import NewTicketModal from "../components/NewTicketModal";
 import {
   PlusIcon,
   ArrowLeftIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { showLoading, showSuccess, showError } from "../utils/toast";
 
@@ -40,10 +41,10 @@ const EmployeeTicketsPage = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState("Open");
   const [closeNote, setCloseNote] = useState("");
   const [closing, setClosing] = useState(false);
+  const [search, setSearch] = useState("");
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // Fetch tickets on mount
   useEffect(() => {
     fetchTickets();
   }, []);
@@ -135,7 +136,6 @@ const EmployeeTicketsPage = ({ onLogout }) => {
   return (
     <Layout onLogout={onLogout} >
       <div className="flex flex-col h-[calc(100vh-4rem)] p-4 md:p-8 max-w-7xl mx-auto w-full">
-        {/* Page Header with New Ticket Button */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 shrink-0 gap-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-800">My Support Tickets</h2>
@@ -147,12 +147,20 @@ const EmployeeTicketsPage = ({ onLogout }) => {
           </button>
         </div>
 
-        {/* Main Grid Layout */}
         <div className="flex-1 flex overflow-hidden bg-slate-50 gap-6">
 
-          {/* LEFT COLUMN: Ticket List */}
           <div className={`w-full lg:w-1/3 shrink-0 flex flex-col overflow-hidden pr-2 ${showDetailOnMobile ? "hidden lg:flex" : "flex"}`}>
-            {/* Tabs */}
+            <div className="relative shrink-0 mb-2">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search tickets…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition"
+              />
+            </div>
+
             <div className="flex gap-2 border-b border-slate-200 shrink-0 bg-slate-50/50">
               <button
                 onClick={() => setActiveTab("Open")}
@@ -176,19 +184,18 @@ const EmployeeTicketsPage = ({ onLogout }) => {
               </button>
             </div>
 
-            {/* Tab Content */}
             <div className="flex-1 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center h-full text-slate-400">
                   Loading tickets...
                 </div>
-              ) : tickets.filter(t => t.status === activeTab).length === 0 ? (
+              ) : tickets.filter(t => t.status === activeTab && (!search || t.title?.toLowerCase().includes(search.toLowerCase()))).length === 0 ? (
                 <div className="flex items-center justify-center h-full text-slate-400">
-                  No {activeTab.toLowerCase()} tickets
+                  No {activeTab.toLowerCase()} tickets{search ? " matching your search" : ""}
                 </div>
               ) : (
                 <div className="space-y-2 p-4">
-                  {tickets.filter(t => t.status === activeTab).map((ticket) => {
+                  {tickets.filter(t => t.status === activeTab && (!search || t.title?.toLowerCase().includes(search.toLowerCase()))).map((ticket) => {
                     const isActive = selectedTicket?._id === ticket._id;
                     return (
                       <button
@@ -225,7 +232,6 @@ const EmployeeTicketsPage = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Ticket Details */}
           <div className={`flex-1 bg-white border border-slate-200 rounded-2xl flex flex-col shadow-sm overflow-y-auto h-fit max-h-full ${!showDetailOnMobile ? "hidden lg:flex" : "flex"}`}>
             {selectedTicket ? (
               <>
@@ -266,10 +272,8 @@ const EmployeeTicketsPage = ({ onLogout }) => {
                   </p>
                 </div>
 
-                {/* State-Based Interaction Footer */}
                 <div className="border-t border-slate-100 mt-auto">
                   {selectedTicket.status === "Closed" ? (
-                    /* Closed Ticket: Show resolution note and metadata */
                     <div className="flex flex-col">
                       <div className="p-6 md:p-8">
                         <h4 className="font-bold text-slate-800 text-lg mb-2">{selectedTicket.resolvedBy ? "Resolved Note" : "Closing Note"}</h4>
@@ -290,7 +294,6 @@ const EmployeeTicketsPage = ({ onLogout }) => {
                       )}
                     </div>
                   ) : (
-                    /* Open Ticket: Show close option */
                     <div className="border-t border-slate-100">
                       <div className="p-6 md:p-8 bg-slate-50/30">
                         <label className="block mb-3 text-sm font-semibold text-slate-700">Close this ticket</label>

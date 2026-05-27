@@ -20,7 +20,7 @@ const notificationSchema = new mongoose.Schema(
     title:   { type: String, required: true },
     message: { type: String, required: true },
     isRead:  { type: Boolean, default: false },
-    readAt:  { type: Date, default: null },   // set when marked read; TTL deletes after 24 h
+    readAt:  { type: Date, default: null },
     data:    { type: mongoose.Schema.Types.Mixed, default: {} },
   },
   { timestamps: true },

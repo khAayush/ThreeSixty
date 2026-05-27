@@ -37,7 +37,6 @@ const ChatPage = ({ currentUser, onLogout }) => {
         </div>
 
       <div className="flex-1 grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4 min-h-0">
-        {/* Left */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-0 overflow-hidden">
           <ConversationList
             currentUser={currentUser}
@@ -48,7 +47,6 @@ const ChatPage = ({ currentUser, onLogout }) => {
           />
         </div>
 
-        {/* Right */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col min-h-0 overflow-hidden">
           {activeUserId ? (
             <MessageWindow

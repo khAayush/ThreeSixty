@@ -2,19 +2,16 @@ import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import { decrypt } from "../utils/encryption.js";
 
-// GET /api/conversations
 export const getConversations = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Find all users this user has exchanged messages with
     const messages = await Message.find({
       $or: [{ sender: userId }, { receiver: userId }],
     })
       .sort({ createdAt: -1 })
       .lean();
 
-    // Build a map: partnerId -> { lastMessage, unreadCount }
     const partnerMap = new Map();
 
     for (const msg of messages) {
@@ -26,7 +23,6 @@ export const getConversations = async (req, res) => {
         partnerMap.set(partnerId, { lastMessage: msg, unreadCount: 0 });
       }
 
-      // Count unread (receiver is me, not seen)
       if (
         msg.receiver.toString() === userId.toString() &&
         msg.status !== "seen"
@@ -35,7 +31,6 @@ export const getConversations = async (req, res) => {
       }
     }
 
-    // Fetch partner user details
     const partnerIds = [...partnerMap.keys()];
     const users = await User.find({ _id: { $in: partnerIds } })
       .select("name email profileImage")
@@ -53,7 +48,6 @@ export const getConversations = async (req, res) => {
       };
     });
 
-    // Sort by last message time descending
     conversations.sort(
       (a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
     );
@@ -64,7 +58,6 @@ export const getConversations = async (req, res) => {
   }
 };
 
-// GET /api/messages/:userId?limit=30&offset=0
 export const getMessages = async (req, res) => {
   try {
     const myId = req.user._id;
@@ -89,7 +82,6 @@ export const getMessages = async (req, res) => {
   }
 };
 
-// GET /api/users/search?q=
 export const searchUsers = async (req, res) => {
   try {
     const q = req.query.q?.trim();

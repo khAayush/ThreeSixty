@@ -41,17 +41,14 @@ const AdminInventoryPage = ({ onLogout }) => {
     Authorization: `Bearer ${token}`,
   };
 
-  // ── Navigation state ─────────────────────────────────────────────────────────
-  const [view, setView] = useState("categories"); // "categories" | "units" | "assets"
+  const [view, setView] = useState("categories");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
 
-  // ── Data state ───────────────────────────────────────────────────────────────
   const [categories, setCategories] = useState([]);
   const [units, setUnits] = useState([]);
   const [assets, setAssets] = useState([]);
 
-  // ── UI state ─────────────────────────────────────────────────────────────────
   const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
@@ -62,12 +59,10 @@ const AdminInventoryPage = ({ onLogout }) => {
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsQuery, setLogsQuery] = useState("");
   const [csvModal, setCsvModal] = useState(false);
-  const [csvRows, setCsvRows] = useState([]);       // parsed preview rows
+  const [csvRows, setCsvRows] = useState([]);
   const [csvError, setCsvError] = useState("");
-  const [csvResults, setCsvResults] = useState(null); // post-submit results
+  const [csvResults, setCsvResults] = useState(null);
   const [csvSubmitting, setCsvSubmitting] = useState(false);
-
-  // ── API helper ───────────────────────────────────────────────────────────────
 
   const inventoryFetch = async (path, opts = {}) => {
     const res = await fetch(`${API_URL}/inventory${path}`, {
@@ -82,8 +77,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     }
     return res;
   };
-
-  // ── Data fetchers ────────────────────────────────────────────────────────────
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -145,8 +138,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Navigation ───────────────────────────────────────────────────────────────
-
   const goToUnits = (category) => {
     setSelectedCategory(category);
     setView("units");
@@ -169,8 +160,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     }
   };
 
-  // ── Modal helpers ────────────────────────────────────────────────────────────
-
   const openModal = (type, data = {}) => {
     setForm({ ...data });
     setModal({ type, data });
@@ -180,8 +169,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     setModal(null);
     setForm({});
   };
-
-  // ── Category handlers ────────────────────────────────────────────────────────
 
   const handleCreateCategory = async () => {
     if (!form.name?.trim() || !form.type) return toast.error("Name and type are required");
@@ -232,8 +219,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     });
   };
 
-  // ── Unit handlers ─────────────────────────────────────────────────────────────
-
   const handleCreateUnit = async () => {
     if (!form.name?.trim() || !form.baseTag?.trim() || !form.initialCount)
       return toast.error("All fields are required");
@@ -279,8 +264,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     } catch { toast.error("Failed to add stock"); }
     finally { setSubmitting(false); }
   };
-
-  // ── Asset handlers ───────────────────────────────────────────────────────────
 
   const handleUpdateStatus = async () => {
     if (!form.status) return toast.error("Please select a status");
@@ -333,7 +316,6 @@ const AdminInventoryPage = ({ onLogout }) => {
 
   const handleToggleLost = (asset) => {
     if (asset.isLost) {
-      // Mark as found - no location needed, call directly
       (async () => {
         try {
           const res = await inventoryFetch(`/assets/${asset._id}/lost`, { method: "PATCH" });
@@ -344,7 +326,6 @@ const AdminInventoryPage = ({ onLogout }) => {
         } catch { toast.error("Failed to mark asset as found"); }
       })();
     } else {
-      // Mark as lost - open modal to collect location
       openModal("markLost", asset);
     }
   };
@@ -464,8 +445,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     finally { setLogsLoading(false); }
   };
 
-  // Render
-
   const pageTitle =
     view === "categories" ? "Inventory"
     : view === "units" ? `${selectedCategory?.name} - Units`
@@ -475,7 +454,6 @@ const AdminInventoryPage = ({ onLogout }) => {
     <Layout onLogout={onLogout}>
       <div className="p-6 space-y-6">
 
-        {/* Header + breadcrumb */}
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1 min-w-0">
             <div className="flex items-center gap-1 text-sm text-slate-500 flex-wrap">
@@ -552,7 +530,6 @@ const AdminInventoryPage = ({ onLogout }) => {
           </div>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="w-8 h-8 border-4 border-brand/30 border-t-brand rounded-full animate-spin" />
@@ -584,8 +561,6 @@ const AdminInventoryPage = ({ onLogout }) => {
           />
         )}
       </div>
-
-      {/* ── Modals ─────────────────────────────────────────────────────────────── */}
 
       {modal?.type === "createCategory" && (
         <Modal title="New Category" onClose={closeModal}>
@@ -740,11 +715,9 @@ const AdminInventoryPage = ({ onLogout }) => {
         />
       )}
 
-      {/* ── CSV Import Modal ─────────────────────────────────────────────────── */}
       {csvModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl flex flex-col max-h-[85vh]">
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-brand/10 rounded-xl flex items-center justify-center">
@@ -760,11 +733,9 @@ const AdminInventoryPage = ({ onLogout }) => {
               </button>
             </div>
 
-            {/* Body */}
             <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
               {!csvResults ? (
                 <>
-                  {/* Upload area */}
                   <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center">
                     <ArrowUpTrayIcon className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                     <p className="text-sm text-slate-500 mb-1">Required columns:</p>
@@ -788,7 +759,6 @@ const AdminInventoryPage = ({ onLogout }) => {
                     </div>
                   )}
 
-                  {/* Preview table */}
                   {csvRows.length > 0 && (
                     <div>
                       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{csvRows.length} row{csvRows.length !== 1 ? "s" : ""} detected</p>
@@ -830,7 +800,6 @@ const AdminInventoryPage = ({ onLogout }) => {
                   )}
                 </>
               ) : (
-                /* Results view */
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${csvResults.every(r => r.success) ? "bg-emerald-50" : "bg-amber-50"}`}>
@@ -885,7 +854,6 @@ const AdminInventoryPage = ({ onLogout }) => {
               )}
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-3 border-t border-slate-100 shrink-0 flex items-center justify-end gap-3">
               <button onClick={() => setCsvModal(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors">
                 {csvResults ? "Close" : "Cancel"}
@@ -909,11 +877,9 @@ const AdminInventoryPage = ({ onLogout }) => {
         </div>
       )}
 
-      {/* ── Inventory Logs Modal (manager only) ─────────────────────────────── */}
       {logsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl flex flex-col max-h-[85vh]">
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center">
@@ -929,7 +895,6 @@ const AdminInventoryPage = ({ onLogout }) => {
               </button>
             </div>
 
-            {/* Search bar */}
             <div className="px-6 py-3 border-b border-slate-100 shrink-0">
               <div className="relative max-w-sm">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -943,7 +908,6 @@ const AdminInventoryPage = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Body */}
             <div className="overflow-y-auto flex-1">
               {logsLoading ? (
                 <div className="flex items-center justify-center h-48">
@@ -994,7 +958,6 @@ const AdminInventoryPage = ({ onLogout }) => {
               })()}
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-3 border-t border-slate-100 shrink-0 flex items-center justify-between">
               <span className="text-xs text-slate-400">
                 {logsQuery.trim()

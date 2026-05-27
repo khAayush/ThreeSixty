@@ -155,11 +155,9 @@ const ProfilePage = ({ onLogout }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Avatar Card */}
           <div className="lg:col-span-1">
             <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm flex flex-col items-center text-center">
               <div className="relative group">
-                {/* Avatar */}
                 {userImage ? (
                   <img
                     src={userImage}
@@ -179,14 +177,12 @@ const ProfilePage = ({ onLogout }) => {
                   {initials}
                 </div>
 
-                {/* Upload overlay spinner */}
                 {uploading && (
                   <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
                     <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
                   </div>
                 )}
 
-                {/* Upload pencil - hidden for Google accounts */}
                 {!user?.isGoogleAccount && (
                   <button
                     type="button"
@@ -214,7 +210,6 @@ const ProfilePage = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* Account Details */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
               <div className="px-6 py-4 border-b border-slate-50 bg-slate-50/30">
@@ -229,7 +224,6 @@ const ProfilePage = ({ onLogout }) => {
           </div>
         </div>
 
-        {/* Security card */}
         {user?.isGoogleAccount ? (
           <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex items-start gap-4 mt-8">
             <div className="bg-white p-2 rounded-lg shadow-sm text-blue-500">

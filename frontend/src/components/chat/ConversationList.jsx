@@ -43,7 +43,6 @@ const ConversationList = ({ currentUser, onSelect }) => {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Header */}
       <div className="px-4 pt-4 pb-3 border-b border-slate-100">
         <h2 className="text-base font-semibold text-slate-800 mb-3">Conversations</h2>
 
@@ -59,7 +58,6 @@ const ConversationList = ({ currentUser, onSelect }) => {
         </div>
       </div>
 
-      {/* Search Results */}
       {query.trim() && (
         <div className="border-b border-slate-100">
           {searching ? (
@@ -115,7 +113,6 @@ const ConversationList = ({ currentUser, onSelect }) => {
         </div>
       )}
 
-      {/* Conversation List */}
       <div className="flex-1 overflow-y-auto py-2 min-h-0">
         {conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full px-6 py-10 text-center">

@@ -16,7 +16,7 @@ const Login = ({ setCurrentUser }) => {
   const [settings, setSettings] = useState({ allowedEmailDomains: [], filteredEmailNames: [] });
 
   useEffect(() => {
-    // Fetch settings for client-side Google login validation
+    // Fetch settings for Google login validation
     fetch(`${API_URL}/settings`)
       .then((r) => r.json())
       .then((data) => { if (data.settings) setSettings(data.settings); })
@@ -74,7 +74,7 @@ const Login = ({ setCurrentUser }) => {
                   // Decode the JWT to get user info including profile picture
                   const decodedToken = jwtDecode(idToken);
 
-                  // Validate email domain (client-side check)
+                  // Validate email domain
                   const userEmail = decodedToken.email;
                   const emailDomain = userEmail.split("@")[1];
                   const emailName = userEmail.split("@")[0];
@@ -121,13 +121,13 @@ const Login = ({ setCurrentUser }) => {
                     return;
                   }
 
-                  // Handle pending approval (202 status)
+                  // Handle pending approval
                   if (res.status === 202 && data.status === "pending") {
                     showPending(`Your account is pending approval.`, toastId);
                     return;
                   }
 
-                  // Successful login - store token and redirect
+                  // Successful login
                   const userData = {
                     ...data.user,
                   };

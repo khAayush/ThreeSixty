@@ -31,11 +31,11 @@ const EmployeeInventoryPage = ({ onLogout }) => {
   };
 
   const [assignments, setAssignments] = useState([]);
-  const [lostReportMap, setLostReportMap] = useState({}); // { assetTag: reportId }
+  const [lostReportMap, setLostReportMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("pending");
 
-  const [reportLostModal, setReportLostModal] = useState(null); // { assignment }
+  const [reportLostModal, setReportLostModal] = useState(null);
   const [lostLocation, setLostLocation] = useState("");
   const [submittingLost, setSubmittingLost] = useState(false);
 
@@ -159,13 +159,11 @@ const EmployeeInventoryPage = ({ onLogout }) => {
     <Layout onLogout={onLogout}>
       <div className="p-6 space-y-6">
 
-        {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-slate-800">My Assets</h1>
           <p className="text-sm text-slate-500 mt-0.5">Track your requests, assigned assets, and history</p>
         </div>
 
-        {/* Tabs */}
         <div className="flex items-center gap-1 p-1.5 bg-slate-100 rounded-xl w-fit">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
@@ -190,7 +188,6 @@ const EmployeeInventoryPage = ({ onLogout }) => {
           ))}
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="w-8 h-8 border-4 border-brand/30 border-t-brand rounded-full animate-spin" />
@@ -200,7 +197,6 @@ const EmployeeInventoryPage = ({ onLogout }) => {
         )}
       </div>
 
-      {/* Report Lost Modal */}
       {reportLostModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
@@ -220,7 +216,6 @@ const EmployeeInventoryPage = ({ onLogout }) => {
             </div>
 
             <div className="p-6 space-y-4">
-              {/* Pre-filled read-only fields */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Asset Tag</label>

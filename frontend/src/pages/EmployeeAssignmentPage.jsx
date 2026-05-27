@@ -17,7 +17,7 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterCatId, setFilterCatId] = useState("");
-  const [requestModal, setRequestModal] = useState(null); // { unit }
+  const [requestModal, setRequestModal] = useState(null);
   const [requestQty, setRequestQty] = useState(1);
   const [submitting, setSubmitting] = useState(false);
 
@@ -114,13 +114,11 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
     <Layout onLogout={onLogout}>
       <div className="p-6 space-y-6">
 
-        {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Request Asset</h1>
           <p className="text-sm text-slate-500 mt-0.5">Browse available assets and submit a request</p>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative">
             <select
@@ -147,7 +145,6 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
           </div>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="w-8 h-8 border-4 border-brand/30 border-t-brand rounded-full animate-spin" />
@@ -184,7 +181,6 @@ const EmployeeAssignmentPage = ({ onLogout }) => {
         )}
       </div>
 
-      {/* Request modal */}
       {requestModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">

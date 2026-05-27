@@ -42,13 +42,11 @@ export const createReport = async (req, res) => {
     }
 
 
-    // CRITICAL: Use req.user._id (from JWT), not req.user.id
     const userId = req.user._id || req.user.id;
     const userName = req.user.name || "Unknown";
 
     const resolvedCode = assetCode || (type === "lost" ? "NO-TAG" : "-");
 
-    // Duplicate check: same user, same type, open status, same asset
     const dupeQuery = { createdBy: userId, type, status: "open" };
     if (type === "lost" && resolvedCode && resolvedCode !== "NO-TAG") {
       dupeQuery.assetCode = resolvedCode;
@@ -76,12 +74,10 @@ export const createReport = async (req, res) => {
       createdByName: userName,
     });
 
-    // Mark the physical asset as lost
     if (type === "lost" && resolvedCode && resolvedCode !== "NO-TAG") {
       await Asset.findOneAndUpdate({ tag: resolvedCode }, { isLost: true });
     }
 
-    // Notify all admins/managers of the new lost/found report
     await notifyRole(
       ["admin", "manager"],
       "lostfound:new",
@@ -103,24 +99,19 @@ export const getReports = async (req, res) => {
     const { type, myReports, search, status } = req.query;
     let query = {};
 
-    // CRITICAL: Always use req.user._id (from JWT)
     const userId = req.user._id || req.user.id;
 
-    // Filter by type if provided
     if (type) query.type = type;
 
-    // Filter by status if provided (e.g., ?status=open or ?status=open,resolved)
     if (status) {
       const statuses = status.split(",");
       query.status = { $in: statuses };
     }
 
-    // If myReports=true, show only items created by this user
     if (myReports === "true") {
       query.createdBy = userId;
     }
 
-    // Search across assetName, assetCode, or createdByName
     if (search) {
       query.$or = [
         { assetName: { $regex: search, $options: "i" } },
@@ -142,7 +133,6 @@ export const getReports = async (req, res) => {
 
 export const resolveReport = async (req, res) => {
   try {
-    // CRITICAL: Use req.user._id (from JWT)
     const userId = req.user._id || req.user.id;
     const userName = req.user.name || "Unknown";
 
@@ -162,7 +152,6 @@ export const resolveReport = async (req, res) => {
       { new: true },
     );
 
-    // Clear isLost on the asset
     if (existing.type === "lost" && existing.assetCode && existing.assetCode !== "NO-TAG") {
       await Asset.findOneAndUpdate({ tag: existing.assetCode }, { isLost: false });
     }
@@ -175,7 +164,6 @@ export const resolveReport = async (req, res) => {
   }
 };
 
-// Soft delete: Mark as cancelled (employees can cancel their own items)
 export const cancelReport = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
@@ -190,7 +178,6 @@ export const cancelReport = async (req, res) => {
       });
     }
 
-    // Check: Must be the report creator or admin
     const isOwner = report.createdBy.toString() === userId.toString();
     const isAdmin = req.user.role === "admin";
 
@@ -201,7 +188,6 @@ export const cancelReport = async (req, res) => {
       });
     }
 
-    // Soft delete: Change status to cancelled
     const updatedReport = await LostAndFound.findByIdAndUpdate(
       req.params.id,
       {
@@ -213,7 +199,6 @@ export const cancelReport = async (req, res) => {
       { new: true },
     );
 
-    // Clear isLost on the asset
     if (report.type === "lost" && report.assetCode && report.assetCode !== "NO-TAG") {
       await Asset.findOneAndUpdate({ tag: report.assetCode }, { isLost: false });
     }

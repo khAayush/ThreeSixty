@@ -1,6 +1,6 @@
 import Settings from "../models/settings.model.js";
 
-// Returns the single settings document, seeding from env vars on first run
+// Seeds from env vars on very first run if no settings document exists yet
 const getOrInit = async () => {
   let settings = await Settings.findOne();
   if (!settings) {

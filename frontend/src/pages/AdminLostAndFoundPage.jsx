@@ -11,13 +11,12 @@ import { showLoading, showSuccess, showError } from "../utils/toast";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminLostAndFoundPage = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState("active"); // "active" or "history"
+  const [activeTab, setActiveTab] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");
   const [allItems, setAllItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [resolvingId, setResolvingId] = useState(null);
 
-  // Fetch all reports on mount
   useEffect(() => {
     fetchReports();
   }, []);
@@ -57,7 +56,6 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
 
       if (!res.ok) throw new Error("Failed to resolve item");
 
-      // Refresh the list
       await fetchReports();
       showSuccess("Item resolved successfully!", toastId);
     } catch (err) {
@@ -68,7 +66,6 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
     }
   };
 
-  // Filter items based on tab and search
   const filteredItems = allItems.filter(item => {
     const matchesTab = activeTab === "active" ? item.status === "open" : (item.status === "resolved" || item.status === "cancelled");
     const matchesSearch = item.assetName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -77,14 +74,12 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
     return matchesTab && matchesSearch;
   });
 
-  // Count stats
   const lostActiveCount = allItems.filter(item => item.type === "lost" && item.status === "open").length;
   const foundActiveCount = allItems.filter(item => item.type === "found" && item.status === "open").length;
 
   return (
     <Layout onLogout={onLogout} >
       <main className="p-4 md:p-8 max-w-7xl mx-auto w-full">
-        {/* Page Header & Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-bold text-slate-800">Lost & Found</h2>
@@ -105,7 +100,6 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
           </div>
         </div>
 
-        {/* Summary Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
           <StatCard
             label="Active Lost Items"
@@ -123,7 +117,6 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
           />
         </div>
 
-        {/* Tab Switcher */}
         <div className="flex bg-slate-100 p-1 rounded-xl w-fit mb-8">
           <button
             onClick={() => setActiveTab("active")}
@@ -143,7 +136,6 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
           </button>
         </div>
 
-        {/* Loading State */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="flex flex-col items-center gap-2">
@@ -155,7 +147,6 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
           </div>
         ) : (
           <>
-            {/* Items Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredItems.map((item) => (
                 <div key={item.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
@@ -214,7 +205,6 @@ const AdminLostAndFoundPage = ({ onLogout }) => {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex gap-3">
                     {item.status === "open" && (
                       <button

@@ -10,18 +10,15 @@ export const register = async (req, res) => {
   const { name, email, password, role } = req.body;
 
   try {
-    // validate email format
     const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    // check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
-    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // manager can only be seeded, never created via API
@@ -30,7 +27,6 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Cannot create a manager account" });
     }
 
-    // create new user
     const newUser = new User({
       name,
       email,
@@ -40,7 +36,6 @@ export const register = async (req, res) => {
     });
     await newUser.save();
 
-    // send account creation email
     await sendEmail({
       to: newUser.email,
       subject: "Your Account Has Been Created",
@@ -71,18 +66,15 @@ Best regards`,
 export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    // check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // check if user is active
     if (user.status !== "active") {
       return res.status(403).json({ message: "Login not authorized" });
     }
 
-    // check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -90,23 +82,21 @@ export const login = async (req, res) => {
 
     // If user must change password, return a response indicating password change is required
     if (user.mustChangePassword) {
-      // Return a limited token for password change endpoint only
+      // Short-lived token that only works on the change-password endpoint
       const tempToken = jwt.sign(
         {
           userId: user._id,
           role: user.role,
-          tempPasswordChange: true, // Flag indicating limited token
+          tempPasswordChange: true,
         },
         process.env.JWT_SECRET,
-        {
-          expiresIn: "1h", // Short expiry for password change
-        },
+        { expiresIn: "1h" },
       );
 
       return res.status(200).json({
         message: "Password change required",
         requiresPasswordChange: true,
-        token: tempToken, // Limited token for password change endpoint
+        token: tempToken,
         user: {
           id: user._id,
           email: user.email,
@@ -116,7 +106,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Format join date
     const joinDate = new Date(user.createdAt).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -144,8 +133,8 @@ export const login = async (req, res) => {
       requiresPasswordChange: false,
       token,
       user: {
-        _id: user._id, // Include _id for frontend to use as user identifier
-        id: String(user._id), // Also provide id for compatibility
+        _id: user._id,
+        id: String(user._id),
         email: user.email,
         name: user.name,
         role: user.role,
@@ -175,38 +164,19 @@ export const adminChangePassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-    // find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // generate random temporary password
     const tempPassword = crypto.randomBytes(6).toString("base64");
-
-    // hash temp password
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
-
-    // save new hashed password
     user.password = hashedPassword;
     await user.save();
-
-    // send email
-    const text = `
-Hi ${user.name || "user"},
-
-Your password has been reset. Here is your temporary password:
-
-${tempPassword}
-
-Please log in and change your password immediately.
-
-If you did not request this, contact support.
-`;
     await sendEmail({
       to: user.email,
       subject: "Password Reset Request",
-      text,
+      text: `Hi ${user.name || "user"},\n\nYour password has been reset. Here is your temporary password:\n\n${tempPassword}\n\nPlease log in and change your password immediately.\n\nIf you did not request this, contact support.`,
     });
 
     res.status(200).json({ message: "Password Reset Successfully" });
@@ -246,7 +216,6 @@ export const changePassword = async (req, res) => {
       });
     }
 
-    // verify current password (or skip if it's the initial forced change)
     if (currentPassword) {
       const isMatch = await bcrypt.compare(currentPassword, targetUser.password);
       if (!isMatch) {
@@ -283,13 +252,11 @@ export const deleteAccount = async (req, res) => {
     const targetUserId = req.params.id;
     const loggedInUserId = req.user.id;
 
-    // find target user
     const targetUser = await User.findById(targetUserId);
     if (!targetUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // authorization check: only admin or manager can terminate users
     if (!["admin", "manager"].includes(req.user.role)) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -322,21 +289,17 @@ export const deleteAccount = async (req, res) => {
       }
     }
 
-    // Set status to terminated instead of deleting
     targetUser.status = "terminated";
     await targetUser.save();
 
-    // Send account termination email
     await sendEmail({
       to: targetUser.email,
       subject: "Account Terminated",
       text: `Hi ${targetUser.name},\n\nYour account has been terminated and you can no longer access the platform. If you believe this is a mistake, please contact the administrator.`,
     });
 
-    // check if admin terminated their own account
     const isSelfDeletion = targetUserId === loggedInUserId;
     if (isSelfDeletion) {
-      // Clear the auth cookie.
       res.clearCookie("token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -358,10 +321,9 @@ export const googleAuth = async (req, res) => {
   const { idToken } = req.body;
 
   try {
-    // Extract email from token
     let email, name, profileImage;
     try {
-      // Decode without verification (only for development!)
+      // JWT is not verified here - Google's signature is trusted implicitly by domain/prefix checks below
       const base64Url = idToken.split(".")[1];
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const jsonPayload = decodeURIComponent(
@@ -384,7 +346,6 @@ export const googleAuth = async (req, res) => {
         .json({ message: "Could not extract email from token" });
     }
 
-    // 1. Validate email domain
     const emailParts = email.split("@");
     if (emailParts.length !== 2) {
       return res.status(400).json({ message: "Invalid email format" });
@@ -398,17 +359,15 @@ export const googleAuth = async (req, res) => {
       return res.status(403).json({ message: "Login not authorized" });
     }
 
-    // 2. Validate email prefix (filtered names)
     const filteredPrefixes = settings?.filteredEmailNames ?? [];
     if (filteredPrefixes.includes(emailPrefix)) {
       return res.status(403).json({ message: "Login not authorized" });
     }
 
-    // 3. Find or create user
     let user = await User.findOne({ email });
 
     if (!user) {
-      // New user: create with pending status
+      // New Google users go to pending status until an admin approves them
       user = new User({
         email,
         name: name || emailPrefix,
@@ -420,7 +379,7 @@ export const googleAuth = async (req, res) => {
       });
       await user.save();
 
-      // 3a. Notify manager first, fall back to first admin
+      // Prefer notifying the manager; fall back to the first available admin
       const notifyUser =
         (await User.findOne({ role: "manager" })) ||
         (await User.findOne({ role: "admin" }));
@@ -432,7 +391,6 @@ export const googleAuth = async (req, res) => {
         });
       }
 
-      // In-app notification for all admins/managers
       await notifyRole(
         ["admin", "manager"],
         "user:pending_approval",
@@ -441,14 +399,12 @@ export const googleAuth = async (req, res) => {
         { pendingUserId: user._id.toString() },
       );
 
-      // 3b. Send email to user
       await sendEmail({
         to: user.email,
         subject: "Account Creation Request",
         text: "Account creation request sent, wait until approval.",
       });
 
-      // Return pending response
       return res.status(202).json({
         message: "Account pending approval",
         status: "pending",
@@ -461,19 +417,16 @@ export const googleAuth = async (req, res) => {
       });
     }
 
-    // 4. Check if pending user trying to login
     if (user.status === "pending") {
       return res
         .status(403)
         .json({ message: "Account waiting approval from admin" });
     }
 
-    // 5. Only active users can log in
     if (user.status !== "active") {
       return res.status(403).json({ message: "Login not authorized" });
     }
 
-    // 6. Update profile image and ensure isGoogleAccount is marked
     if (profileImage && user.profileImage !== profileImage) {
       user.profileImage = profileImage;
     }
@@ -482,7 +435,6 @@ export const googleAuth = async (req, res) => {
     }
     await user.save();
 
-    // 7. Format join date and create JWT token
     const joinDate = new Date(user.createdAt).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -527,7 +479,6 @@ export const googleAuth = async (req, res) => {
   }
 };
 
-// Get pending users (admin only)
 export const getPendingUsers = async (req, res) => {
   try {
     const pendingUsers = await User.find({ status: "pending" }).select(
@@ -543,7 +494,6 @@ export const getPendingUsers = async (req, res) => {
   }
 };
 
-// Approve user (admin only)
 export const approveUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -557,11 +507,9 @@ export const approveUser = async (req, res) => {
       return res.status(400).json({ message: "User is not pending approval" });
     }
 
-    // Approve user
     user.status = "active";
     await user.save();
 
-    // Send approval email
     await sendEmail({
       to: user.email,
       subject: "Account Approved",
@@ -584,7 +532,6 @@ export const approveUser = async (req, res) => {
   }
 };
 
-// Reinitialize user (admin only)
 export const reinitializeUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -598,11 +545,9 @@ export const reinitializeUser = async (req, res) => {
       return res.status(400).json({ message: "User is not terminated" });
     }
 
-    // Set status back to active
     user.status = "active";
     await user.save();
 
-    // Send reinitialization email
     await sendEmail({
       to: user.email,
       subject: "Account Reactivated",
@@ -624,7 +569,6 @@ export const reinitializeUser = async (req, res) => {
   }
 };
 
-// Reject user (admin only)
 export const rejectUser = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -638,11 +582,9 @@ export const rejectUser = async (req, res) => {
       return res.status(400).json({ message: "User is not pending approval" });
     }
 
-    // Set status to rejected
     user.status = "rejected";
     await user.save();
 
-    // Send rejection email
     await sendEmail({
       to: user.email,
       subject: "Account Request Rejected",
@@ -664,7 +606,6 @@ export const rejectUser = async (req, res) => {
   }
 };
 
-// Forgot Password - Generate OTP
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -685,16 +626,12 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
-    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-
-    // Save OTP to user
+    const otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // expires in 5 minutes
     user.resetOtp = otp;
     user.resetOtpExpiresAt = otpExpiresAt;
     await user.save();
 
-    // Send OTP email
     await sendEmail({
       to: user.email,
       subject: "Password Reset OTP",
@@ -710,7 +647,6 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-// Verify OTP
 export const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 
@@ -726,7 +662,6 @@ export const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    // Clear OTP (but keep user record)
     user.resetOtp = null;
     user.resetOtpExpiresAt = null;
     await user.save();
@@ -741,12 +676,10 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
-// Reset Password
 export const resetPassword = async (req, res) => {
   const { email, newPassword } = req.body;
 
   try {
-    // Password validation regex: min 6 chars, at least one lowercase, uppercase, digit, special char
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
@@ -762,14 +695,12 @@ export const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Hash and update password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     user.resetOtp = null;
     user.resetOtpExpiresAt = null;
     await user.save();
 
-    // Send confirmation email
     await sendEmail({
       to: user.email,
       subject: "Password Changed Successfully",

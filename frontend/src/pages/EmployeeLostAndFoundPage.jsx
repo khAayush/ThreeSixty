@@ -12,7 +12,6 @@ import ConfirmModal from "../components/ConfirmModal";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// --- MODAL COMPONENT ---
 const Modal = ({ isOpen, onClose, title, subtitle, children, submitText, isDisabled, onSubmit }) => {
   if (!isOpen) return null;
   return (
@@ -65,7 +64,6 @@ const EmployeeLostFound = ({ onLogout }) => {
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // Fetch reports on mount
   useEffect(() => {
     fetchReports();
   }, []);
@@ -95,7 +93,6 @@ const EmployeeLostFound = ({ onLogout }) => {
     }
   };
 
-  // Handle Input Changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -110,7 +107,6 @@ const EmployeeLostFound = ({ onLogout }) => {
     setFormData({ assetCode: "", assetName: "", location: "" });
   };
 
-  // Submit Handlers
   const handleReportLost = async () => {
     const toastId = showLoading("Reporting lost asset...");
     setSubmittingLost(true);
@@ -227,8 +223,7 @@ const EmployeeLostFound = ({ onLogout }) => {
     });
   };
 
-  // Validation Logic
-  const isLostFormValid = 
+  const isLostFormValid =
     formData.assetCode.trim().length > 0 && 
     formData.assetName.trim().length > 0 && 
     formData.location.trim().length > 0;
@@ -245,7 +240,6 @@ const EmployeeLostFound = ({ onLogout }) => {
           <p className="text-slate-500 text-sm">Report lost assets or found items within the organization</p>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-wrap gap-4 mb-10">
           <button
             onClick={() => setIsLostModalOpen(true)}
@@ -263,7 +257,6 @@ const EmployeeLostFound = ({ onLogout }) => {
           </button>
         </div>
 
-        {/* Loading State */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="flex flex-col items-center gap-2">
@@ -276,7 +269,6 @@ const EmployeeLostFound = ({ onLogout }) => {
         ) : (
           <div className="space-y-12">
           
-          {/* My Lost Assets Section */}
           <div>
             <h3 className="text-[17px] font-bold text-[#1F2937] mb-5">My Lost Assets</h3>
             {lostAssets.length === 0 ? (
@@ -292,7 +284,6 @@ const EmployeeLostFound = ({ onLogout }) => {
                 {lostAssets.map((asset) => (
                   <div key={asset.id} className="bg-white border border-slate-200 rounded-3xl flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     
-                    {/* Top Badges */}
                     <div className="px-6 pt-6 pb-3 flex justify-between items-center">
                       <span className="text-[11px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full tracking-wide">
                         {asset.assetCode}
@@ -302,7 +293,6 @@ const EmployeeLostFound = ({ onLogout }) => {
                       </span>
                     </div>
 
-                    {/* Content */}
                     <div className="px-6 py-2 grow">
                       <h4 className="text-[17px] font-bold text-[#1F2937] mb-2">{asset.assetName}</h4>
                       <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -311,13 +301,12 @@ const EmployeeLostFound = ({ onLogout }) => {
                       </div>
                     </div>
 
-                    {/* Footer */}
                     <div className="px-6 py-4 mt-4 border-t border-slate-100 flex justify-between items-center">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Reported On</span>
                         <span className="text-[11px] font-bold text-slate-600">{asset.createdAt}</span>
                       </div>
-                      <button 
+                      <button
                         onClick={() => cancelReport(asset.id)}
                         className="text-xs font-bold text-red-500 hover:text-red-700 transition-colors"
                       >
@@ -330,7 +319,6 @@ const EmployeeLostFound = ({ onLogout }) => {
             )}
           </div>
 
-          {/* Found Items I Reported Section */}
           <div>
             <h3 className="text-[17px] font-bold text-[#1F2937] mb-5">Found Items I Reported</h3>
             {foundItems.length === 0 ? (
@@ -346,7 +334,6 @@ const EmployeeLostFound = ({ onLogout }) => {
                 {foundItems.map((item) => (
                   <div key={item.id} className="bg-white border border-slate-200 rounded-3xl flex flex-col shadow-sm hover:shadow-md transition-shadow">
                     
-                    {/* Top Badges */}
                     <div className="px-6 pt-6 pb-3 flex justify-between items-center">
                       <span className="text-[11px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full tracking-wide">
                         {item.assetCode !== "-" ? item.assetCode : "NO TAG"}
@@ -356,7 +343,6 @@ const EmployeeLostFound = ({ onLogout }) => {
                       </span>
                     </div>
 
-                    {/* Content */}
                     <div className="px-6 py-2 grow">
                       <h4 className="text-[17px] font-bold text-[#1F2937] mb-2">{item.assetName}</h4>
                       <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -365,13 +351,12 @@ const EmployeeLostFound = ({ onLogout }) => {
                       </div>
                     </div>
 
-                    {/* Footer */}
                     <div className="px-6 py-4 mt-4 border-t border-slate-100 flex justify-between items-center">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Reported On</span>
                         <span className="text-[11px] font-bold text-slate-600">{item.createdAt}</span>
                       </div>
-                      <button 
+                      <button
                         onClick={() => cancelReport(item.id)}
                         className="text-xs font-bold text-red-500 hover:text-red-700 transition-colors"
                       >
@@ -387,7 +372,6 @@ const EmployeeLostFound = ({ onLogout }) => {
           </div>
         )}
 
-        {/* --- REPORT LOST MODAL --- */}
         <Modal
           isOpen={isLostModalOpen}
           onClose={closeModal}
@@ -434,7 +418,6 @@ const EmployeeLostFound = ({ onLogout }) => {
           </div>
         </Modal>
 
-        {/* --- REPORT FOUND MODAL --- */}
         <Modal
           isOpen={isFoundModalOpen}
           onClose={closeModal}

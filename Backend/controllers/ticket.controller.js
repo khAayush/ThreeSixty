@@ -1,5 +1,8 @@
 import Ticket from "../models/ticket.model.js";
+import User from "../models/user.model.js";
 import { createNotification, notifyRole } from "../utils/createNotification.js";
+import { sendEmail } from "../utils/sendEmail.js";
+import Settings from "../models/settings.model.js";
 
 export const getTickets = async (req, res) => {
   try {
@@ -74,6 +77,51 @@ export const resolveTicket = async (req, res) => {
     res.status(200).json(updatedTicket);
   } catch (error) {
     res.status(500).json({ message: "Error resolving ticket", error: error.message });
+  }
+};
+
+export const notifyVisitDepartment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const ticket = await Ticket.findById(id);
+    if (!ticket) return res.status(404).json({ message: "Ticket not found" });
+
+    const user = await User.findById(ticket.userId).select("email name");
+    if (!user) return res.status(404).json({ message: "Ticket user not found" });
+
+    const settings = await Settings.findOne();
+    const orgName = settings?.organizationName || "ThreeSixty";
+
+    await sendEmail({
+      to: user.email,
+      subject: `Action Required: Please Visit the Department – "${ticket.title}"`,
+      text: [
+        `Dear ${user.name},`,
+        "",
+        `We have reviewed your support ticket titled "${ticket.title}" and would like to inform you that this issue requires an in-person visit to the department for resolution.`,
+        "",
+        "Please visit us at your earliest convenience during working hours so that we can assist you directly.",
+        "",
+        "If you have any questions or need to schedule a specific time, please reply to this email.",
+        "",
+        `Best regards,`,
+        `${orgName} Support Team`,
+      ].join("\n"),
+    });
+
+    await createNotification(
+      ticket.userId,
+      "ticket:visit_required",
+      "Department Visit Required",
+      `Please visit the department regarding your ticket: "${ticket.title}".`,
+      { ticketId: ticket._id.toString() },
+    );
+
+    res.status(200).json({ message: "Notification sent successfully" });
+  } catch (error) {
+    console.error("notifyVisitDepartment error:", error);
+    res.status(500).json({ message: "Failed to send notification", error: error.message });
   }
 };
 

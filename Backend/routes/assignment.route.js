@@ -12,19 +12,19 @@ import {
   requestReturn,
   cancelRequest,
   cancelRequestsByUnit,
+  importAssignments,
 } from "../controllers/assignment.controller.js";
 
 const router = express.Router();
 
-// Employee routes
 router.post("/request", verifyToken, createRequest);
 router.get("/my", verifyToken, getMyAssignments);
 router.patch("/cancel-unit/:unitId", verifyToken, cancelRequestsByUnit);
 router.patch("/:id/cancel", verifyToken, cancelRequest);
 
-// Admin routes
 router.get("/", verifyToken, requireAdmin, getAssignments);
 router.get("/available/:unitId", verifyToken, requireAdmin, getAvailableAssets);
+router.post("/import", verifyToken, requireAdmin, importAssignments);
 router.patch("/:id/approve", verifyToken, requireAdmin, approveRequest);
 router.patch("/:id/reject", verifyToken, requireAdmin, rejectRequest);
 router.patch("/:id/return", verifyToken, requireAdmin, processReturn);

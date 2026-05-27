@@ -14,7 +14,6 @@ const UnitsView = ({ units, onViewAssets, onAddStock }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      {/* Search bar */}
       <div className="px-6 py-3 border-b border-slate-100">
         <div className="relative max-w-xs">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -53,7 +52,11 @@ const UnitsView = ({ units, onViewAssets, onAddStock }) => {
               {filtered.map((unit) => {
                 const sc = unit.statusCounts || {};
                 return (
-                  <tr key={unit._id} className="hover:bg-slate-50 transition-colors">
+                  <tr
+                    key={unit._id}
+                    onClick={() => onViewAssets(unit)}
+                    className="hover:bg-slate-50 transition-colors cursor-pointer"
+                  >
                     <td className="px-6 py-4 font-semibold text-slate-800">{unit.name}</td>
                     <td className="px-6 py-4">
                       <span className="font-mono text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">
@@ -65,7 +68,7 @@ const UnitsView = ({ units, onViewAssets, onAddStock }) => {
                     <td className="px-6 py-4 font-semibold text-amber-600">{sc.Damaged || 0}</td>
                     <td className="px-6 py-4 font-semibold text-blue-600">{sc["Out-For-Repair"] || 0}</td>
                     <td className="px-6 py-4 font-semibold text-slate-400">{sc.Discarded || 0}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2 justify-end">
                         <button
                           onClick={() => onViewAssets(unit)}

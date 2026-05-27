@@ -8,8 +8,6 @@ import InventoryLog from "../models/inventorylog.model.js";
 
 const uid = (req) => req.user._id || req.user.id;
 
-// ── Categories ────────────────────────────────────────────────────────────────
-
 export const getCategories = async (req, res) => {
   try {
     const categories = await Category.find().sort({ name: 1 });
@@ -101,8 +99,6 @@ export const deleteCategory = async (req, res) => {
   }
 };
 
-// ── Employee browse (categories + units + availableCount) ────────────────────
-
 export const browseInventory = async (req, res) => {
   try {
     const categories = await Category.find({ type: "assignable" }).sort({ name: 1 });
@@ -112,12 +108,10 @@ export const browseInventory = async (req, res) => {
     const unitIds = units.map((u) => u._id);
 
     const [availAgg, totalAgg] = await Promise.all([
-      // availableCount = Healthy AND not assigned
       Asset.aggregate([
         { $match: { unitId: { $in: unitIds }, status: "Healthy", isAssigned: { $ne: true } } },
         { $group: { _id: "$unitId", count: { $sum: 1 } } },
       ]),
-      // assetCount = actual number of asset documents (source of truth)
       Asset.aggregate([
         { $match: { unitId: { $in: unitIds } } },
         { $group: { _id: "$unitId", count: { $sum: 1 } } },
@@ -146,8 +140,6 @@ export const browseInventory = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
-// ── Units ─────────────────────────────────────────────────────────────────────
 
 export const getUnitsByCategory = async (req, res) => {
   try {
@@ -266,7 +258,6 @@ export const bulkImport = async (req, res) => {
           continue;
         }
 
-        // ── Find or create category ──────────────────────────────────────────
         let category = await Category.findOne({ name: { $regex: new RegExp(`^${categoryName}$`, "i") }, type: categoryType });
         let categoryCreated = false;
         if (!category) {
@@ -275,11 +266,9 @@ export const bulkImport = async (req, res) => {
           InventoryLog.create({ actionType: "CATEGORY_CREATED", entityName: category.name, details: `Type: ${categoryType} (via CSV import)`, performedBy: userId }).catch(() => {});
         }
 
-        // ── Find or create unit ──────────────────────────────────────────────
         let unit = await ItemUnit.findOne({ baseTag, categoryId: category._id });
 
         if (unit) {
-          // Unit exists → add stock
           const startIdx = unit.totalCount;
           const assetDocs = Array.from({ length: quantity }, (_, i) => ({
             unitId: unit._id,
@@ -295,7 +284,6 @@ export const bulkImport = async (req, res) => {
           InventoryLog.create({ actionType: "STOCK_ADDED", entityName: unit.name, details: `${quantity} asset(s) added via CSV import`, performedBy: userId }).catch(() => {});
           results.push({ category: categoryName, unitName: unit.name, baseTag, success: true, action: "stock_added", assetsCreated: quantity, categoryCreated });
         } else {
-          // Unit doesn't exist → create unit + assets
           unit = await ItemUnit.create({ categoryId: category._id, name: unitName, baseTag, totalCount: quantity });
           const assetDocs = Array.from({ length: quantity }, (_, i) => ({
             unitId: unit._id,
@@ -378,8 +366,6 @@ export const addStock = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
-// ── Assets ────────────────────────────────────────────────────────────────────
 
 export const getAssetsByUnit = async (req, res) => {
   try {
@@ -475,7 +461,7 @@ export const deleteAsset = async (req, res) => {
     if (asset.isAssigned)
       return res.status(409).json({ success: false, message: "Cannot delete an assigned asset" });
 
-    // Nullify any pending assignment suggestions pointing to this asset
+    // Pending requests that suggested this asset need their assetId cleared so admin can pick a different one
     await Assignment.updateMany({ assetId: asset._id, status: "Pending" }, { $set: { assetId: null } });
 
     const unit = await ItemUnit.findById(asset.unitId);
@@ -506,7 +492,6 @@ export const markAssetLost = async (req, res) => {
     if (!asset) return res.status(404).json({ success: false, message: "Asset not found" });
 
     if (!asset.isLost) {
-      // ── Marking as lost ──────────────────────────────────────────────────────
       if (!location?.trim())
         return res.status(400).json({ success: false, message: "Last known location is required" });
 
@@ -533,7 +518,6 @@ export const markAssetLost = async (req, res) => {
         comment: `Marked as lost by admin. Last known location: ${location.trim()}`,
       });
     } else {
-      // ── Marking as found ─────────────────────────────────────────────────────
       asset.isLost = false;
       await asset.save();
 

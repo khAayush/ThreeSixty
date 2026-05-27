@@ -20,7 +20,6 @@ export const updateProfileImage = async (req, res) => {
       });
     }
 
-    // Only the user themselves or an admin/manager can update the photo
     const callerId = String(req.user._id);
     const targetId = String(req.params.id);
     if (callerId !== targetId && !["admin", "manager"].includes(req.user.role)) {

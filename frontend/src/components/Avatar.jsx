@@ -1,7 +1,6 @@
 import React from "react";
 
 const Avatar = ({ name = "", email = "", photoUrl = "", size = "md" }) => {
-  // Determine size classes
   const sizeClasses = {
     sm: "w-8 h-8 text-xs",
     md: "w-10 h-10 text-xs",
@@ -9,7 +8,6 @@ const Avatar = ({ name = "", email = "", photoUrl = "", size = "md" }) => {
     xl: "w-16 h-16 text-base",
   };
 
-  // Get initials
   const getInitials = () => {
     if (name) {
       const parts = name.trim().split(" ");
@@ -24,7 +22,6 @@ const Avatar = ({ name = "", email = "", photoUrl = "", size = "md" }) => {
     return "?";
   };
 
-  // If photo exists, show image
   if (photoUrl) {
     return (
       <img
@@ -35,7 +32,6 @@ const Avatar = ({ name = "", email = "", photoUrl = "", size = "md" }) => {
     );
   }
 
-  // Otherwise show initials
   return (
     <div
       className={`${sizeClasses[size]} rounded-full bg-brand flex items-center justify-center text-white font-bold shrink-0`}

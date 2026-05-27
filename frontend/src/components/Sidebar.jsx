@@ -8,7 +8,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { useChat } from '../contexts/ChatContext';
 
-// 1. Added 'roles' array to define access levels
 const navItems = [
   { id: 'overview-admin', label: 'Overview', icon: Squares2X2Icon, path: '/admin-dashboard', roles: ['admin', 'manager'] },
   { id: 'overview-employee', label: 'Overview', icon: Squares2X2Icon, path: '/employee-dashboard', roles: ['employee'] },
@@ -37,25 +36,22 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { conversations } = useChat();
   const totalUnread = conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
 
-  // 2. Fetch user role from localStorage on component mount
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       try {
         const userData = JSON.parse(userStr);
-        setUserRole(userData.role || "Employee"); // Default to Employee if role is missing
+        setUserRole(userData.role || "Employee");
       } catch (err) {
         console.error("Error parsing user role:", err);
       }
     }
   }, []);
 
-  // 3. Filter items based on the user's role
   const filteredNavItems = navItems.filter(item => item.roles.includes(userRole));
 
   return (
     <>
-      {/* Mobile Dark Overlay */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-slate-900/50 z-30 lg:hidden transition-opacity animate-in fade-in duration-300"
@@ -63,7 +59,6 @@ const Sidebar = ({ isOpen, onClose }) => {
         />
       )}
 
-      {/* Sidebar Container */}
       <aside className={`
         fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 p-4 flex flex-col
         transform transition-transform duration-300 ease-in-out
@@ -71,7 +66,6 @@ const Sidebar = ({ isOpen, onClose }) => {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         
-        {/* Brand Logo & Mobile Close Button */}
         <div className="flex items-center justify-between mb-10 px-2 py-2">
           <Link
             to={userRole === "employee" ? "/employee-dashboard" : "/admin-dashboard"}
@@ -90,14 +84,13 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Navigation Links */}
         <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
           {filteredNavItems.map((item) => (
             <NavLink
               key={item.id}
               to={item.path}
               onClick={() => {
-                if (window.innerWidth < 1024) onClose(); // Auto-close only on mobile
+                if (window.innerWidth < 1024) onClose();
               }}
               className={({ isActive }) => `
                 w-full flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 group
@@ -125,7 +118,6 @@ const Sidebar = ({ isOpen, onClose }) => {
           ))}
         </nav>
 
-        {/* Optional: Simple Version/Brand tag at bottom */}
         <div className="mt-auto pt-4 px-2">
           <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">
             Copyright &copy; 2026 ThreeSixty

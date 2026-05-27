@@ -13,14 +13,12 @@ const lostAndFoundSchema = new mongoose.Schema(
       default: "open",
       required: true,
     },
-    // Who created this report
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
     createdByName: { type: String, required: true },
-    // Who resolved/cancelled it (if applicable)
     resolvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",

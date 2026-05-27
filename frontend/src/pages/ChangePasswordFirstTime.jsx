@@ -56,7 +56,6 @@ const ChangePasswordFirstTime = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate passwords
     if (!newPassword || !confirmPassword) {
       showError("Please fill in all password fields");
       return;
@@ -92,12 +91,10 @@ const ChangePasswordFirstTime = () => {
         return;
       }
 
-      // Clear temporary data
       localStorage.removeItem("tempToken");
       localStorage.removeItem("tempUser");
       localStorage.removeItem("requiresPasswordChange");
 
-      // Now redirect to login to get the full session token
       showSuccess(
         "Password changed successfully! Please log in again.",
         toastId,

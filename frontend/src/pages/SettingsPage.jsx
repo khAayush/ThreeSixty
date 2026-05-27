@@ -160,13 +160,13 @@ const SettingsPage = ({ onLogout }) => {
     }
   };
 
-  // Used by preset swatches - does not touch customColor
+  // Used by color options
   const previewColor = (color) => {
     setBrandColor(color);
     document.documentElement.style.setProperty("--color-brand", color);
   };
 
-  // Used by the color picker - updates customColor and persists it locally
+  // Used by the color picker
   const handleCustomColorChange = (color) => {
     setCustomColor(color);
     localStorage.setItem("customBrandColor", color);
@@ -264,7 +264,6 @@ const SettingsPage = ({ onLogout }) => {
           <div className="text-center py-16 text-gray-400">Loading settings…</div>
         ) : (
           <div className="space-y-6">
-            {/* Organization Name */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50">
@@ -295,7 +294,6 @@ const SettingsPage = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Brand Color */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-orange-50">
@@ -381,7 +379,6 @@ const SettingsPage = ({ onLogout }) => {
               </div>
             </div>
 
-            {/* Allowed Email Domains */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-green-50">
@@ -403,7 +400,6 @@ const SettingsPage = ({ onLogout }) => {
               />
             </div>
 
-            {/* Blocked Email Prefixes */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50">

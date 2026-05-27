@@ -9,7 +9,6 @@ const AssetDetailModal = ({ asset, logs, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
 
-        {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-slate-100">
           <div>
             <p className="font-mono text-xl font-bold text-slate-800">{asset.tag}</p>
@@ -26,7 +25,6 @@ const AssetDetailModal = ({ asset, logs, onClose }) => {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Info grid */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
@@ -74,7 +72,6 @@ const AssetDetailModal = ({ asset, logs, onClose }) => {
             </div>
           </div>
 
-          {/* History */}
           <div>
             <h4 className="text-sm font-bold text-slate-700 mb-3">
               History ({logs?.length || 0})

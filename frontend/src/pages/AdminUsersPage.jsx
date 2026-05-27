@@ -33,7 +33,6 @@ const UsersPage = ({ onLogout }) => {
   const [isReinitializeModalOpen, setIsReinitializeModalOpen] = useState(false);
   const [userToReinitialize, setUserToReinitialize] = useState(null);
 
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -42,7 +41,6 @@ const UsersPage = ({ onLogout }) => {
   const [userToChangePassword, setUserToChangePassword] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Form State
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -56,7 +54,6 @@ const UsersPage = ({ onLogout }) => {
 
   const token = localStorage.getItem("token");
 
-  // Current logged-in user (for permission checks)
   const currentUser = (() => {
     try {
       return JSON.parse(localStorage.getItem("user") || "{}");
@@ -66,13 +63,11 @@ const UsersPage = ({ onLogout }) => {
   })();
   const currentRole = currentUser?.role;
 
-  // Helper for handling 401 Unauthorized globally
   const handleUnauthorized = () => {
     toast.error("Session expired. Please log in again.");
     window.location.href = "/login";
   };
 
-  // Permission helpers
   // Admin can only act on employees; manager can act on both admins and employees
   const canTerminate = (targetUser) => {
     if (targetUser.role === "manager") return false;
@@ -92,7 +87,6 @@ const UsersPage = ({ onLogout }) => {
     return true;
   };
 
-  // 1. Fetch Users
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
@@ -126,7 +120,6 @@ const UsersPage = ({ onLogout }) => {
     fetchPendingUsers();
   }, []);
 
-  // Fetch Pending Users
   const fetchPendingUsers = async () => {
     try {
       const res = await fetch(`${API_URL}/auth/admin/pending-users`, {
@@ -150,7 +143,6 @@ const UsersPage = ({ onLogout }) => {
     }
   };
 
-  // Approve User
   const handleApprove = async (userId) => {
     try {
       setApprovingId(userId);
@@ -180,7 +172,6 @@ const UsersPage = ({ onLogout }) => {
     }
   };
 
-  // Reject User
   const handleReject = async (userId) => {
     try {
       setRejectingId(userId);
@@ -210,7 +201,6 @@ const UsersPage = ({ onLogout }) => {
     }
   };
 
-  // Reinitialize User (set status back to active)
   const handleReinitialize = async (userId) => {
     try {
       setReinitializingId(userId);
@@ -243,7 +233,6 @@ const UsersPage = ({ onLogout }) => {
     }
   };
 
-  // 2. Add / Update User
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -318,7 +307,6 @@ const UsersPage = ({ onLogout }) => {
     }
   };
 
-  // 3. Change Password
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
 
@@ -358,7 +346,6 @@ const UsersPage = ({ onLogout }) => {
     }
   };
 
-  // 4. Delete User
   const confirmDelete = async () => {
     if (!userToDelete) return;
 
@@ -412,7 +399,6 @@ const UsersPage = ({ onLogout }) => {
     }
   };
 
-  // Modal handlers for reinitialize
   const openReinitializeModal = (user) => {
     setUserToReinitialize(user);
     setIsReinitializeModalOpen(true);
@@ -495,7 +481,6 @@ const UsersPage = ({ onLogout }) => {
     <Layout onLogout={onLogout}>
       <Toaster position="top-right" />
       <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
-        {/* Header & Actions */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-bold text-slate-800">Users</h2>
@@ -525,7 +510,6 @@ const UsersPage = ({ onLogout }) => {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatCard
             label="Total Users"
@@ -550,7 +534,6 @@ const UsersPage = ({ onLogout }) => {
           />
         </div>
 
-        {/* Users - grouped by role, each section collapsible */}
         {isLoading ? (
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-8 text-center text-sm text-slate-500">
             Loading users...
@@ -562,7 +545,6 @@ const UsersPage = ({ onLogout }) => {
               { role: "employee", label: "Employees", rows: filteredEmployees, accent: "text-emerald-600", dot: "bg-emerald-400" },
             ].map(({ role, label, rows, accent, dot }) => (
               <div key={role} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                {/* Section header / toggle */}
                 <button
                   onClick={() => toggleSection(role)}
                   className="w-full flex items-center justify-between px-6 py-4 bg-slate-50/60 border-b border-slate-100 hover:bg-slate-50 transition-colors"
@@ -579,7 +561,6 @@ const UsersPage = ({ onLogout }) => {
                   />
                 </button>
 
-                {/* Collapsible body */}
                 {!collapsedSections[role] && (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -650,7 +631,6 @@ const UsersPage = ({ onLogout }) => {
                               <td className="px-6 py-4">
                                 {user.status !== "terminated" ? (
                                   <div className="flex justify-end items-center space-x-2">
-                                    {/* Left: change password */}
                                     {canChangePassword(user) && (
                                       <button
                                         onClick={(e) => { e.stopPropagation(); openPasswordModal(user); }}
@@ -659,7 +639,6 @@ const UsersPage = ({ onLogout }) => {
                                         <KeyIcon className="w-3.5 h-3.5 stroke-2" />
                                       </button>
                                     )}
-                                    {/* Middle: delete / terminate */}
                                     {canTerminate(user) && (
                                       <button
                                         onClick={(e) => { e.stopPropagation(); openDeleteModal(user); }}
@@ -668,7 +647,6 @@ const UsersPage = ({ onLogout }) => {
                                         <TrashIcon className="w-3.5 h-3.5 stroke-2" />
                                       </button>
                                     )}
-                                    {/* Right: edit info */}
                                     {canEdit(user) && (
                                       <button
                                         onClick={(e) => { e.stopPropagation(); openModal(user); }}
@@ -702,7 +680,6 @@ const UsersPage = ({ onLogout }) => {
           </div>
         )}
 
-        {/* --- Pending Users Section --- */}
         {pendingUsers.length > 0 && (
           <div className="mt-12">
             <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -771,7 +748,6 @@ const UsersPage = ({ onLogout }) => {
         )}
       </div>
 
-      {/* --- ADD / EDIT USER MODAL --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -885,7 +861,6 @@ const UsersPage = ({ onLogout }) => {
         </div>
       )}
 
-      {/* --- CHANGE PASSWORD MODAL --- */}
       {isPasswordModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -968,7 +943,6 @@ const UsersPage = ({ onLogout }) => {
         </div>
       )}
 
-      {/* --- DELETE CONFIRMATION MODAL --- */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -1004,7 +978,6 @@ const UsersPage = ({ onLogout }) => {
         </div>
       )}
 
-      {/* --- User Detail Modal --- */}
       {selectedUser && (
         <UserDetailModal
           user={selectedUser}
@@ -1013,7 +986,6 @@ const UsersPage = ({ onLogout }) => {
         />
       )}
 
-      {/* --- Reinitialize Confirmation Modal --- */}
       {isReinitializeModalOpen && userToReinitialize && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -1066,8 +1038,6 @@ const UsersPage = ({ onLogout }) => {
   );
 };
 
-// ── User Detail Modal ─────────────────────────────────────────────────────────
-
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "-";
 
@@ -1105,7 +1075,6 @@ const UserDetailModal = ({ user, token, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
 
-        {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-4">
             {user.profileImage ? (
@@ -1137,7 +1106,6 @@ const UserDetailModal = ({ user, token, onClose }) => {
           </button>
         </div>
 
-        {/* Info grid */}
         <div className="px-6 pt-5 shrink-0">
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-slate-50 rounded-xl p-3">
@@ -1159,7 +1127,6 @@ const UserDetailModal = ({ user, token, onClose }) => {
           </div>
         </div>
 
-        {/* Assigned assets */}
         <div className="px-6 pt-5 pb-6 flex-1 overflow-y-auto">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
             Currently Assigned Assets

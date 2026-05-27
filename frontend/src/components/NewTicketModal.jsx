@@ -40,7 +40,6 @@ const NewTicketModal = ({ isOpen, onClose, onSubmit }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <h2 className="text-xl font-bold text-slate-800">Create New Ticket</h2>
           <button
@@ -51,9 +50,7 @@ const NewTicketModal = ({ isOpen, onClose, onSubmit }) => {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Title Field */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Title <span className="text-red-500">*</span>
@@ -69,7 +66,6 @@ const NewTicketModal = ({ isOpen, onClose, onSubmit }) => {
             />
           </div>
 
-          {/* Description Field */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-2">
               Description <span className="text-red-500">*</span>
@@ -85,7 +81,6 @@ const NewTicketModal = ({ isOpen, onClose, onSubmit }) => {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"

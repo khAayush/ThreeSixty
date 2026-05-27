@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import { useNotifications } from "../contexts/NotificationContext";
 
-// Map notification type → route for the current user's role
+// Map notification type to route for the current user's role
 const getRoute = (notif) => {
   const role = (() => {
     try { return JSON.parse(localStorage.getItem("user") || "{}").role; } catch { return null; }
@@ -28,7 +28,6 @@ const NotificationBell = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -48,7 +47,6 @@ const NotificationBell = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Bell button */}
       <button
         onClick={() => setOpen((o) => !o)}
         className="relative p-1 text-slate-400 hover:text-brand transition-colors duration-200"
@@ -56,16 +54,14 @@ const NotificationBell = () => {
       >
         <BellIcon className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold text-white bg-brand rounded-full px-1 border-2 border-white leading-none">
+          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-4.5 h-4.5 text-[10px] font-bold text-white bg-brand rounded-full px-1 border-2 border-white leading-none">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div className="absolute right-0 mt-2 w-80 bg-white border border-slate-100 rounded-xl shadow-xl z-50 overflow-hidden">
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
             <h3 className="text-sm font-semibold text-slate-800">Notifications</h3>
             {unreadCount > 0 && (
@@ -78,7 +74,6 @@ const NotificationBell = () => {
             )}
           </div>
 
-          {/* List */}
           <div className="max-h-96 overflow-y-auto divide-y divide-slate-50">
             {notifications.length === 0 ? (
               <p className="text-sm text-slate-400 text-center py-10">No notifications</p>
@@ -92,9 +87,8 @@ const NotificationBell = () => {
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
-                    {/* Unread dot */}
                     <span
-                      className={`mt-1.5 flex-shrink-0 w-2 h-2 rounded-full ${
+                      className={`mt-1.5 shrink-0 w-2 h-2 rounded-full ${
                         !notif.isRead ? "bg-brand" : "bg-transparent"
                       }`}
                     />
@@ -102,7 +96,7 @@ const NotificationBell = () => {
                       <p className="text-sm font-semibold text-slate-800 truncate">
                         {notif.title}
                       </p>
-                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-2 break-words">
+                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-2 wrap-break">
                         {notif.message}
                       </p>
                       <p className="text-[10px] text-slate-400 mt-1">

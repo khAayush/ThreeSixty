@@ -59,38 +59,32 @@ const EmployeeDashboard = ({ onLogout }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Client-side derived counts
   const assignedCount  = assignments.filter((a) => a.status === "Approved").length;
   const pendingCount   = assignments.filter((a) => a.status === "Pending").length;
   const ticketCount    = tickets.length;
 
-  // Active requests to show in the list (Pending + Approved, most recent first, max 5)
   const activeRequests = assignments
     .filter((a) => a.status === "Pending" || a.status === "Approved")
     .slice(0, 5);
 
-  // Most recent ticket
   const latestTicket = tickets[0] || null;
 
   return (
     <Layout onLogout={onLogout}>
       <main className="p-4 md:p-8 max-w-7xl mx-auto w-full">
-        {/* Title */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Dashboard Overview</h2>
           <p className="text-slate-500 text-sm">Monitor your personal assets and requests</p>
         </div>
 
-        {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10">
-          <StatCard label="Assigned Assets"  value={loading ? "-" : assignedCount} icon={CubeIcon}    iconBg="bg-blue-50"   iconColor="text-blue-500"   />
-          <StatCard label="Pending Requests" value={loading ? "-" : pendingCount}  icon={ClockIcon}   iconBg="bg-orange-50" iconColor="text-orange-500" />
-          <StatCard label="Tickets Created"  value={loading ? "-" : ticketCount}   icon={TicketIcon}  iconBg="bg-yellow-50" iconColor="text-yellow-500" />
+          <StatCard label="Assigned Assets"  value={loading ? "-" : assignedCount} icon={CubeIcon}   iconBg="bg-blue-50"   iconColor="text-blue-500"   onClick={() => navigate("/my-assets")}  />
+          <StatCard label="Pending Requests" value={loading ? "-" : pendingCount}  icon={ClockIcon}  iconBg="bg-orange-50" iconColor="text-orange-500" onClick={() => navigate("/my-assets")}  />
+          <StatCard label="Tickets Created"  value={loading ? "-" : ticketCount}   icon={TicketIcon} iconBg="bg-yellow-50" iconColor="text-yellow-500" onClick={() => navigate("/my-tickets")} />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-          {/* Requested / Assigned Assets */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col h-100">
             <div className="flex items-center justify-between mb-6 shrink-0">
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
@@ -153,7 +147,6 @@ const EmployeeDashboard = ({ onLogout }) => {
             )}
           </div>
 
-          {/* Latest Ticket */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm h-100 flex flex-col">
             <div className="flex items-center justify-between mb-6 shrink-0">
               <h3 className="font-bold text-slate-800 flex items-center gap-2">

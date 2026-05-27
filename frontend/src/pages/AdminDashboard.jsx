@@ -33,7 +33,7 @@ const Dashboard = ({ onLogout }) => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirm, setConfirm] = useState(null);
-  const [approveModal, setApproveModal] = useState(null); // { assignment }
+  const [approveModal, setApproveModal] = useState(null);
 
   const authFetch = (path, opts = {}) =>
     fetch(`${API_URL}${path}`, { credentials: "include", headers: authHeaders, ...opts });
@@ -49,9 +49,9 @@ const Dashboard = ({ onLogout }) => {
         statsRes.json(), reqRes.json(), ticketRes.json(),
       ]);
       if (statsData.success) setStats(statsData.data);
-      if (reqData.success) setRequests(reqData.data.slice(0, 5));
+      if (reqData.success) setRequests(reqData.data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).slice(0, 5));
       if (Array.isArray(ticketData)) {
-        setTickets(ticketData.filter((t) => t.status === "Open").slice(0, 5));
+        setTickets(ticketData.filter((t) => t.status === "Open").sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).slice(0, 5));
       }
     } catch {
       toast.error("Failed to load dashboard");
@@ -91,26 +91,22 @@ const Dashboard = ({ onLogout }) => {
   return (
     <Layout onLogout={onLogout}>
       <main className="p-4 md:p-8 max-w-7xl mx-auto w-full">
-        {/* Title */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-slate-800">Dashboard Overview</h2>
           <p className="text-slate-500 text-sm">Monitor your organization's assets and requests</p>
         </div>
 
-        {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10">
-          <StatCard label="Total Assets"       value={loading ? "-" : s.totalAssets}     icon={CubeIcon}                iconBg="bg-blue-50"   iconColor="text-blue-500"   />
-          <StatCard label="In Stock"            value={loading ? "-" : s.inStock}          icon={CheckCircleIcon}         iconBg="bg-emerald-50" iconColor="text-emerald-500" />
-          <StatCard label="Assigned"            value={loading ? "-" : s.assigned}         icon={CubeIcon}                iconBg="bg-purple-50"  iconColor="text-purple-500"  />
-          <StatCard label="Damaged / In Repair" value={loading ? "-" : s.damagedOrRepair}  icon={ExclamationTriangleIcon} iconBg="bg-red-50"     iconColor="text-red-500"    />
-          <StatCard label="Open Tickets"        value={loading ? "-" : s.openTickets}      icon={TicketIcon}              iconBg="bg-amber-50"   iconColor="text-amber-500"   />
-          <StatCard label="Pending Requests"    value={loading ? "-" : s.pendingRequests}  icon={ClockIcon}               iconBg="bg-orange-50"  iconColor="text-orange-500"  />
+          <StatCard label="Total Assets"       value={loading ? "-" : s.totalAssets}     icon={CubeIcon}                iconBg="bg-blue-50"   iconColor="text-blue-500"   onClick={() => navigate("/assets")}      />
+          <StatCard label="In Stock"            value={loading ? "-" : s.inStock}          icon={CheckCircleIcon}         iconBg="bg-emerald-50" iconColor="text-emerald-500" onClick={() => navigate("/assets")}      />
+          <StatCard label="Assigned"            value={loading ? "-" : s.assigned}         icon={CubeIcon}                iconBg="bg-purple-50"  iconColor="text-purple-500"  onClick={() => navigate("/assignments")} />
+          <StatCard label="Damaged / In Repair" value={loading ? "-" : s.damagedOrRepair}  icon={ExclamationTriangleIcon} iconBg="bg-red-50"     iconColor="text-red-500"    onClick={() => navigate("/assets")}      />
+          <StatCard label="Open Tickets"        value={loading ? "-" : s.openTickets}      icon={TicketIcon}              iconBg="bg-amber-50"   iconColor="text-amber-500"   onClick={() => navigate("/tickets")}     />
+          <StatCard label="Pending Requests"    value={loading ? "-" : s.pendingRequests}  icon={ClockIcon}               iconBg="bg-orange-50"  iconColor="text-orange-500"  onClick={() => navigate("/assignments")} />
         </div>
 
-        {/* Bottom two-column grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-          {/* Pending Asset Requests */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-slate-50 shrink-0">
               <div>
@@ -168,7 +164,6 @@ const Dashboard = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* Open Tickets */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-slate-50 shrink-0">
               <div>

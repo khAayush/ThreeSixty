@@ -19,7 +19,6 @@ const AssetsView = ({ assets, categoryType, onViewDetail, onChangeStatus, onChan
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      {/* Search bar */}
       <div className="px-6 py-3 border-b border-slate-100">
         <div className="relative max-w-xs">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />

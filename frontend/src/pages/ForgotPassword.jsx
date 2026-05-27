@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP + Password
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -176,7 +176,6 @@ const ForgotPassword = () => {
 
         <div className="w-full max-w-md mx-auto bg-white py-10 px-8 rounded-2xl shadow border border-gray-100">
           {step === 1 ? (
-            // Step 1: Email Input
             <>
               <h2 className="text-xl mb-2 font-normal text-center text-gray-700">
                 Reset Your Password
@@ -219,7 +218,6 @@ const ForgotPassword = () => {
               </div>
             </>
           ) : (
-            // Step 2: OTP + Password
             <>
               <h2 className="text-xl mb-2 font-normal text-center text-gray-700">
                 Enter OTP & New Password

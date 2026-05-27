@@ -1,4 +1,4 @@
-// manager has all admin privileges, so treat both roles as "admin-level"
+// manager has all admin privileges plus extra
 export const requireAdmin = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({

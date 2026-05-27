@@ -39,7 +39,6 @@ const run = async () => {
 
   await connectDB();
 
-  // ── 1. Organisation settings ──────────────────────────────────
   printSection("1 / 3  —  Organisation Settings");
 
   let settings = await Settings.findOne();
@@ -73,7 +72,6 @@ const run = async () => {
     console.log("\nOrganisation settings created.");
   }
 
-  // ── 2. Manager account ────────────────────────────────────────
   printSection("2 / 3  —  Manager Account(Super Admin)");
 
   const existingManager = await User.findOne({ role: "manager" });
@@ -132,7 +130,6 @@ const run = async () => {
     console.log("\nManager account created.");
   }
 
-  // ── 3. Summary ────────────────────────────────────────────────
   printSection("3 / 3  —  Summary");
 
   const finalSettings = await Settings.findOne();

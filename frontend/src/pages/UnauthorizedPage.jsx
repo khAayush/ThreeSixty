@@ -9,7 +9,6 @@ const UnauthorizedPage = () => {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
       <div className="max-w-lg w-full bg-white rounded-4xl border border-slate-200 shadow-2xl shadow-slate-200/50 p-8 md:p-12 text-center">
         
-        {/* Warning Icon */}
         <div className="inline-flex items-center justify-center w-20 h-20 bg-red-50 text-red-500 rounded-2xl mb-8">
           <ShieldExclamationIcon className="w-12 h-12" />
         </div>

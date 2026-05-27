@@ -1,6 +1,7 @@
 import Assignment from "../models/assignment.model.js";
 import Asset from "../models/asset.model.js";
 import ItemUnit from "../models/itemunit.model.js";
+import User from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { createNotification, notifyRole } from "../utils/createNotification.js";
 
@@ -14,8 +15,6 @@ const populate = (q) =>
     .populate("assignedTo",  "name email")
     .populate("assignedBy",  "name")
     .populate("receivedBy",  "name");
-
-// ── Employee ──────────────────────────────────────────────────────────────────
 
 export const createRequest = async (req, res) => {
   try {
@@ -69,8 +68,6 @@ export const getMyAssignments = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
-// ── Admin ─────────────────────────────────────────────────────────────────────
 
 export const getAssignments = async (req, res) => {
   try {
@@ -272,6 +269,86 @@ export const processReturn = async (req, res) => {
     );
 
     res.json({ success: true, data: assignment });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const importAssignments = async (req, res) => {
+  try {
+    const { rows } = req.body;
+    if (!Array.isArray(rows) || rows.length === 0)
+      return res.status(400).json({ success: false, message: "No rows provided" });
+
+    const adminId = uid(req);
+    const results = [];
+
+    for (const row of rows) {
+      const email = row.email?.trim().toLowerCase();
+      const tag   = row.tag?.trim();
+
+      if (!email || !tag) {
+        results.push({ ...row, status: "skipped", reason: "Missing email or tag" });
+        continue;
+      }
+
+      const user = await User.findOne({ email });
+      if (!user) {
+        results.push({ ...row, status: "skipped", reason: `No user found with email: ${email}` });
+        continue;
+      }
+
+      const asset = await Asset.findOne({ tag });
+      if (!asset) {
+        results.push({ ...row, status: "skipped", reason: `Asset tag not found: ${tag}` });
+        continue;
+      }
+
+      if (asset.status !== "Healthy") {
+        results.push({ ...row, status: "skipped", reason: `Asset ${tag} is ${asset.status}` });
+        continue;
+      }
+
+      if (asset.isAssigned) {
+        results.push({ ...row, status: "skipped", reason: `Asset ${tag} is already assigned` });
+        continue;
+      }
+
+      const existing = await Assignment.findOne({ assetId: asset._id, status: "Approved" });
+      if (existing) {
+        results.push({ ...row, status: "skipped", reason: `Asset ${tag} already has an active assignment` });
+        continue;
+      }
+
+      const assignment = new Assignment({
+        unitId:      asset.unitId,
+        assetId:     asset._id,
+        requestedBy: user._id,
+        assignedTo:  user._id,
+        assignedBy:  adminId,
+        assignedAt:  new Date(),
+        status:      "Approved",
+      });
+      await assignment.save();
+
+      asset.isAssigned = true;
+      await asset.save();
+
+      await createNotification(
+        user._id,
+        "asset:request_updated",
+        "Asset Assigned",
+        `An asset (${tag}) has been assigned to you.`,
+        { requestId: assignment._id.toString(), status: "Approved" },
+      );
+
+      results.push({ ...row, status: "imported" });
+    }
+
+    const imported = results.filter((r) => r.status === "imported").length;
+    const skipped  = results.filter((r) => r.status === "skipped").length;
+
+    res.json({ success: true, imported, skipped, results });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

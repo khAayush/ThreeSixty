@@ -8,7 +8,6 @@ const NotFoundPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center">
-        {/* Animated Icon Container */}
         <div className="relative mb-8 flex justify-center">
           <div className="absolute inset-0 bg-brand/10 blur-3xl rounded-full scale-150"></div>
           <div className="relative bg-white p-6 rounded-3xl shadow-xl shadow-brand/10 border border-slate-100">

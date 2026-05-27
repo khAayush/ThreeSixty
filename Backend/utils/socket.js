@@ -15,7 +15,6 @@ export const initSocket = (httpServer) => {
     },
   });
 
-  // ---------- Auth middleware ----------
   io.use(async (socket, next) => {
     try {
       const token =
@@ -28,7 +27,7 @@ export const initSocket = (httpServer) => {
       const user = await User.findById(decoded.id).select("-password");
       if (!user) return next(new Error("User not found"));
 
-      socket.user = user; // attach user to socket
+      socket.user = user;
       next();
     } catch {
       next(new Error("Invalid token"));
@@ -40,10 +39,8 @@ export const initSocket = (httpServer) => {
   io.on("connection", (socket) => {
     const userId = socket.user._id.toString();
 
-    // Each user joins their own personal room
     socket.join(userId);
 
-    // ---------- Send message ----------
     socket.on("message:send", async ({ receiverId, content, tempId, type }) => {
       const msgType = type === "image" ? "image" : "text";
       if (!receiverId) return;
@@ -53,7 +50,6 @@ export const initSocket = (httpServer) => {
       try {
         const rawContent = msgType === "text" ? content.trim() : content;
 
-        // Save to DB (encrypted)
         const message = await Message.create({
           sender: userId,
           receiver: receiverId,
@@ -64,13 +60,9 @@ export const initSocket = (httpServer) => {
 
         const msgObj = { ...message.toObject(), content: rawContent };
 
-        // Confirm to sender (reconcile optimistic UI via tempId)
         socket.emit("message:sent", { ...msgObj, tempId });
-
-        // Deliver to receiver
         io.to(receiverId).emit("message:new", msgObj);
 
-        // Mark delivered after emitting
         await Message.findByIdAndUpdate(message._id, { status: "delivered" });
         const deliveredPayload = { messageId: message._id, status: "delivered" };
         io.to(userId).emit("message:status", deliveredPayload);
@@ -81,12 +73,10 @@ export const initSocket = (httpServer) => {
       }
     });
 
-    // ---------- Seen ----------
     socket.on("message:seen", async ({ messageIds }) => {
       if (!Array.isArray(messageIds) || !messageIds.length) return;
 
       try {
-        // Only update messages where this socket's user is the receiver
         const messages = await Message.find({
           _id: { $in: messageIds },
           receiver: userId,
@@ -98,7 +88,6 @@ export const initSocket = (httpServer) => {
 
         await Message.updateMany({ _id: { $in: ids } }, { status: "seen" });
 
-        // Notify both parties for each message
         const senderIds = [...new Set(messages.map((m) => m.sender.toString()))];
         for (const id of ids) {
           const payload = { messageId: id, status: "seen" };
@@ -110,7 +99,6 @@ export const initSocket = (httpServer) => {
       }
     });
 
-    // ---------- Typing ----------
     socket.on("typing", ({ toUserId }) => {
       io.to(toUserId).emit("typing", { fromUserId: userId });
     });
@@ -119,7 +107,6 @@ export const initSocket = (httpServer) => {
       io.to(toUserId).emit("stopTyping", { fromUserId: userId });
     });
 
-    // ---------- Edit ----------
     socket.on("message:edit", async ({ messageId, newContent }) => {
       if (!newContent?.trim()) return;
 
@@ -140,7 +127,6 @@ export const initSocket = (httpServer) => {
       }
     });
 
-    // ---------- Delete ----------
     socket.on("message:delete", async ({ messageId }) => {
       try {
         const message = await Message.findOne({ _id: messageId, sender: userId });

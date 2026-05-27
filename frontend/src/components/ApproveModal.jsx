@@ -4,14 +4,6 @@ import { XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-/**
- * Modal for approving an asset request.
- * Props:
- *   assignment  – the full assignment object (populated)
- *   authHeaders – { Authorization, Content-Type }
- *   onClose     – close without action
- *   onApproved  – called after a successful approval
- */
 const ApproveModal = ({ assignment, authHeaders, onClose, onApproved }) => {
   const a = assignment;
   const [assets, setAssets] = useState([]);
@@ -70,7 +62,6 @@ const ApproveModal = ({ assignment, authHeaders, onClose, onApproved }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
 
-        {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-slate-100">
           <div>
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Approve Request</p>
@@ -82,13 +73,11 @@ const ApproveModal = ({ assignment, authHeaders, onClose, onApproved }) => {
         </div>
 
         <div className="p-6 space-y-4">
-          {/* Employee info */}
           <div className="p-3 bg-slate-50 rounded-xl text-sm text-slate-500">
             Requested by{" "}
             <span className="font-semibold text-slate-700">{a.requestedBy?.name}</span>
           </div>
 
-          {/* Asset picker */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
               Assign Asset
@@ -113,7 +102,6 @@ const ApproveModal = ({ assignment, authHeaders, onClose, onApproved }) => {
             )}
           </div>
 
-          {/* Admin note (optional) */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
               Note <span className="normal-case font-normal text-slate-400">(optional)</span>
@@ -128,7 +116,6 @@ const ApproveModal = ({ assignment, authHeaders, onClose, onApproved }) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-6 pb-5">
           <button
             onClick={onClose}
