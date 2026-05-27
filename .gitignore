@@ -5,6 +5,8 @@ node_modules/
 .env
 .env.local
 .env.*.local
+# .env.example should be committed — it contains no real secrets
+!.env.example
 
 # Logs
 logs/

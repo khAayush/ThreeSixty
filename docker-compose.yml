@@ -1,0 +1,74 @@
+services:
+  # ─── MongoDB ────────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: threesixty-mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - threesixty_net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─── Backend (Node.js / Express) ────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: threesixty-backend
+    restart: always
+    env_file: .env
+    environment:
+      NODE_ENV: production
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - threesixty_net
+    # Port 5000 is intentionally NOT exposed externally.
+    # All traffic is routed through the Nginx frontend container.
+    # To expose for debugging: uncomment the next two lines.
+    # ports:
+    #   - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  # ─── Frontend (React → Nginx) ────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # These are baked into the React bundle at build time.
+        # Change them by editing .env and rebuilding: docker compose up --build -d
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID}
+    container_name: threesixty-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - threesixty_net
+
+# ─── Networking ─────────────────────────────────────────────────────────────
+networks:
+  threesixty_net:
+    driver: bridge
+
+# ─── Persistent Volumes ─────────────────────────────────────────────────────
+volumes:
+  mongo_data:
+    # Data persists across container restarts and rebuilds.
+    # To wipe the database: docker compose down -v

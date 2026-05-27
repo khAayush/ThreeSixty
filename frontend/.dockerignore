@@ -1,0 +1,18 @@
+# frontend/.dockerignore — build context: ./frontend
+
+# Reinstalled inside the container
+node_modules/
+
+# Previous build output (will be regenerated)
+dist/
+
+# Env files — VITE_* vars are injected as build args, not file copies
+.env
+.env.*
+!.env.example
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
