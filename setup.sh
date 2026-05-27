@@ -112,7 +112,7 @@ run_setup() {
 
   # Run interactively — TTY is inherited from this terminal session.
   # If the manager account already exists, setup.js will ask if you want to update it.
-  $COMPOSE exec backend node backend/scripts/setup.js
+  $COMPOSE exec backend node scripts/setup.js
 
   echo ""
   success "Setup wizard complete"
@@ -138,7 +138,7 @@ print_summary() {
   echo -e "    View logs:      ${COMPOSE} logs -f"
   echo -e "    Stop:           ${COMPOSE} down"
   echo -e "    Restart:        ${COMPOSE} restart"
-  echo -e "    Re-run setup:   ${COMPOSE} exec backend node backend/scripts/setup.js"
+  echo -e "    Re-run setup:   ${COMPOSE} exec backend node scripts/setup.js"
   echo -e "    Update app:     git pull && ${COMPOSE} up --build -d"
   echo ""
 }

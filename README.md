@@ -33,7 +33,7 @@ The script will:
 1. Verify Docker is installed
 2. Build all three containers (MongoDB, backend, frontend/Nginx)
 3. Wait for all services to be healthy
-4. Run the interactive setup wizard (`backend/scripts/setup.js`) — you will configure your organisation name, brand colour, allowed Google login domains, and create the manager (super-admin) account
+4. Run the interactive setup wizard (`backend/scripts/setup.js` → runs as `scripts/setup.js` inside the container) — you will configure your organisation name, brand colour, allowed Google login domains, and create the manager (super-admin) account
 5. Print your application URL
 
 That's it. The app is live.
@@ -171,7 +171,7 @@ docker compose up --build -d
 You can re-run the interactive setup wizard at any time to update organisation settings or the manager account:
 
 ```bash
-docker compose exec backend node backend/scripts/setup.js
+docker compose exec backend node scripts/setup.js
 ```
 
 ---
@@ -282,7 +282,7 @@ docker compose restart backend
 ### Re-run setup after containers are already running
 
 ```bash
-docker compose exec backend node backend/scripts/setup.js
+docker compose exec backend node scripts/setup.js
 ```
 
 ### Full reset (wipes all data)

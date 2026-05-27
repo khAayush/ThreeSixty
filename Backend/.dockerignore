@@ -1,0 +1,15 @@
+# backend/.dockerignore — build context: ./backend
+# Docker uses this file when building with context: ./backend
+
+# Reinstalled inside the container via npm ci
+node_modules/
+
+# Never bake secrets into the image
+.env
+.env.*
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
