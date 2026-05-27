@@ -1,6 +1,6 @@
 # ThreeSixty
 
-A self-hosted, production-ready asset management platform built with the MERN stack.
+A self-hosted Inventory Management Platform built with the MERN stack.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ A self-hosted, production-ready asset management platform built with the MERN st
 ### 1. Clone and configure
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/khAayush/ThreeSixty.git
 cd ThreeSixty
 
 cp .env.example .env
