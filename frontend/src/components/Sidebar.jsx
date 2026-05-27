@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router'; // Using your current import
+import { NavLink, Link } from 'react-router';
 import {
   Squares2X2Icon, CubeIcon, ClipboardDocumentCheckIcon,
   TicketIcon, MagnifyingGlassIcon, ChatBubbleLeftEllipsisIcon,
@@ -73,14 +73,17 @@ const Sidebar = ({ isOpen, onClose }) => {
         
         {/* Brand Logo & Mobile Close Button */}
         <div className="flex items-center justify-between mb-10 px-2 py-2">
-          <div className="flex items-center space-x-3">
+          <Link
+            to={userRole === "employee" ? "/employee-dashboard" : "/admin-dashboard"}
+            className="flex items-center space-x-3"
+          >
             <div className="bg-brand p-2 rounded-xl shadow-lg shadow-brand/20">
               <Squares2X2Icon className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-xl font-bold text-slate-800 tracking-tight italic">
               Three<span className="text-brand">Sixty</span>
             </h1>
-          </div>
+          </Link>
           
           <button onClick={onClose} className="lg:hidden p-1 text-slate-400 hover:bg-slate-100 rounded-lg transition-colors">
             <XMarkIcon className="w-6 h-6" />

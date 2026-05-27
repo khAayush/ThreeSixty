@@ -38,7 +38,7 @@ const Modal = ({ isOpen, onClose, title, subtitle, children, submitText, isDisab
             disabled={isDisabled}
             onClick={onSubmit}
             className={`px-6 py-2.5 text-sm font-bold text-white rounded-xl transition-all shadow-md 
-              ${isDisabled ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#ff6b00] hover:brightness-110 shadow-orange-500/20'}`}
+              ${isDisabled ? 'bg-slate-300 cursor-not-allowed' : 'bg-brand hover:brightness-110 shadow-brand/20'}`}
           >
             {submitText}
           </button>
@@ -256,7 +256,7 @@ const EmployeeLostFound = ({ onLogout }) => {
           </button>
           <button
             onClick={() => setIsFoundModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#ff6b00] text-white rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-md shadow-orange-500/20"
+            className="flex items-center gap-2 px-5 py-2.5 bg-brand text-white rounded-xl text-sm font-bold hover:brightness-110 transition-all shadow-md shadow-brand/20"
           >
             <PlusIcon className="w-5 h-5 stroke-2" />
             Report Found Item
