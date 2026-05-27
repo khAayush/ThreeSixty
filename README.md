@@ -1,6 +1,6 @@
 # ThreeSixty
 
-A self-hosted, production-ready asset management platform built with the MERN stack.
+A self-hosted Inventory Management Platform built with the MERN stack.
 
 ## Requirements
 
