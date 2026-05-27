@@ -1,13 +1,18 @@
 services:
-  # ─── MongoDB ────────────────────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
+  # MongoDB
+  # ─────────────────────────────────────────────────────────────
   mongo:
     image: mongo:7
     container_name: threesixty-mongo
     restart: always
+
     volumes:
       - mongo_data:/data/db
+
     networks:
       - threesixty_net
+
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
       interval: 10s
@@ -15,60 +20,77 @@ services:
       retries: 5
       start_period: 30s
 
-  # ─── Backend (Node.js / Express) ────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
+  # Backend (Node.js / Express / Socket.IO)
+  # ─────────────────────────────────────────────────────────────
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./Backend
+      dockerfile: Dockerfile
+
     container_name: threesixty-backend
+
     restart: always
-    env_file: .env
+
+    env_file:
+      - .env
+
     environment:
       NODE_ENV: production
+
     depends_on:
       mongo:
         condition: service_healthy
+
     networks:
       - threesixty_net
-    # Port 5000 is intentionally NOT exposed externally.
-    # All traffic is routed through the Nginx frontend container.
-    # To expose for debugging: uncomment the next two lines.
+
+    # Uncomment ONLY if you want direct backend access
     # ports:
     #   - "5000:5000"
+
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:5000/"]
       interval: 10s
       timeout: 5s
       retries: 6
-      start_period: 15s
+      start_period: 20s
 
-  # ─── Frontend (React → Nginx) ────────────────────────────────────────────────
+  # ─────────────────────────────────────────────────────────────
+  # Frontend (React + Vite + Nginx)
+  # ─────────────────────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+
       args:
-        # These are baked into the React bundle at build time.
-        # Change them by editing .env and rebuilding: docker compose up --build -d
         VITE_API_URL: ${VITE_API_URL}
         VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID}
+
     container_name: threesixty-frontend
+
     restart: always
+
     ports:
       - "80:80"
+
     depends_on:
       backend:
         condition: service_healthy
+
     networks:
       - threesixty_net
 
-# ─── Networking ─────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+# Networks
+# ─────────────────────────────────────────────────────────────
 networks:
   threesixty_net:
     driver: bridge
 
-# ─── Persistent Volumes ─────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+# Persistent Volumes
+# ─────────────────────────────────────────────────────────────
 volumes:
   mongo_data:
-    # Data persists across container restarts and rebuilds.
-    # To wipe the database: docker compose down -v
