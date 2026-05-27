@@ -153,7 +153,7 @@ const MessageWindow = ({ currentUser, activeUser, onBack }) => {
         </button>
 
         {displayImg ? (
-          <img src={displayImg} alt={displayName} className="w-9 h-9 rounded-full object-cover shrink-0" />
+          <img src={displayImg} alt={displayName} referrerPolicy="no-referrer" className="w-9 h-9 rounded-full object-cover shrink-0" />
         ) : (
           <div className="w-9 h-9 rounded-full bg-brand/10 text-brand text-sm font-semibold flex items-center justify-center shrink-0">
             {getInitials(displayName)}

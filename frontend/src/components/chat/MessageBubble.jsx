@@ -119,6 +119,7 @@ const MessageBubble = ({ message, currentUser, activeUser, isLastInGroup = false
             <img
               src={activeUser.profileImage}
               alt={activeUser.name || ""}
+              referrerPolicy="no-referrer"
               className="w-7 h-7 rounded-full object-cover shrink-0"
             />
           ) : (

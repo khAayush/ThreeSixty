@@ -90,6 +90,7 @@ const ConversationList = ({ currentUser, onSelect }) => {
                       <img
                         src={u.profileImage}
                         alt={u.name || ""}
+                        referrerPolicy="no-referrer"
                         className="w-9 h-9 rounded-full object-cover shrink-0"
                       />
                     ) : (

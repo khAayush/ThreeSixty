@@ -170,6 +170,7 @@ const Header = ({
                 <img
                   src={userImage}
                   alt={userName}
+                  referrerPolicy="no-referrer"
                   className="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover shadow-md shadow-brand/20 ring-2 ring-transparent group-hover:ring-brand/30 transition-all"
                   onError={(e) => {
                     e.target.style.display = "none";

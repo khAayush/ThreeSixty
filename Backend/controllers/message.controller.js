@@ -1,5 +1,6 @@
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
+import { decrypt } from "../utils/encryption.js";
 
 // GET /api/conversations
 export const getConversations = async (req, res) => {
@@ -42,11 +43,12 @@ export const getConversations = async (req, res) => {
 
     const conversations = users.map((user) => {
       const data = partnerMap.get(user._id.toString());
+      const lm = data.lastMessage;
       return {
         userId: user._id,
         name: user.name,
         profileImage: user.profileImage,
-        lastMessage: data.lastMessage,
+        lastMessage: { ...lm, content: decrypt(lm.content) },
         unreadCount: data.unreadCount,
       };
     });
@@ -81,7 +83,7 @@ export const getMessages = async (req, res) => {
       .limit(limit)
       .lean();
 
-    res.json(messages);
+    res.json(messages.map((m) => ({ ...m, content: decrypt(m.content) })));
   } catch (err) {
     res.status(500).json({ message: "Failed to load messages" });
   }

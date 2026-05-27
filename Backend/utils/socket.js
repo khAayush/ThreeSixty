@@ -2,6 +2,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
+import { encrypt, decrypt } from "./encryption.js";
 
 let _io = null;
 export const getIO = () => _io;
@@ -50,16 +51,18 @@ export const initSocket = (httpServer) => {
       if (msgType === "image" && !content) return;
 
       try {
-        // Save to DB
+        const rawContent = msgType === "text" ? content.trim() : content;
+
+        // Save to DB (encrypted)
         const message = await Message.create({
           sender: userId,
           receiver: receiverId,
-          content: msgType === "text" ? content.trim() : content,
+          content: encrypt(rawContent),
           type: msgType,
           status: "sent",
         });
 
-        const msgObj = message.toObject();
+        const msgObj = { ...message.toObject(), content: rawContent };
 
         // Confirm to sender (reconcile optimistic UI via tempId)
         socket.emit("message:sent", { ...msgObj, tempId });
@@ -124,11 +127,12 @@ export const initSocket = (httpServer) => {
         const message = await Message.findOne({ _id: messageId, sender: userId, deleted: false });
         if (!message) return socket.emit("message:error", { error: "Cannot edit this message" });
 
-        message.content = newContent.trim();
+        const rawEdit = newContent.trim();
+        message.content = encrypt(rawEdit);
         message.edited = true;
         await message.save();
 
-        const updated = message.toObject();
+        const updated = { ...message.toObject(), content: rawEdit };
         io.to(userId).emit("message:updated", updated);
         io.to(message.receiver.toString()).emit("message:updated", updated);
       } catch {
@@ -142,11 +146,12 @@ export const initSocket = (httpServer) => {
         const message = await Message.findOne({ _id: messageId, sender: userId });
         if (!message) return socket.emit("message:error", { error: "Cannot delete this message" });
 
+        const deletedText = "This message was deleted";
         message.deleted = true;
-        message.content = "This message was deleted";
+        message.content = encrypt(deletedText);
         await message.save();
 
-        const updated = message.toObject();
+        const updated = { ...message.toObject(), content: deletedText };
         io.to(userId).emit("message:updated", updated);
         io.to(message.receiver.toString()).emit("message:updated", updated);
       } catch {

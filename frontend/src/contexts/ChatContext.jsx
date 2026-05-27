@@ -18,6 +18,12 @@ export const ChatProvider = ({ currentUser, children }) => {
   const [messages, setMessages] = useState({});
   const [typing, setTyping] = useState({});
   const typingTimers = useRef({});
+  const conversationsRef = useRef([]);
+
+  // Keep ref in sync so socket handlers always see latest conversations
+  useEffect(() => {
+    conversationsRef.current = conversations;
+  }, [conversations]);
 
   // Init socket - re-runs whenever the logged-in user changes
   useEffect(() => {
@@ -71,17 +77,22 @@ export const ChatProvider = ({ currentUser, children }) => {
         ...prev,
         [partnerId]: [...(prev[partnerId] || []), msg],
       }));
-      setConversations((prev) => {
-        const exists = prev.find((c) => c.userId.toString() === partnerId);
-        if (exists) {
-          return prev.map((c) =>
+
+      const exists = conversationsRef.current.find(
+        (c) => c.userId.toString() === partnerId,
+      );
+      if (exists) {
+        setConversations((prev) =>
+          prev.map((c) =>
             c.userId.toString() === partnerId
-              ? { ...c, lastMessage: msg, unreadCount: c.unreadCount + 1 }
+              ? { ...c, lastMessage: msg, unreadCount: (c.unreadCount || 0) + 1 }
               : c,
-          );
-        }
-        return prev;
-      });
+          ),
+        );
+      } else {
+        // New conversation — reload from server to get sender profile info
+        loadConversations();
+      }
     });
 
     // Status update (delivered / seen)
@@ -159,6 +170,11 @@ export const ChatProvider = ({ currentUser, children }) => {
     }
   }, []);
 
+  // Load conversations on login so the sidebar badge is populated on all pages
+  useEffect(() => {
+    if (currentUser?._id) loadConversations();
+  }, [currentUser?._id, loadConversations]);
+
   const loadMessages = useCallback(async (userId) => {
     try {
       const res = await fetch(
@@ -191,7 +207,7 @@ export const ChatProvider = ({ currentUser, children }) => {
 
   const sendMessage = useCallback(
     (receiverId, content, type = "text") => {
-      const tempId = `temp_${Date.now()}`;
+      const tempId = `temp_${crypto.randomUUID()}`;
       const optimistic = {
         _id: tempId,
         tempId,

@@ -200,7 +200,7 @@ const EmployeeTicketsPage = ({ onLogout }) => {
                       >
                         <div className="w-10 h-10 rounded-full bg-slate-500 text-white flex items-center justify-center text-sm font-semibold shrink-0 shadow-inner overflow-hidden">
                           {ticket.userImage ? (
-                            <img src={ticket.userImage} alt={ticket.userName} className="w-full h-full object-cover" />
+                            <img src={ticket.userImage} alt={ticket.userName} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                           ) : (
                             getInitials(ticket.userName)
                           )}
@@ -241,7 +241,7 @@ const EmployeeTicketsPage = ({ onLogout }) => {
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 rounded-full bg-slate-500 text-white flex items-center justify-center text-lg font-semibold shadow-inner shrink-0 overflow-hidden">
                         {selectedTicket.userImage ? (
-                          <img src={selectedTicket.userImage} alt={selectedTicket.userName} className="w-full h-full object-cover" />
+                          <img src={selectedTicket.userImage} alt={selectedTicket.userName} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                         ) : (
                           getInitials(selectedTicket.userName)
                         )}

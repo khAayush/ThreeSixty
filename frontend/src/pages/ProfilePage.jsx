@@ -164,6 +164,7 @@ const ProfilePage = ({ onLogout }) => {
                   <img
                     src={userImage}
                     alt={userName}
+                    referrerPolicy="no-referrer"
                     className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-xl ring-1 ring-slate-100"
                     onError={(e) => {
                       e.target.style.display = "none";

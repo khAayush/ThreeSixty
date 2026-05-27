@@ -612,6 +612,7 @@ const UsersPage = ({ onLogout }) => {
                                     <img
                                       src={user.profileImage}
                                       alt={`${user.name}'s profile`}
+                                      referrerPolicy="no-referrer"
                                       className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-sm"
                                     />
                                   ) : (
@@ -719,6 +720,7 @@ const UsersPage = ({ onLogout }) => {
                       <img
                         src={user.profileImage}
                         alt={user.name}
+                        referrerPolicy="no-referrer"
                         className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
@@ -1110,6 +1112,7 @@ const UserDetailModal = ({ user, token, onClose }) => {
               <img
                 src={user.profileImage}
                 alt={user.name}
+                referrerPolicy="no-referrer"
                 className="w-14 h-14 rounded-full object-cover border border-slate-200 shadow-sm"
               />
             ) : (
